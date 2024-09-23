@@ -20,6 +20,7 @@ function Registration() {
       <div>
         <label className="px-2">Username</label>
         <input
+          className="input bg-primary"
           type="text"
           onChange={e => {
             // TODO: Validate username length < 32 char/bytes
@@ -29,7 +30,7 @@ function Registration() {
       </div>
       <div className="py-5">
         <button
-          className="btn"
+          className="btn btn-primary"
           onClick={async () => {
             if (username === undefined || username === null) {
               // TODO: Get toasty
