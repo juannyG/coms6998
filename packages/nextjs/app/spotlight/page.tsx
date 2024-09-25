@@ -6,8 +6,7 @@ import { useAccount } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 
-function Registration() {
-  const { address: connectedAddress } = useAccount();
+function Registration({ connectedAddress }: { connectedAddress: string }) {
   const [username, setUsername] = useState<string | null>(null);
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
 
@@ -56,22 +55,35 @@ function Registration() {
   );
 }
 
-function CheckIn() {
-  const { address: connectedAddress } = useAccount();
-  const { data: username, error: err } = useScaffoldReadContract({
+function Welcome({ connectedAddress }: { connectedAddress: string }) {
+  const { data: username } = useScaffoldReadContract({
     contractName: "Spotlight",
     functionName: "getProfile",
+    args: [connectedAddress],
+  });
+
+  if (username === undefined) {
+    return null;
+  }
+  return <>Welcome {username}!</>;
+}
+
+function CheckIn() {
+  const { address: connectedAddress } = useAccount();
+  const { data: isRegistered } = useScaffoldReadContract({
+    contractName: "Spotlight",
+    functionName: "isRegistered",
     args: [connectedAddress],
   });
 
   if (connectedAddress === undefined) {
     return <>Awaiting wallet connection...</>;
   }
-  if (err) {
-    return <Registration />;
+  if (isRegistered === false) {
+    return <Registration connectedAddress={connectedAddress} />;
   }
-  if (username) {
-    return <>Welcome {username}!</>;
+  if (isRegistered === true) {
+    return <Welcome connectedAddress={connectedAddress} />;
   }
   return <>Checking registration status...</>;
 }

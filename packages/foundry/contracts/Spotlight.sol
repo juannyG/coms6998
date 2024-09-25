@@ -30,6 +30,13 @@ contract Spotlight {
         profiles.push(Profile({username: _username}));
     }
 
+    function isRegistered(address a) public view returns (bool) {
+        if (profile_idx_map[a] == 0) {
+            return false;
+        }
+        return true;
+    }
+
     function getProfile(address a) public view returns (string memory) {
         // Make sure they do exist
         require(profile_idx_map[a] > 0);
