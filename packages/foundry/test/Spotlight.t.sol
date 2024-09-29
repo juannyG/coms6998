@@ -27,4 +27,26 @@ contract SpotlightTest is Test {
 
     assertEq("newUser", spotlight.getProfile(newUser));
   }
+
+  function testCannotRegisterEmptyUsername() public {
+      vm.expectRevert();
+      spotlight.registerProfile("");
+  }
+
+  function testCannotRegisterUsernameMoreThan32bytes() public {
+      // NOTE: bytes vs chars is important distinction...
+      vm.expectRevert();
+      spotlight.registerProfile("abcdefghijklmnopqrstuvwxyz-abcdefg");
+  }
+
+  function testCannotRegisterIfUsernameAlreadyExists_CaseInsensitive() public {
+      address first_u = vm.addr(1);
+      vm.prank(first_u);
+      spotlight.registerProfile("userNAME1");
+
+      address second_u = vm.addr(2);
+      vm.prank(second_u);
+      vm.expectRevert();
+      spotlight.registerProfile("USERname1");
+  }
 }

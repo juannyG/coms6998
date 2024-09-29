@@ -14,6 +14,7 @@ contract Spotlight {
 
     Profile[] profiles;
     mapping(address => uint256) profile_idx_map;
+    mapping(bytes32 => bool) normalized_username_hashes;
 
     constructor(address _owner) {
         owner = _owner;
@@ -26,20 +27,41 @@ contract Spotlight {
     function registerProfile(string memory _username) public {
         // Make sure they don't exist
         require(profile_idx_map[msg.sender] == 0);
+        require(bytes(_username).length > 0);
+        require(bytes(_username).length < 32);
+
+        string memory lowercase_username = toLower(_username);
+        bytes32 hash = keccak256(abi.encodePacked(lowercase_username));
+        require(normalized_username_hashes[hash] == false);
+
+        normalized_username_hashes[hash] = true;
         profile_idx_map[msg.sender] = profiles.length;
         profiles.push(Profile({username: _username}));
     }
 
-    function isRegistered(address a) public view returns (bool) {
-        if (profile_idx_map[a] == 0) {
-            return false;
+    function toLower(string memory _s) private pure returns (string memory) {
+        // Create new bytes so we don't modify memory reference of _s
+        bytes memory orig_s = bytes(_s);
+        bytes memory new_s = new bytes(orig_s.length);
+
+        for (uint8 i = 0; i < orig_s.length; i++) {
+            new_s[i] = orig_s[i];
+
+            // If A <= s[i] <= Z
+            if (uint8(orig_s[i]) >= 65 && uint8(orig_s[i]) <= 90) {
+                new_s[i] = bytes1(uint8(orig_s[i]) + 32);
+            }
         }
-        return true;
+        return string(new_s);
+    }
+
+    function isRegistered(address a) public view returns (bool) {
+        return profile_idx_map[a] != 0;
     }
 
     function getProfile(address a) public view returns (string memory) {
         // Make sure they do exist
         require(profile_idx_map[a] > 0);
-        return profiles[profile_idx_map[a]].username;
+        return profiles[profile_idx_map[a]].username; // TODO: return Profile object
     }
 }
