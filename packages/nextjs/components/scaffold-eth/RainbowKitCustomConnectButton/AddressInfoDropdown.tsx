@@ -13,7 +13,8 @@ import {
   DocumentDuplicateIcon,
   QrCodeIcon,
 } from "@heroicons/react/24/outline";
-import { BlockieAvatar, isENS } from "~~/components/scaffold-eth";
+import { Address as AddressEth } from "~~/components/scaffold-eth";
+// import { BlockieAvatar, isENS } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 import { getTargetNetworks } from "~~/utils/scaffold-eth";
 
@@ -22,14 +23,14 @@ const allowedNetworks = getTargetNetworks();
 type AddressInfoDropdownProps = {
   address: Address;
   blockExplorerAddressLink: string | undefined;
-  displayName: string;
-  ensAvatar?: string;
+  // displayName: string;
+  // ensAvatar?: string;
 };
 
 export const AddressInfoDropdown = ({
   address,
-  ensAvatar,
-  displayName,
+  // ensAvatar,
+  // displayName,
   blockExplorerAddressLink,
 }: AddressInfoDropdownProps) => {
   const { disconnect } = useDisconnect();
@@ -49,10 +50,7 @@ export const AddressInfoDropdown = ({
     <>
       <details ref={dropdownRef} className="dropdown dropdown-end leading-3">
         <summary tabIndex={0} className="btn btn-secondary btn-sm pl-0 pr-2 shadow-md dropdown-toggle gap-0 !h-auto">
-          <BlockieAvatar address={checkSumAddress} size={30} ensImage={ensAvatar} />
-          <span className="ml-2 mr-1">
-            {isENS(displayName) ? displayName : checkSumAddress?.slice(0, 6) + "..." + checkSumAddress?.slice(-4)}
-          </span>
+          <AddressEth address={checkSumAddress} format="short" disableAddressLink={true} />
           <ChevronDownIcon className="h-6 w-4 ml-2 sm:ml-0" />
         </summary>
         <ul

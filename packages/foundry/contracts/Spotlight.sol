@@ -10,6 +10,9 @@ contract Spotlight {
     struct Profile {
         // TODO: avatar img?
         string username; // TODO: validate 32 byte len for EVM packing
+        string bio;
+        string location;
+        uint8 age;
     }
 
     Profile[] profiles;
@@ -20,23 +23,29 @@ contract Spotlight {
         owner = _owner;
 
         // push an empty profile into the 0 position - no one can every occupy this
-        profiles.push(Profile({username: ""}));
+        profiles.push(Profile({username: "", bio: "", location: "", age: 0}));
         profile_idx_map[address(0)] = 0;
     }
-
-    function registerProfile(string memory _username) public {
+    
+    function registerProfile(string memory _username, string memory _bio, string memory _location, uint8 _age) public {
         // Make sure they don't exist
         require(profile_idx_map[msg.sender] == 0);
+
+        // Integrity Check
         require(bytes(_username).length > 0);
         require(bytes(_username).length < 32);
-
+        // require(bytes(_bio).length < 512);
+        // require(bytes(_location).length < 256);
+        // require(_age > 0);
+        // require(_age < 150);
+        
         string memory lowercase_username = toLower(_username);
         bytes32 hash = keccak256(abi.encodePacked(lowercase_username));
         require(normalized_username_hashes[hash] == false);
 
         normalized_username_hashes[hash] = true;
         profile_idx_map[msg.sender] = profiles.length;
-        profiles.push(Profile({username: _username}));
+        profiles.push(Profile({username: _username, bio: _bio, location: _location, age: _age}));
     }
 
     function toLower(string memory _s) private pure returns (string memory) {
@@ -59,9 +68,9 @@ contract Spotlight {
         return profile_idx_map[a] != 0;
     }
 
-    function getProfile(address a) public view returns (string memory) {
+    function getProfile(address a) public view returns (Profile memory) {
         // Make sure they do exist
         require(profile_idx_map[a] > 0);
-        return profiles[profile_idx_map[a]].username; // TODO: return Profile object
+        return profiles[profile_idx_map[a]]; // TODO: return Profile object
     }
 }

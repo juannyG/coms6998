@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0x0165878a594ca255338adfa4d48449f69242eb8f",
+      address: "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
       abi: [
         {
           type: "constructor",
@@ -33,8 +33,30 @@ const deployedContracts = {
           outputs: [
             {
               name: "",
-              type: "string",
-              internalType: "string",
+              type: "tuple",
+              internalType: "struct Spotlight.Profile",
+              components: [
+                {
+                  name: "username",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "bio",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "location",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "age",
+                  type: "uint8",
+                  internalType: "uint8",
+                },
+              ],
             },
           ],
           stateMutability: "view",
@@ -79,6 +101,21 @@ const deployedContracts = {
               name: "_username",
               type: "string",
               internalType: "string",
+            },
+            {
+              name: "_bio",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "_location",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "_age",
+              type: "uint8",
+              internalType: "uint8",
             },
           ],
           outputs: [],

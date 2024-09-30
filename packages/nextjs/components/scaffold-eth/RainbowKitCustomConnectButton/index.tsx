@@ -44,15 +44,15 @@ export const RainbowKitCustomConnectButton = () => {
               return (
                 <>
                   <div className="flex flex-col items-center mr-1">
-                    <Balance address={account.address as Address} className="min-h-0 h-auto" />
+                    <Balance address={account.address as Address} className="min-h-0 h-auto text-3xl" />
                     <span className="text-xs" style={{ color: networkColor }}>
                       {chain.name}
                     </span>
                   </div>
                   <AddressInfoDropdown
                     address={account.address as Address}
-                    displayName={account.displayName}
-                    ensAvatar={account.ensAvatar}
+                    // displayName={account.displayName}
+                    // ensAvatar={account.ensAvatar}
                     blockExplorerAddressLink={blockExplorerAddressLink}
                   />
                   <AddressQRCodeModal address={account.address as Address} modalId="qrcode-modal" />

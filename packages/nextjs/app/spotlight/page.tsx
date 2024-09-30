@@ -7,7 +7,10 @@ import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadCo
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 
 function Registration({ connectedAddress }: { connectedAddress: string }) {
-  const [username, setUsername] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>("");
+  const [bio, setBio] = useState<string>("");
+  const [location, setLocation] = useState<string>("");
+  const [age, setAge] = useState<number>(0);
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
 
   if (connectedAddress === undefined) {
@@ -16,16 +19,48 @@ function Registration({ connectedAddress }: { connectedAddress: string }) {
 
   return (
     <div>
-      <div>
-        <label className="px-2">Username</label>
-        <input
-          className="input bg-primary"
-          type="text"
-          onChange={e => {
-            // TODO: Validate username length < 32 char/bytes
-            setUsername(e.target.value);
-          }}
-        />
+      <div className="flex flex-col">
+        <div className="flex items-center">
+          <label className="px-2 w-1/3 text-right pr-4">Username</label>
+          <input
+            className="input bg-primary"
+            type="text"
+            onChange={e => {
+              // TODO: Validate username length < 32 char/bytes
+              setUsername(e.target.value);
+            }}
+          />
+        </div>
+        <div className="flex items-center mt-4">
+          <label className="px-2 w-1/3 text-right pr-4">Bio</label>
+          <input
+            className="input bg-primary"
+            type="text"
+            onChange={e => {
+              setBio(e.target.value);
+            }}
+          />
+        </div>
+        <div className="flex items-center mt-4">
+          <label className="px-2 w-1/3 text-right pr-4">Location</label>
+          <input
+            className="input bg-primary"
+            type="text"
+            onChange={e => {
+              setLocation(e.target.value);
+            }}
+          />
+        </div>
+        <div className="flex items-center my-4">
+          <label className="px-2 w-1/3 text-right pr-4">Age</label>
+          <input
+            className="input bg-primary"
+            type="number"
+            onChange={e => {
+              setAge(parseInt(e.target.value));
+            }}
+          />
+        </div>
       </div>
       <div className="py-5">
         <button
@@ -37,11 +72,11 @@ function Registration({ connectedAddress }: { connectedAddress: string }) {
               return;
             }
 
-            console.log(username);
             try {
+              console.log(username, bio, location, age);
               await writeSpotlightContractAsync({
                 functionName: "registerProfile",
-                args: [username],
+                args: [username, bio, location, age],
               });
             } catch (e) {
               console.log(e);
@@ -56,16 +91,27 @@ function Registration({ connectedAddress }: { connectedAddress: string }) {
 }
 
 function Welcome({ connectedAddress }: { connectedAddress: string }) {
-  const { data: username } = useScaffoldReadContract({
+  const { data: profile } = useScaffoldReadContract({
     contractName: "Spotlight",
     functionName: "getProfile",
     args: [connectedAddress],
   });
 
-  if (username === undefined) {
+  if (profile === undefined) {
     return null;
   }
-  return <>Welcome {username}!</>;
+  return (
+    <>
+      Welcome
+      <span style={{ color: "green" }} className="text-3xl">
+        {profile.username}{" "}
+      </span>
+      at
+      <span style={{ color: "green" }}>{connectedAddress.slice(0, 6) + "..." + connectedAddress.slice(-4)}</span>
+      BIO: {profile.bio}
+      Location: <span style={{ color: "purple" }}>{profile.location}</span>
+    </>
+  );
 }
 
 function CheckIn() {
