@@ -3,6 +3,7 @@ services:
     image: ghcr.io/foundry-rs/foundry:latest
     # Need to wrap command in quotes because found entrypoint is /bin/sh -c
     command: '"anvil --host 0.0.0.0"'
+    platform: linux/x86_64
     ports:
       - "8545:8545"
 
