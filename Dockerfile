@@ -8,9 +8,8 @@ RUN /root/.foundry/bin/foundryup
 COPY . .
 RUN yarn install
 
-# TODO: check if these are needed...
-#RUN git config --global --add safe.directory /app
-#RUN git submodule update --init --recursive
+RUN git config --global --add safe.directory /app
+RUN git submodule update --init --recursive
 
 ENV PATH $PATH:/root/.foundry/bin
 
