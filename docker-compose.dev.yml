@@ -1,0 +1,59 @@
+services:
+  scaffold-eth:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    platform: linux/x86_64
+    ports:
+      - "3000:3000"  # Next.js application
+      - "8545:8545"  # Local blockchain (Anvil)
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - .:/app  # Mount the current directory into the container
+      - /app/node_modules  # Prevent node_modules from being overwritten
+    entrypoint: ["/app/entrypoint.sh"]
+  
+#   ganache:
+#     image: trufflesuite/ganache-cli:latest
+#     ports:
+#       - "8545:8545"
+#     command: --deterministic --networkId 1337 --chainId 1337
+
+#   graph-node:
+#     image: graphprotocol/graph-node:latest
+#     ports:
+#       - "8000:8000"
+#       - "8001:8001"
+#       - "8020:8020"
+#     depends_on:
+#       - ipfs
+#       - postgres
+#     environment:
+#       postgres_host: postgres
+#       postgres_user: graph-node
+#       postgres_pass: let-me-in
+#       postgres_db: graph-node
+#       ipfs: 'ipfs:5001'
+#       ethereum: 'mainnet:http://ganache:8545'
+#       RUST_LOG: info
+
+#   ipfs:
+#     image: ipfs/go-ipfs:latest
+#     ports:
+#       - "5001:5001"
+
+#   postgres:
+#     image: postgres:13
+#     ports:
+#       - "5432:5432"
+#     command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
+#     environment:
+#       POSTGRES_USER: graph-node
+#       POSTGRES_PASSWORD: let-me-in
+#       POSTGRES_DB: graph-node
+#     volumes:
+#       - postgres-data:/var/lib/postgresql/data
+
+# volumes:
+#   postgres-data:

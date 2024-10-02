@@ -1,0 +1,49 @@
+# Build stage for Foundry
+FROM ghcr.io/foundry-rs/foundry:latest as foundry-builder
+
+WORKDIR /app
+
+# Copy Foundry files
+COPY foundry.toml .
+COPY src ./src
+COPY test ./test
+
+# Build Foundry project
+RUN forge build
+
+# Build stage for Next.js
+FROM node:18-alpine as nextjs-builder
+
+WORKDIR /app
+
+# Copy package.json and yarn.lock
+COPY package.json yarn.lock ./
+
+# Install dependencies
+RUN yarn install --frozen-lockfile
+
+# Copy Next.js files
+COPY next.config.js .
+COPY pages ./pages
+COPY public ./public
+COPY styles ./styles
+
+# Build Next.js app
+RUN yarn build
+
+# Production stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy built artifacts from previous stages
+COPY --from=foundry-builder /app/out ./out
+COPY --from=nextjs-builder /app/.next ./.next
+COPY --from=nextjs-builder /app/node_modules ./node_modules
+COPY --from=nextjs-builder /app/package.json ./package.json
+
+# Expose port
+EXPOSE 3000
+
+# Start the application
+CMD ["yarn", "start"]
