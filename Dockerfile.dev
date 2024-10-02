@@ -1,5 +1,5 @@
-# # Use Foundry image as base
-# FROM ghcr.io/foundry-rs/foundry:latest as foundry
+# Use Foundry image as base
+FROM ghcr.io/foundry-rs/foundry:latest AS foundry
 
 # # Use Node.js image for the main build
 FROM node:20-alpine
@@ -17,16 +17,22 @@ RUN apk update && apk add --no-cache git bash \
 # Set up work directory
 WORKDIR /app
 
-# Copy only package.json and yarn.lock for cache efficiency
-COPY package.json yarn.lock ./
+# # Copy only package.json and yarn.lock for cache efficiency
+# COPY package.json yarn.lock ./
 
-# Install dependencies
+COPY . .
+
+# # Install dependencies
 RUN yarn install
 
-# Ensure entrypoint script is executable
-RUN chmod +x /app/entrypoint.sh
+EXPOSE 3000
 
-# Expose ports for the app and local blockchain
-EXPOSE 3000 8545
+ENTRYPOINT [ "/app/entrypoint.sh" ]
+
+# # Ensure entrypoint script is executable
+# RUN chmod +x /app/entrypoint.sh
+
+# # Expose ports for the app and local blockchain
+# EXPOSE 3000 8545
 
 # No COPY . . here, as code will be mounted via docker-compose volumes

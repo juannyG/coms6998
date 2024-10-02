@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     platform: linux/x86_64
+    container_name: scaffold-eth
     ports:
       - "3000:3000"  # Next.js application
       - "8545:8545"  # Local blockchain (Anvil)
@@ -12,7 +13,7 @@ services:
     volumes:
       - .:/app  # Mount the current directory into the container
       - /app/node_modules  # Prevent node_modules from being overwritten
-    entrypoint: ["/app/entrypoint.sh"]
+    # entrypoint: ["/app/entrypoint.sh"]
   
 #   ganache:
 #     image: trufflesuite/ganache-cli:latest
