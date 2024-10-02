@@ -1,18 +1,11 @@
 # Setup
 
 ```sh
-$ git clone git@github.com:juannyG/coms6998.git
-$ cd coms6998
-$ yarn install
-$ cp packages/foundry/.env.example packages/foundry/.env
-$ yarn compile
-$ yarn chain
+$ ./setup.sh
 
-# Open a new tab
+# Open a new tab - deploy the contract to your local test net
+$ docker exec -ti coms6998_yarn-chain_1
 $ yarn deploy
-
-# Open a new tab
-$ yarn start
 ```
 
 To interact with spotlight, go to http://localhost:3000/spotlight
