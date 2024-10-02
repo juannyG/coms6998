@@ -1,9 +1,19 @@
+x-base:
+  &base
+  platform: linux/x86_64
+  build:
+    context: .
+  volumes:
+    - .:/app/
+    - /app/node_modules
+    - /app/packages/nextjs/node_modules
+    - /app/packages/foundry/node_modules
+    - /app/packages/foundry/lib
+
+
 services:
   yarn-chain:
-    platform: linux/x86_64
-    build:
-      context: .
-      target: runner
+    <<: *base
     command:
       - yarn
       - chain
@@ -11,22 +21,15 @@ services:
       - 0.0.0.0
     ports:
       - "8545:8545"
-    volumes:
-      - .:/app/
 
   yarn-start:
+    <<: *base
     tty: true
     stdin_open: true
-    platform: linux/x86_64
-    build:
-      context: .
-      target: runner
     command:
       - yarn
       - start
       - --hostname
       - 0.0.0.0
-    volumes:
-      - .:/app/
     ports:
       - "3000:3000"

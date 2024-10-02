@@ -1,25 +1,16 @@
-FROM debian:bookworm-slim as deps
+FROM node:bookworm-slim
 
 WORKDIR /app
-RUN apt-get update && apt-get -y install git curl nodejs npm
+RUN apt-get update && apt-get -y install git curl
 RUN curl -L https://foundry.paradigm.xyz | bash
 RUN /root/.foundry/bin/foundryup
-COPY package.json yarn.lock ./
-RUN npm install --global yarn@3.2.3
-RUN /usr/local/bin/yarn install
 
-FROM debian:bookworm-slim as builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-ENV NEXT_TELEMETRY_DISABLED 1
-RUN /usr/local/bin/yarn build
+RUN yarn install
 
-FROM debian:bookworm-slim as runner
-WORKDIR /app
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+# TODO: check if these are needed...
+#RUN git config --global --add safe.directory /app
+#RUN git submodule update --init --recursive
 
 ENV PATH $PATH:/root/.foundry/bin
 
