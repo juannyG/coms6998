@@ -1,0 +1,32 @@
+services:
+  yarn-chain:
+    platform: linux/x86_64
+    build:
+      context: .
+      target: runner
+    command:
+      - yarn
+      - chain
+      - --host
+      - 0.0.0.0
+    ports:
+      - "8545:8545"
+    volumes:
+      - .:/app/
+
+  yarn-start:
+    tty: true
+    stdin_open: true
+    platform: linux/x86_64
+    build:
+      context: .
+      target: runner
+    command:
+      - yarn
+      - start
+      - --hostname
+      - 0.0.0.0
+    volumes:
+      - .:/app/
+    ports:
+      - "3000:3000"
