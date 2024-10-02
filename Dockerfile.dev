@@ -24,6 +24,8 @@ COPY . .
 
 # # Install dependencies
 RUN yarn install
+RUN git config --global --add safe.directory /app
+RUN git submodule update --init --recursive
 
 EXPOSE 3000
 

@@ -1,8 +1,6 @@
-.git
 *Dockerfile*
 *docker-compose*
 node_modules
-.git
 .github
 .dockerignore
 .gitignore
@@ -45,7 +43,6 @@ nosetests.xml
 coverage.xml
 *.cover
 *.log
-.git
 .mypy_cache
 .pytest_cache
 .hypothesis

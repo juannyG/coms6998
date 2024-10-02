@@ -13,8 +13,10 @@ services:
     volumes:
       - .:/app  # Mount the current directory into the container
       - /app/node_modules  # Prevent node_modules from being overwritten
+      - /app/packages/foundry/node_modules  # Prevent node_modules from being overwritten
+      - /app/packages/nextjs/node_modules  # Prevent node_modules from being overwritten
     # entrypoint: ["/app/entrypoint.sh"]
-  
+
 #   ganache:
 #     image: trufflesuite/ganache-cli:latest
 #     ports:
