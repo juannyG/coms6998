@@ -31,5 +31,7 @@ services:
       - start
       - --hostname
       - 0.0.0.0
+    depends_on:
+      - yarn-chain # Ensure the chain is up when running the UI
     ports:
       - "3000:3000"
