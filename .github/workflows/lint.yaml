@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - dev
   pull_request:
     branches:
       - main
+      - dev
 
 jobs:
   ci:
@@ -29,7 +31,7 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --immutable
-      
+
       - name: Install foundry-toolchain
         uses: foundry-rs/foundry-toolchain@v1
         with:

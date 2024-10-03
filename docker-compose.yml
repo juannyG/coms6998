@@ -1,18 +1,35 @@
+x-base:
+  &base
+  platform: linux/x86_64
+  build:
+    context: .
+  volumes:
+    - .:/app/
+    - /app/node_modules
+    - /app/packages/nextjs/node_modules
+    - /app/packages/foundry/node_modules
+    - /app/packages/foundry/lib
+
+
 services:
-  anvil:
-    image: ghcr.io/foundry-rs/foundry:latest
-    # Need to wrap command in quotes because found entrypoint is /bin/sh -c
-    command: '"anvil --host 0.0.0.0"'
+  yarn-chain:
+    <<: *base
+    command:
+      - yarn
+      - chain
+      - --host
+      - 0.0.0.0
     ports:
       - "8545:8545"
 
-  dapp:
-    build:
-      context: .
-    command: python test_conn.py
-    environment:
-      - ANVIL_HOST=http://anvil:8545
-    volumes:
-      - .:/app/
-    depends_on:
-      - anvil
+  yarn-start:
+    <<: *base
+    tty: true
+    stdin_open: true
+    command:
+      - yarn
+      - start
+      - --hostname
+      - 0.0.0.0
+    ports:
+      - "3000:3000"
