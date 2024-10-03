@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 
 # Ask for confirmation before pruning Docker system
 echo "This will remove all stopped containers, unused networks, dangling images, and build caches."

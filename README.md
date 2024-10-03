@@ -1,14 +1,11 @@
 # Setup
 
 ```sh
-$ ./setup.sh
+$ ./bin/setup.sh
 
 # Open a new tab - deploy the contract to your local test net
-$ docker exec -ti coms6998_yarn-chain_1
-$ yarn deploy
+$ ./bin/deploy-contracts.sh
 ```
-
-To interact with spotlight, go to http://localhost:3000/spotlight
 
 # VSCode
 
