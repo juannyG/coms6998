@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "../contracts/YourContract.sol";
+import "../contracts/Spotlight.sol";
 import "./DeployHelpers.s.sol";
 
 contract DeployScript is ScaffoldETHDeploy {
@@ -16,12 +17,19 @@ contract DeployScript is ScaffoldETHDeploy {
     }
     vm.startBroadcast(deployerPrivateKey);
 
-    YourContract yourContract = new YourContract(vm.addr(deployerPrivateKey));
+    Spotlight spotlight = new Spotlight(vm.addr(deployerPrivateKey));
     console.logString(
       string.concat(
-        "YourContract deployed at: ", vm.toString(address(yourContract))
+        "Spotlight deployed at: ", vm.toString(address(spotlight))
       )
     );
+
+    //YourContract yourContract = new YourContract(vm.addr(deployerPrivateKey));
+    //console.logString(
+    //  string.concat(
+    //    "YourContract deployed at: ", vm.toString(address(yourContract))
+    //  )
+    //);
 
     vm.stopBroadcast();
 
