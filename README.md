@@ -1,10 +1,10 @@
 # Setup
 
 ```sh
-$ ./bin/setup.sh
+$ python3 bin/spotlight-cli.py local build --run
 
 # Open a new tab - deploy the contract to your local test net
-$ ./bin/deploy-contracts.sh
+$ python3 bin/spotlight-cli.py local deploy
 ```
 
 # VSCode
