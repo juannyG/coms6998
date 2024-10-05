@@ -72,6 +72,8 @@ if __name__ == '__main__':
 
     deploy_parser = subparsers.add_parser('deploy', help='Deploy the app to the target environment')
 
+    test_parser = subparsers.add_parser('test', help='Run tests')
+
     _set_cwd()
 
     args = parser.parse_args()
@@ -79,5 +81,7 @@ if __name__ == '__main__':
         build(args.env, args.prune, args.local_run)
     elif args.command == 'deploy':
         deploy(args.env)
+    elif args.command == 'test':
+        os.system('docker exec -ti coms6998_yarn-chain_1 yarn test')
 
     exit(0)
