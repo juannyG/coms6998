@@ -7,6 +7,11 @@ $ python3 bin/spotlight-cli.py local build --run
 $ python3 bin/spotlight-cli.py local deploy
 ```
 
+To run tests
+```sh
+$ python3 bin/spotlight-cli.py local test
+```
+
 # VSCode
 
 Helpful Extensions
