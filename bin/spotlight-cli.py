@@ -20,9 +20,9 @@ def build(target_env, prune, local_run):
             exit(res)
 
     if target_env == 'local':
-        cmd = f'{DOCKER_COMPOSE_CMD} build'
+        cmd = f'COMPOSE_COMPATIBILITY=true {DOCKER_COMPOSE_CMD} build'
         if local_run:
-            cmd = f'{DOCKER_COMPOSE_CMD} up --build'
+            cmd = f'COMPOSE_COMPATIBILITY=true {DOCKER_COMPOSE_CMD} up --build'
         os.system(cmd)
     else:
         print(f"Builds for {target_env} are not currently supported.")
@@ -58,9 +58,9 @@ if __name__ == '__main__':
     """
     parser = argparse.ArgumentParser(description="Spotlight CLI")
     parser.add_argument(
-        'env', 
-        default='local', 
-        choices=('local', 'dev', 'prd'), 
+        'env',
+        default='local',
+        choices=('local', 'dev', 'prd'),
         help="Target environment to execute subcommands against"
     )
 
