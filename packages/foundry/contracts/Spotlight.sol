@@ -12,41 +12,40 @@ contract Spotlight {
         string username; // TODO: Could we store bytes instead for better for EVM packing
     }
 
-    mapping(address => Profile) profiles;
-    mapping(bytes32 => bool) normalized_username_hashes;
+    mapping(address => Profile) private profiles;
+    mapping(bytes32 => bool) private normalized_username_hashes;
+	mapping(address => string[]) public address_to_comments;
+
+    event ProfileRegistered(address indexed user, string username);
+    event ProfileUpdated(address indexed user, string newUsername);
+    event ProfileDeleted(address indexed user);
+    event CommentPosted(address indexed user, string comment);
 
     constructor(address _owner) {
         owner = _owner;
     }
 
-    function registerProfile(string memory _username) public {
-        // Make sure they don't exist
-        require(bytes(profiles[msg.sender].username).length == 0);
-        require(bytes(_username).length > 0);
-        require(bytes(_username).length < 32);
-
-        string memory lowercase_username = toLower(_username);
-        bytes32 hash = keccak256(abi.encodePacked(lowercase_username));
-        require(normalized_username_hashes[hash] == false);
-
-        normalized_username_hashes[hash] = true;
-        profiles[msg.sender] = Profile({username: _username});
+	modifier onlyRegistered() {
+        require(isRegistered(msg.sender), "Profile does not exist");
+        _;
     }
 
-    function toLower(string memory _s) private pure returns (string memory) {
-        // Create new bytes so we don't modify memory reference of _s
-        bytes memory orig_s = bytes(_s);
-        bytes memory new_s = new bytes(orig_s.length);
+	modifier usernameValid(string memory _username) {
+        require(bytes(_username).length > 0, "Username cannot be empty");
+        require(bytes(_username).length < 32, "Username too long");
+        _;
+    }
 
-        for (uint8 i = 0; i < orig_s.length; i++) {
-            new_s[i] = orig_s[i];
+    function registerProfile(string memory _username) public usernameValid(_username) {
+        // Make sure they don't exist
+        require(!isRegistered(msg.sender), "Profile already exists");
 
-            // If A <= s[i] <= Z
-            if (uint8(orig_s[i]) >= 65 && uint8(orig_s[i]) <= 90) {
-                new_s[i] = bytes1(uint8(orig_s[i]) + 32);
-            }
-        }
-        return string(new_s);
+        bytes32 usernameHash = _getUsernameHash(_username);
+		require(normalized_username_hashes[usernameHash] == false, "Username is already taken");
+
+        normalized_username_hashes[usernameHash] = true;
+        profiles[msg.sender] = Profile({username: _username});
+		emit ProfileRegistered(msg.sender, _username);
     }
 
     function isRegistered(address a) public view returns (bool) {
@@ -57,5 +56,56 @@ contract Spotlight {
         // Make sure they do exist
         require(bytes(profiles[a].username).length > 0);
         return profiles[a].username; // TODO: return Profile object
+    }
+
+	function updateUsername(string memory _newUsername) public onlyRegistered usernameValid(_newUsername) {
+        bytes32 newHash = _getUsernameHash(_newUsername);
+        require(!normalized_username_hashes[newHash], "Username is already taken");
+
+        // Remove the old username hash.
+        bytes32 oldHash = _getUsernameHash(profiles[msg.sender].username);
+        normalized_username_hashes[oldHash] = false;
+
+        // Update the username and set the new hash.
+        profiles[msg.sender].username = _newUsername;
+        normalized_username_hashes[newHash] = true;
+
+		emit ProfileUpdated(msg.sender, _newUsername);
+    }
+
+	function deleteProfile() public onlyRegistered {
+        bytes32 oldHash = _getUsernameHash(profiles[msg.sender].username);
+        normalized_username_hashes[oldHash] = false;
+
+        delete profiles[msg.sender];
+        emit ProfileDeleted(msg.sender);
+    }
+
+    // Function to post a comment.
+    function postComment(string memory _comment) public onlyRegistered {
+        address_to_comments[msg.sender].push(_comment);
+        emit CommentPosted(msg.sender, _comment);
+    }
+
+	function _getUsernameHash(string memory _username) private pure returns (bytes32) {
+        string memory lowercaseUsername = _toLower(_username);
+        return keccak256(abi.encodePacked(lowercaseUsername));
+    }
+
+	function _toLower(string memory _s) private pure returns (string memory) {
+        bytes memory orig_s = bytes(_s);
+        bytes memory new_s = new bytes(orig_s.length);
+
+        for (uint256 i = 0; i < orig_s.length; i++) {
+            bytes1 char = orig_s[i];
+
+            // If character is uppercase A-Z.
+            if (char >= 0x41 && char <= 0x5A) {
+                new_s[i] = bytes1(uint8(char) + 32);
+            } else {
+                new_s[i] = char;
+            }
+        }
+        return string(new_s);
     }
 }
