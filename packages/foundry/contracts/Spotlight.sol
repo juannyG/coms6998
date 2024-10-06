@@ -14,7 +14,7 @@ contract Spotlight {
 
     mapping(address => Profile) private profiles;
     mapping(bytes32 => bool) private normalized_username_hashes;
-	mapping(address => string[]) public address_to_comments;
+    mapping(address => string[]) public address_to_comments;
 
     event ProfileRegistered(address indexed user, string username);
     event ProfileUpdated(address indexed user, string newUsername);
@@ -25,12 +25,12 @@ contract Spotlight {
         owner = _owner;
     }
 
-	modifier onlyRegistered() {
+    modifier onlyRegistered() {
         require(isRegistered(msg.sender), "Profile does not exist");
         _;
     }
 
-	modifier usernameValid(string memory _username) {
+    modifier usernameValid(string memory _username) {
         require(bytes(_username).length > 0, "Username cannot be empty");
         require(bytes(_username).length < 32, "Username too long");
         _;
@@ -41,11 +41,11 @@ contract Spotlight {
         require(!isRegistered(msg.sender), "Profile already exists");
 
         bytes32 usernameHash = _getUsernameHash(_username);
-		require(normalized_username_hashes[usernameHash] == false, "Username is already taken");
+        require(normalized_username_hashes[usernameHash] == false, "Username is already taken");
 
         normalized_username_hashes[usernameHash] = true;
         profiles[msg.sender] = Profile({username: _username});
-		emit ProfileRegistered(msg.sender, _username);
+        emit ProfileRegistered(msg.sender, _username);
     }
 
     function isRegistered(address a) public view returns (bool) {
@@ -58,7 +58,7 @@ contract Spotlight {
         return profiles[a].username; // TODO: return Profile object
     }
 
-	function updateUsername(string memory _newUsername) public onlyRegistered usernameValid(_newUsername) {
+    function updateUsername(string memory _newUsername) public onlyRegistered usernameValid(_newUsername) {
         bytes32 newHash = _getUsernameHash(_newUsername);
         require(!normalized_username_hashes[newHash], "Username is already taken");
 
@@ -70,10 +70,10 @@ contract Spotlight {
         profiles[msg.sender].username = _newUsername;
         normalized_username_hashes[newHash] = true;
 
-		emit ProfileUpdated(msg.sender, _newUsername);
+        emit ProfileUpdated(msg.sender, _newUsername);
     }
 
-	function deleteProfile() public onlyRegistered {
+    function deleteProfile() public onlyRegistered {
         bytes32 oldHash = _getUsernameHash(profiles[msg.sender].username);
         normalized_username_hashes[oldHash] = false;
 
@@ -87,12 +87,12 @@ contract Spotlight {
         emit CommentPosted(msg.sender, _comment);
     }
 
-	function _getUsernameHash(string memory _username) private pure returns (bytes32) {
+    function _getUsernameHash(string memory _username) private pure returns (bytes32) {
         string memory lowercaseUsername = _toLower(_username);
         return keccak256(abi.encodePacked(lowercaseUsername));
     }
 
-	function _toLower(string memory _s) private pure returns (string memory) {
+    function _toLower(string memory _s) private pure returns (string memory) {
         bytes memory orig_s = bytes(_s);
         bytes memory new_s = new bytes(orig_s.length);
 
