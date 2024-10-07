@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+      address: "0x5fc8d32690cc91d4c39d9d3abcbd16989f875707",
       abi: [
         {
           type: "constructor",
@@ -19,6 +19,45 @@ const deployedContracts = {
             },
           ],
           stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "authenticate",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getAccount",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getOwner",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -56,26 +95,12 @@ const deployedContracts = {
                   type: "uint8",
                   internalType: "uint8",
                 },
+                {
+                  name: "isRegistered",
+                  type: "bool",
+                  internalType: "bool",
+                },
               ],
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "isRegistered",
-          inputs: [
-            {
-              name: "a",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          outputs: [
-            {
-              name: "",
-              type: "bool",
-              internalType: "bool",
             },
           ],
           stateMutability: "view",
@@ -120,6 +145,62 @@ const deployedContracts = {
           ],
           outputs: [],
           stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "userRegistered",
+          inputs: [
+            {
+              name: "a",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "event",
+          name: "ProfileRegistered",
+          inputs: [
+            {
+              name: "_address",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "_username",
+              type: "string",
+              indexed: false,
+              internalType: "string",
+            },
+            {
+              name: "_bio",
+              type: "string",
+              indexed: false,
+              internalType: "string",
+            },
+            {
+              name: "_location",
+              type: "string",
+              indexed: false,
+              internalType: "string",
+            },
+            {
+              name: "_age",
+              type: "uint8",
+              indexed: false,
+              internalType: "uint8",
+            },
+          ],
+          anonymous: false,
         },
       ],
       inheritedFunctions: {},

@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
@@ -22,58 +24,51 @@ function Registration({ connectedAddress }: { connectedAddress: string }) {
       <div className="flex flex-col">
         <div className="flex items-center">
           <label className="px-2 w-1/3 text-right pr-4">Username</label>
-          <input
-            className="input bg-primary"
-            type="text"
-            onChange={e => {
-              // TODO: Validate username length < 32 char/bytes
-              setUsername(e.target.value);
-            }}
+          <TextField
+            id="outlined-username"
+            label=""
+            variant="outlined"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
           />
         </div>
         <div className="flex items-center mt-4">
           <label className="px-2 w-1/3 text-right pr-4">Bio</label>
-          <input
-            className="input bg-primary"
-            type="text"
-            onChange={e => {
-              setBio(e.target.value);
-            }}
+          <TextField
+            id="outlined-bio"
+            label=""
+            variant="outlined"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setBio(e.target.value)}
           />
         </div>
         <div className="flex items-center mt-4">
           <label className="px-2 w-1/3 text-right pr-4">Location</label>
-          <input
-            className="input bg-primary"
-            type="text"
-            onChange={e => {
-              setLocation(e.target.value);
-            }}
+          <TextField
+            id="outlined-location"
+            label=""
+            variant="outlined"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setLocation(e.target.value)}
           />
         </div>
         <div className="flex items-center my-4">
           <label className="px-2 w-1/3 text-right pr-4">Age</label>
-          <input
-            className="input bg-primary"
-            type="number"
-            onChange={e => {
-              setAge(parseInt(e.target.value));
-            }}
+          <TextField
+            id="outlined-age"
+            label=""
+            variant="outlined"
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setAge(Number(e.target.value))}
           />
         </div>
       </div>
       <div className="py-5">
-        <button
-          className="btn btn-primary"
+        <Button
+          variant="contained"
           onClick={async () => {
             if (username === undefined || username === null) {
-              // TODO: Get toasty
               alert("Please populate username");
               return;
             }
 
             try {
-              console.log(username, bio, location, age);
               await writeSpotlightContractAsync({
                 functionName: "registerProfile",
                 args: [username, bio, location, age],
@@ -84,7 +79,7 @@ function Registration({ connectedAddress }: { connectedAddress: string }) {
           }}
         >
           Register
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -108,7 +103,7 @@ function Welcome({ connectedAddress }: { connectedAddress: string }) {
       </span>
       at
       <span style={{ color: "green" }}>{connectedAddress.slice(0, 6) + "..." + connectedAddress.slice(-4)}</span>
-      BIO: {profile.bio}
+      <div>BIO: {profile.bio}</div>
       Location: <span style={{ color: "purple" }}>{profile.location}</span>
     </>
   );
@@ -118,7 +113,7 @@ function CheckIn() {
   const { address: connectedAddress } = useAccount();
   const { data: isRegistered } = useScaffoldReadContract({
     contractName: "Spotlight",
-    functionName: "isRegistered",
+    functionName: "userRegistered",
     args: [connectedAddress],
   });
 

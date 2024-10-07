@@ -29,3 +29,9 @@ Version: 0.8.5
 Publisher: Nomic Foundation
 VS Marketplace Link: https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity
 ```
+
+# Material-UI
+To install material-ui, run the following command under the `coms6998` directory:
+```sh
+yarn add @mui/material @emotion/react @emotion/styled @mui/icons-material
+```

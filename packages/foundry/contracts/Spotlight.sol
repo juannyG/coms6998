@@ -8,45 +8,88 @@ contract Spotlight {
     address public owner;
 
     struct Profile {
-        // TODO: avatar img?
-        string username; // TODO: validate 32 byte len for EVM packing
+        string username;
         string bio;
         string location;
         uint8 age;
+        bool isRegistered;
     }
 
-    Profile[] profiles;
-    mapping(address => uint256) profile_idx_map;
+    mapping(address => Profile) profiles;
     mapping(bytes32 => bool) normalized_username_hashes;
 
-    constructor(address _owner) {
-        owner = _owner;
+    event ProfileRegistered(address indexed _address, string _username, string _bio, string _location, uint8 _age);
 
-        // push an empty profile into the 0 position - no one can every occupy this
-        profiles.push(Profile({username: "", bio: "", location: "", age: 0}));
-        profile_idx_map[address(0)] = 0;
+    constructor(address _owner) {
+        owner = _owner;// msg.sender;
+
+        profiles[address(0)] = Profile({username: "", bio: "", location: "", age: 0, isRegistered: false});
     }
     
+    /**
+     * Register a profile for a user
+     * @param _username username of the user
+     * @param _bio description
+     * @param _location location
+     * @param _age age
+     */
     function registerProfile(string memory _username, string memory _bio, string memory _location, uint8 _age) public {
-        // Make sure they don't exist
-        require(profile_idx_map[msg.sender] == 0);
+        // Make sure the address is not registered
+        require(!profiles[msg.sender].isRegistered, "Profile already registered");
 
         // Integrity Check
         require(bytes(_username).length > 0);
         require(bytes(_username).length < 32);
-        // require(bytes(_bio).length < 512);
-        // require(bytes(_location).length < 256);
-        // require(_age > 0);
-        // require(_age < 150);
-        
+        require(bytes(_bio).length < 512);
+        require(bytes(_location).length < 256);
+        require(_age > 0);
+        require(_age < 150);
+
         string memory lowercase_username = toLower(_username);
         bytes32 hash = keccak256(abi.encodePacked(lowercase_username));
         require(normalized_username_hashes[hash] == false);
 
         normalized_username_hashes[hash] = true;
-        profile_idx_map[msg.sender] = profiles.length;
-        profiles.push(Profile({username: _username, bio: _bio, location: _location, age: _age}));
+        profiles[msg.sender] = Profile({username: _username, bio: _bio, location: _location, age: _age, isRegistered: true});
+        
+        emit ProfileRegistered(msg.sender, _username, _bio, _location, _age);
     }
+
+    /**
+     * Check if a user is registered
+     * @param a address of the user
+     */
+    function userRegistered(address a) public view returns (bool) {
+        return profiles[a].isRegistered;
+    }
+
+    /**
+     * Get the profile of a user
+     * @param a address of the user
+     */
+    function getProfile(address a) public view returns (Profile memory) {
+        // Make sure they do exist
+        require(profiles[a].isRegistered == true);
+        return profiles[a];
+    }
+
+    /**
+     * Get the address of the owner
+     */
+    function getOwner() public view returns (address) {
+        return owner;
+    }
+
+    function authenticate() public view returns (bool) {
+        return msg.sender == owner;
+    }
+
+    function getAccount() public view returns (address) {
+        return msg.sender;
+    }
+
+
+    // -------------- private methods ----------------
 
     function toLower(string memory _s) private pure returns (string memory) {
         // Create new bytes so we don't modify memory reference of _s
@@ -62,15 +105,5 @@ contract Spotlight {
             }
         }
         return string(new_s);
-    }
-
-    function isRegistered(address a) public view returns (bool) {
-        return profile_idx_map[a] != 0;
-    }
-
-    function getProfile(address a) public view returns (Profile memory) {
-        // Make sure they do exist
-        require(profile_idx_map[a] > 0);
-        return profiles[profile_idx_map[a]]; // TODO: return Profile object
     }
 }
