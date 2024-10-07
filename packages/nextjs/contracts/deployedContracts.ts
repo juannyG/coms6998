@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
       abi: [
         {
           type: "constructor",
@@ -22,15 +22,22 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "address_to_comments",
+          name: "deleteProfile",
+          inputs: [],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "getCommentByIndex",
           inputs: [
             {
-              name: "",
+              name: "user",
               type: "address",
               internalType: "address",
             },
             {
-              name: "",
+              name: "index",
               type: "uint256",
               internalType: "uint256",
             },
@@ -46,10 +53,22 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "deleteProfile",
-          inputs: [],
-          outputs: [],
-          stateMutability: "nonpayable",
+          name: "getCommentsLength",
+          inputs: [
+            {
+              name: "user",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
         },
         {
           type: "function",

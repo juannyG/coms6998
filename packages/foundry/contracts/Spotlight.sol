@@ -8,13 +8,12 @@ contract Spotlight {
     address public owner;
 
     struct Profile {
-        // TODO: avatar img?
-        string username; // TODO: Could we store bytes instead for better for EVM packing
+        string username;
     }
 
     mapping(address => Profile) private profiles;
     mapping(bytes32 => bool) private normalized_username_hashes;
-    mapping(address => string[]) public address_to_comments;
+    mapping(address => string[]) private address_to_comments;
 
     event ProfileRegistered(address indexed user, string username);
     event ProfileUpdated(address indexed user, string newUsername);
@@ -37,11 +36,10 @@ contract Spotlight {
     }
 
     function registerProfile(string memory _username) public usernameValid(_username) {
-        // Make sure they don't exist
         require(!isRegistered(msg.sender), "Profile already exists");
 
         bytes32 usernameHash = _getUsernameHash(_username);
-        require(normalized_username_hashes[usernameHash] == false, "Username is already taken");
+        require(!normalized_username_hashes[usernameHash], "Username is already taken");
 
         normalized_username_hashes[usernameHash] = true;
         profiles[msg.sender] = Profile({username: _username});
@@ -53,9 +51,8 @@ contract Spotlight {
     }
 
     function getProfile(address a) public view returns (string memory) {
-        // Make sure they do exist
-        require(bytes(profiles[a].username).length > 0);
-        return profiles[a].username; // TODO: return Profile object
+        require(bytes(profiles[a].username).length > 0, "Profile does not exist");
+        return profiles[a].username;
     }
 
     function updateUsername(string memory _newUsername) public onlyRegistered usernameValid(_newUsername) {
@@ -81,10 +78,19 @@ contract Spotlight {
         emit ProfileDeleted(msg.sender);
     }
 
-    // Function to post a comment.
     function postComment(string memory _comment) public onlyRegistered {
         address_to_comments[msg.sender].push(_comment);
         emit CommentPosted(msg.sender, _comment);
+    }
+
+    // New functions added
+    function getCommentsLength(address user) public view returns (uint256) {
+        return address_to_comments[user].length;
+    }
+
+    function getCommentByIndex(address user, uint256 index) public view returns (string memory) {
+        require(index < address_to_comments[user].length, "Index out of bounds");
+        return address_to_comments[user][index];
     }
 
     function _getUsernameHash(string memory _username) private pure returns (bytes32) {
