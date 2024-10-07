@@ -17,6 +17,7 @@ contract Spotlight {
 
     mapping(address => Profile) profiles;
     mapping(bytes32 => bool) normalized_username_hashes;
+    mapping(address => bool) authorizedUsers;
 
     event ProfileRegistered(address indexed _address, string _username, string _bio, string _location, uint8 _age);
 
@@ -25,6 +26,8 @@ contract Spotlight {
 
         profiles[address(0)] = Profile({username: "", bio: "", location: "", age: 0, isRegistered: false});
     }
+
+    // ----------------------------------------- Profile Management -----------------------------------------
     
     /**
      * Register a profile for a user
@@ -38,12 +41,12 @@ contract Spotlight {
         require(!profiles[msg.sender].isRegistered, "Profile already registered");
 
         // Integrity Check
-        require(bytes(_username).length > 0);
-        require(bytes(_username).length < 32);
-        require(bytes(_bio).length < 512);
-        require(bytes(_location).length < 256);
-        require(_age > 0);
-        require(_age < 150);
+        require(bytes(_username).length > 0, "Username cannot be empty");
+        require(bytes(_username).length < 32, "Username cannot be longer than 32 characters");
+        require(bytes(_bio).length < 512, "Bio cannot be longer than 512 characters");
+        require(bytes(_location).length < 256,  "Location cannot be longer than 256 characters");
+        require(_age > 0, "Age cannot be less than 0");
+        require(_age < 150, "Age cannot be greater than 150");
 
         string memory lowercase_username = toLower(_username);
         bytes32 hash = keccak256(abi.encodePacked(lowercase_username));
@@ -73,6 +76,66 @@ contract Spotlight {
         return profiles[a];
     }
 
+    // ----------------------------------------- Authorization -----------------------------------------
+
+    /**
+     * Authorize a user to interact with the contract
+     * @param user address of the user
+     */
+    function authorizeUser(address user) public {
+        // TODO: requirements for authorization.
+        require(!authorizedUsers[user], "User is already authorized");
+        require(profiles[user].isRegistered, "User must have a registered profile");
+        authorizedUsers[user] = true;
+    }
+
+    /**
+     * Revoke authorization from a user
+     * @param user address of the user
+     */
+    function revokeAuthorization(address user) public {
+        require(authorizedUsers[user], "User is not authorized");
+        require(profiles[user].isRegistered, "User must have a registered profile");
+        authorizedUsers[user] = false;
+    }
+
+    /**
+     * Check if a user is authorized
+     * @param user address of the user
+     */
+    function isAuthorized(address user) public view returns (bool) {
+        return authorizedUsers[user];
+    }
+
+    
+    modifier onlyAuthorized() {
+        require(authorizedUsers[msg.sender], "Not an authorized user");
+        _;
+    }
+
+    // ----------------------------------------- Transaction Management -----------------------------------------
+
+    /**
+     * Send a transaction to another address from msg.sender
+     * @param _to address to send to
+     */
+    function sendTransaction(address payable _to) public payable onlyAuthorized {
+        require(msg.value <= address(msg.sender).balance, "Insufficient balance");
+        require(_to != address(0), "Cannot send to address 0");
+        require(msg.value > 0, "Amount must be greater than 0");
+
+        (bool success, ) = _to.call{value: msg.value}("");
+        require(success, "Transfer failed");
+    }
+
+    /**
+     * Get the balance of an account
+     * @param _addr address of the account
+     */
+    function getAccountAmount(address _addr) public view returns (uint256) {
+        return _addr.balance;
+    }
+
     /**
      * Get the address of the owner
      */
@@ -80,16 +143,15 @@ contract Spotlight {
         return owner;
     }
 
-    function authenticate() public view returns (bool) {
-        return msg.sender == owner;
-    }
-
     function getAccount() public view returns (address) {
         return msg.sender;
     }
 
+    receive() external payable {}
+    fallback() external payable {}
 
-    // -------------- private methods ----------------
+
+    // ----------------------------------------- Utility Functions -----------------------------------------
 
     function toLower(string memory _s) private pure returns (string memory) {
         // Create new bytes so we don't modify memory reference of _s

@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0x5fc8d32690cc91d4c39d9d3abcbd16989f875707",
+      address: "0x3aa5ebb10dc797cac828524e59a333d0a371443c",
       abi: [
         {
           type: "constructor",
@@ -21,17 +21,25 @@ const deployedContracts = {
           stateMutability: "nonpayable",
         },
         {
+          type: "fallback",
+          stateMutability: "payable",
+        },
+        {
+          type: "receive",
+          stateMutability: "payable",
+        },
+        {
           type: "function",
-          name: "authenticate",
-          inputs: [],
-          outputs: [
+          name: "authorizeUser",
+          inputs: [
             {
-              name: "",
-              type: "bool",
-              internalType: "bool",
+              name: "user",
+              type: "address",
+              internalType: "address",
             },
           ],
-          stateMutability: "view",
+          outputs: [],
+          stateMutability: "nonpayable",
         },
         {
           type: "function",
@@ -42,6 +50,25 @@ const deployedContracts = {
               name: "",
               type: "address",
               internalType: "address",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getAccountAmount",
+          inputs: [
+            {
+              name: "_addr",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
             },
           ],
           stateMutability: "view",
@@ -107,6 +134,25 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "isAuthorized",
+          inputs: [
+            {
+              name: "user",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "owner",
           inputs: [],
           outputs: [
@@ -145,6 +191,32 @@ const deployedContracts = {
           ],
           outputs: [],
           stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "revokeAuthorization",
+          inputs: [
+            {
+              name: "user",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "sendTransaction",
+          inputs: [
+            {
+              name: "_to",
+              type: "address",
+              internalType: "address payable",
+            },
+          ],
+          outputs: [],
+          stateMutability: "payable",
         },
         {
           type: "function",

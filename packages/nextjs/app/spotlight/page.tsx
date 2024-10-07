@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
+import SendTransaction from "./transcation/sendTranscation";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import type { NextPage } from "next";
@@ -95,18 +96,7 @@ function Welcome({ connectedAddress }: { connectedAddress: string }) {
   if (profile === undefined) {
     return null;
   }
-  return (
-    <>
-      Welcome
-      <span style={{ color: "green" }} className="text-3xl">
-        {profile.username}{" "}
-      </span>
-      at
-      <span style={{ color: "green" }}>{connectedAddress.slice(0, 6) + "..." + connectedAddress.slice(-4)}</span>
-      <div>BIO: {profile.bio}</div>
-      Location: <span style={{ color: "purple" }}>{profile.location}</span>
-    </>
-  );
+  return <SendTransaction address={connectedAddress} profile={profile} />;
 }
 
 function CheckIn() {
