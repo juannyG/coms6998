@@ -5,14 +5,49 @@ import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
+import { notification } from "~~/utils/scaffold-eth";
 
-function Registration({ connectedAddress }: { connectedAddress: string }) {
+function Registration({
+  connectedAddress,
+  actionType,
+  onSuccess,
+}: {
+  connectedAddress: string;
+  actionType: "register" | "update";
+  onSuccess?: () => void;
+}) {
   const [username, setUsername] = useState<string | null>(null);
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
 
   if (connectedAddress === undefined) {
     return null;
   }
+
+  const handleSubmit = async () => {
+    if (username === undefined || username === null) {
+      // TODO: Get toasty
+      alert("Please populate username");
+      return;
+    }
+    console.log(username);
+    const functionName = actionType === "register" ? "registerProfile" : "updateUsername";
+
+    try {
+      await writeSpotlightContractAsync({
+        functionName,
+        args: [username],
+      });
+      // Call onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (e: any) {
+      console.error(e);
+      if (e.message.includes("Username is already taken")) {
+        notification.error("Username is already taken. Please choose a different username.");
+      }
+    }
+  };
 
   return (
     <div>
@@ -28,34 +63,24 @@ function Registration({ connectedAddress }: { connectedAddress: string }) {
         />
       </div>
       <div className="py-5">
-        <button
-          className="btn btn-primary"
-          onClick={async () => {
-            if (username === undefined || username === null) {
-              // TODO: Get toasty
-              alert("Please populate username");
-              return;
-            }
-
-            console.log(username);
-            try {
-              await writeSpotlightContractAsync({
-                functionName: "registerProfile",
-                args: [username],
-              });
-            } catch (e) {
-              console.log(e);
-            }
-          }}
-        >
-          Register
+        <button className="btn btn-primary" onClick={handleSubmit}>
+          {actionType === "register" ? "Register" : "Change Username"}
         </button>
       </div>
     </div>
   );
 }
 
-function Welcome({ connectedAddress }: { connectedAddress: string }) {
+function Welcome({
+  connectedAddress,
+  refetchIsRegistered,
+}: {
+  connectedAddress: string;
+  refetchIsRegistered: () => void;
+}) {
+  const [isChangingUsername, setIsChangingUsername] = useState(false);
+  const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
+
   const { data: username } = useScaffoldReadContract({
     contractName: "Spotlight",
     functionName: "getProfile",
@@ -65,12 +90,51 @@ function Welcome({ connectedAddress }: { connectedAddress: string }) {
   if (username === undefined) {
     return null;
   }
-  return <>Welcome {username}!</>;
+
+  const handleDeleteProfile = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to delete your profile?");
+    if (!confirmDelete) return;
+
+    try {
+      await writeSpotlightContractAsync({
+        functionName: "deleteProfile",
+      });
+      notification.success("Profile deleted successfully");
+      // Refetch registration status
+      refetchIsRegistered();
+    } catch (e: any) {
+      console.error(e);
+      notification.error("Failed to delete profile");
+    }
+  };
+
+  if (isChangingUsername) {
+    return (
+      <Registration
+        connectedAddress={connectedAddress}
+        actionType="update"
+        onSuccess={() => setIsChangingUsername(false)}
+      />
+    );
+  }
+  return (
+    <>
+      <p>Welcome {username}!</p>
+      <div className="flex space-x-4 mt-4">
+        <button className="btn btn-secondary" onClick={() => setIsChangingUsername(true)}>
+          Change Username
+        </button>
+        <button className="btn btn-danger" onClick={handleDeleteProfile}>
+          Delete Profile
+        </button>
+      </div>
+    </>
+  );
 }
 
 function CheckIn() {
   const { address: connectedAddress } = useAccount();
-  const { data: isRegistered } = useScaffoldReadContract({
+  const { data: isRegistered, refetch } = useScaffoldReadContract({
     contractName: "Spotlight",
     functionName: "isRegistered",
     args: [connectedAddress],
@@ -80,10 +144,10 @@ function CheckIn() {
     return <>Awaiting wallet connection...</>;
   }
   if (isRegistered === false) {
-    return <Registration connectedAddress={connectedAddress} />;
+    return <Registration connectedAddress={connectedAddress} actionType="register" />;
   }
   if (isRegistered === true) {
-    return <Welcome connectedAddress={connectedAddress} />;
+    return <Welcome connectedAddress={connectedAddress} refetchIsRegistered={refetch} />;
   }
   return <>Checking registration status...</>;
 }
