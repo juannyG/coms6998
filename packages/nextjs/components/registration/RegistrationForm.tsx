@@ -12,9 +12,11 @@ const RegistrationForm = () => {
   const router = useRouter();
   const { userProfile } = useContext(UserProfileContext);
 
-  if (userProfile.isRegistered === undefined && userProfile.username === undefined) {
-    // We cannot render anything
-    return;
+  if (connectedAddress) {
+    if (userProfile.isRegistered === undefined && userProfile.username === undefined) {
+      // We cannot render anything
+      return;
+    }
   }
 
   if (userProfile.isRegistered === true) {
