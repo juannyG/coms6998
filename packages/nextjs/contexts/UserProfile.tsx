@@ -1,7 +1,8 @@
 import { createContext } from "react";
 
 export type TUserProfile = {
-  username: string;
+  username: string | undefined;
+  isRegistered: boolean | undefined;
 };
 
 interface IUserProfileContext {
@@ -10,7 +11,8 @@ interface IUserProfileContext {
 }
 export const UserProfileContext = createContext<IUserProfileContext>({
   userProfile: {
-    username: "",
+    username: undefined,
+    isRegistered: undefined,
   },
   setUserProfile: () => {
     return null;

@@ -9,10 +9,6 @@ import { notification } from "~~/utils/scaffold-eth";
 
 const Home: NextPage = () => {
   const router = useRouter();
-  const { userProfile, setUserProfile } = useContext(UserProfileContext);
-
-  // TODO: What if they navigate directly to "/" but have no account?
-
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
   const handleDeleteProfile = async () => {
     const confirmDelete = window.confirm("Are you sure you want to delete your profile?");
@@ -22,14 +18,24 @@ const Home: NextPage = () => {
       await writeSpotlightContractAsync({
         functionName: "deleteProfile",
       });
-      setUserProfile({ username: "" });
-      router.push("/");
     } catch (e: any) {
       console.error(e);
       notification.error("Failed to delete profile");
     }
   };
 
+  const { userProfile } = useContext(UserProfileContext);
+  if (userProfile.isRegistered === undefined || userProfile.username === undefined) {
+    // We cannot render anything
+    return;
+  }
+
+  if (userProfile.isRegistered === false) {
+    // They need to go register first...
+    router.push("/");
+  }
+
+  // TODO: Loading delete UX - after delete completes, clear out while waiting for re-render
   return (
     <div className="w-full h-[842px] relative overflow-hidden">
       <div className="flex flex-col justify-start items-center w-full h-dvh absolute left-0 top-0 gap-8 px-8 py-12 bg-gray-50">

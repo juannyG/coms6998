@@ -1,21 +1,42 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useTheme } from "next-themes";
 import { Toaster } from "react-hot-toast";
-import { WagmiProvider } from "wagmi";
+import { WagmiProvider, useAccount } from "wagmi";
 import { Footer } from "~~/components/Footer";
 import { Header } from "~~/components/Header";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { ProgressBar } from "~~/components/scaffold-eth/ProgressBar";
 import { TUserProfile, UserProfileContext } from "~~/contexts/UserProfile";
 import { useInitializeNativeCurrencyPrice } from "~~/hooks/scaffold-eth";
+import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   useInitializeNativeCurrencyPrice();
+  const { address: connectedAddress } = useAccount();
+  const { setUserProfile } = useContext(UserProfileContext);
+
+  const { data: isRegistered } = useScaffoldReadContract({
+    contractName: "Spotlight",
+    functionName: "isRegistered",
+    args: [connectedAddress],
+  });
+  const { data: username } = useScaffoldReadContract({
+    contractName: "Spotlight",
+    functionName: "getProfile",
+    args: [connectedAddress],
+  });
+
+  useEffect(() => {
+    if (isRegistered !== undefined && username !== undefined) {
+      console.log("ScaffoldEthApp effect", username, isRegistered);
+      setUserProfile({ username, isRegistered });
+    }
+  }, [isRegistered, username, setUserProfile]);
 
   return (
     <>
@@ -41,7 +62,7 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
   const { resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === "dark";
   const [mounted, setMounted] = useState(false);
-  const [userProfile, setUserProfile] = useState<TUserProfile>({ username: "" });
+  const [userProfile, setUserProfile] = useState<TUserProfile>({ username: undefined, isRegistered: undefined });
 
   useEffect(() => {
     setMounted(true);

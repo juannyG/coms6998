@@ -3,7 +3,6 @@ import RegistrationForm from "~~/components/registration/RegistrationForm";
 import RegistrationHeader from "~~/components/registration/RegistrationHeader";
 
 const Landing: NextPage = () => {
-  // TODO: What if they navigate to "/" but are already registered?
   return (
     <>
       <div className="w-full h-[842px] relative overflow-hidden">

@@ -1,18 +1,24 @@
 "use client";
 
+import { useContext } from "react";
+import { useRouter } from "next/navigation";
 import Loading from "./Loading";
 import Register from "./Register";
 import { useAccount } from "wagmi";
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
+import { UserProfileContext } from "~~/contexts/UserProfile";
 
 const RegistrationForm = () => {
   const { address: connectedAddress } = useAccount();
+  const router = useRouter();
+  const { userProfile } = useContext(UserProfileContext);
+  if (userProfile.isRegistered === true) {
+    // Already registered
+    router.push("/home");
+  }
 
-  const { data: isRegistered, isFetched: isRegisterFetched } = useScaffoldReadContract({
-    contractName: "Spotlight",
-    functionName: "isRegistered",
-    args: [connectedAddress],
-  });
+  // if (userProfile.isRegistered === undefined) {
+  //   return;
+  // }
 
   return (
     <div
@@ -20,8 +26,8 @@ const RegistrationForm = () => {
       style={{ boxShadow: "0px 1px 3px 0 rgba(0,0,0,0.1), 0px 1px 2px 0 rgba(0,0,0,0.06)" }}
     >
       {!connectedAddress && <Loading />}
-      {connectedAddress && isRegisterFetched && !isRegistered && <Register />}
-      {connectedAddress && isRegisterFetched && isRegistered && <>TODO: Auto redirect</>}
+      {connectedAddress && userProfile.isRegistered === false && <Register />}
+      {connectedAddress && userProfile.isRegistered === true && <>Redirecting...</>}
       <div className="flex justify-center items-center self-stretch flex-grow-0 flex-shrink-0 w-[368px] h-5 gap-2" />
     </div>
   );

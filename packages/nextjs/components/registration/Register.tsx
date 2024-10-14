@@ -1,8 +1,7 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { UserProfileContext } from "~~/contexts/UserProfile";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 import { notification } from "~~/utils/scaffold-eth";
 
@@ -10,7 +9,6 @@ const Register = () => {
   const router = useRouter();
   const [username, setUsername] = useState<string | null>(null);
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
-  const { setUserProfile } = useContext(UserProfileContext);
 
   const handleSubmit = async () => {
     if (username === undefined || username === null) {
@@ -23,7 +21,6 @@ const Register = () => {
         functionName: "registerProfile",
         args: [username],
       });
-      setUserProfile({ username });
       router.push("/home");
     } catch (e: any) {
       console.error(e);
