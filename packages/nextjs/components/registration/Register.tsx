@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 import { notification } from "~~/utils/scaffold-eth";
 
 const Register = () => {
-  const router = useRouter();
   const [username, setUsername] = useState<string | null>(null);
+  const [completed, setCompleted] = useState(false);
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
 
   const handleSubmit = async () => {
@@ -21,7 +20,7 @@ const Register = () => {
         functionName: "registerProfile",
         args: [username],
       });
-      router.push("/home");
+      setCompleted(true);
     } catch (e: any) {
       console.error(e);
       if (e.message.includes("Username is already taken")) {
@@ -29,6 +28,10 @@ const Register = () => {
       }
     }
   };
+
+  if (completed) {
+    return <>Completing registration...</>;
+  }
 
   return (
     <>

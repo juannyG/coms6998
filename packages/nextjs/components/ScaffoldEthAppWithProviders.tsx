@@ -24,19 +24,18 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
     contractName: "Spotlight",
     functionName: "isRegistered",
     args: [connectedAddress],
+    watch: true,
   });
   const { data: username } = useScaffoldReadContract({
     contractName: "Spotlight",
     functionName: "getProfile",
     args: [connectedAddress],
+    watch: true,
   });
 
   useEffect(() => {
-    if (isRegistered !== undefined && username !== undefined) {
-      console.log("ScaffoldEthApp effect", username, isRegistered);
-      setUserProfile({ username, isRegistered });
-    }
-  }, [isRegistered, username, setUserProfile]);
+    setUserProfile({ username, isRegistered });
+  }, [isRegistered, username, connectedAddress, setUserProfile]);
 
   return (
     <>
