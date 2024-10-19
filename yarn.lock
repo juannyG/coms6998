@@ -4171,6 +4171,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"daisyui@npm:latest":
+  version: 4.12.13
+  resolution: "daisyui@npm:4.12.13"
+  dependencies:
+    css-selector-tokenizer: ^0.8
+    culori: ^3
+    picocolors: ^1
+    postcss-js: ^4
+  checksum: fff8168f7cb2633511992b6c8e9922925f732808b4b3d9bd0cfbddf967fa8c0b2e74f3b208e9bd0829dc3d5e9bae7a4322b09dc34a58192de1ac96bad9678cb0
+  languageName: node
+  linkType: hard
+
 "damerau-levenshtein@npm:^1.0.8":
   version: 1.0.8
   resolution: "damerau-levenshtein@npm:1.0.8"
@@ -9339,6 +9351,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "se-2@workspace:."
   dependencies:
+    daisyui: latest
     husky: ~8.0.3
     lint-staged: ~13.2.2
   languageName: unknown
