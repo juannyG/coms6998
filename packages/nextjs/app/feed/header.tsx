@@ -5,7 +5,7 @@ import { NextPage } from "next";
 const FeedHeaderPage: NextPage = () => {
   return (
     <div className="w-full h-20 relative">
-      <div className="w-screen h-20 absolute top-[-0.5px] bg-white" style={{ boxShadow: "0px 1px 0px 0 #e8edf3" }} />
+      <div className="w-full h-20 absolute top-[-0.5px] bg-white" style={{ boxShadow: "0px 1px 0px 0 #e8edf3" }} />
 
       <div className="grid grid-cols-3 grid-cols-[1fr_50%_1fr] items-center w-full h-20 relative">
         <div className="col-span-1 h-full">
