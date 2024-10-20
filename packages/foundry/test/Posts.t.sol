@@ -14,7 +14,7 @@ contract PostManagementTest is Test {
 
     function testCannotCreatePostIfAddressNotRegistered() public {
         vm.expectRevert("Profile does not exist");
-        spotlight.createPost("Hello, world!");
+        spotlight.createPost("Hello, world!", "not a sig");
     }
 
     function testRegisteredAddressCanCreatePostAndEmitsAPostCreatedEvent() public {
@@ -22,17 +22,16 @@ contract PostManagementTest is Test {
         vm.prank(user);
         spotlight.registerProfile("Username");
 
+        vm.expectEmit();
+        emit PostCreated(user, "TODO sig");
         vm.prank(user);
-        spotlight.createPost("Hello, world!");
-
-        vm.expectEmit(true, true, false, true);
-        emit PostCreated(user, "Hello, world!");
-        vm.prank(user);
-        spotlight.createPost("Hello, world!");
+        spotlight.createPost("Hello, world!", "TODO sig");
     }
 
-    // TODO: check storage of post
-    // How though? Need a way to provide a pointer to posts that can be stored
-    // in different data structures --- aka a foreign key
+    function testSignatureThatCannotBeVerifiedIsRejected() public {}
+    function testEmptySignatureIsRejected() public {}
+    function testEmptyPostIsRejected() public {}
+    function testPostCanBeRetrievedBySignature() public {}
+    function testUserCanGetListOfTheirPosts() public {}
+    function testUserCanGetListOfAllPosts() public {}
 }
-

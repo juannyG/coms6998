@@ -13,15 +13,22 @@ contract Spotlight {
     /// @notice The owner of the contract.
     address public owner;
 
+    /// @notice Structure to store the reference to a post
+    struct Post {
+        address creator;
+        bytes signature;
+        bytes content;
+    }
+
     /// @notice Structure to store profile information.
     struct Profile {
         // TODO: avatar, bio, etc.
         string username; // The username of the profile
-        bytes[] posts; // Array of post signatures (aka - post IDs) made by the user
+        Post[] posts; // Array of post signatures (aka - post IDs) made by the user
     }
 
     /// @dev Mapping from signature of post to post content
-    mapping(bytes => bytes) private posts;
+    mapping(bytes => Post) private posts;
 
     /// @dev Mapping from an address to its associated profile.
     mapping(address => Profile) private profiles;
@@ -59,8 +66,10 @@ contract Spotlight {
         require(!normalized_username_hashes[usernameHash], "Username is already taken");
 
         normalized_username_hashes[usernameHash] = true;
-        bytes[] memory _posts = new bytes[](0);
-        profiles[msg.sender] = Profile({username: _username, posts: _posts});
+
+        Profile memory profile;
+        profile.username = _username;
+        profiles[msg.sender] = profile;
 
         emit ProfileRegistered(msg.sender, _username);
     }
@@ -138,8 +147,19 @@ contract Spotlight {
     }
 
     /// @notice Create a post from the caller's address.
-    /// @param _post The content of the post.
-    function createPost(bytes memory _post) public onlyRegistered {
+    /// @param _content The content of the post.
+    /// @param _sig The signature of the post.
+    function createPost(bytes memory _content, bytes memory _sig) public onlyRegistered {
+        // TODO: Require non empty post content & signature
+        // TODO: Verify sig
+        Post memory p = Post({
+            creator: msg.sender,
+            signature: _sig,
+            content: _content
+            });
+        posts[_sig] = p;
+        profiles[msg.sender].posts.push(p);
+        emit PostCreated(msg.sender, _sig);
     }
 
     // TODO: Do we want posts to be completely public or only registered users can read?
