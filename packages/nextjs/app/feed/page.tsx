@@ -1,4 +1,4 @@
-import ContentPage from "./content";
+import ContentPage from "./contentPage";
 import FeedHeaderPage from "./header";
 import LeftPage from "./leftPage";
 import RightPage from "./rightPage";

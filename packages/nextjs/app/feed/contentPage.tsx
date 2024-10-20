@@ -1,8 +1,10 @@
+import CreatePage from "./createPost";
 import { NextPage } from "next";
 
 const ContentPage: NextPage = function () {
   return (
     <div className="flex flex-col gap-10">
+      <CreatePage />
       <div className="flex flex-col justify-start gap-4 p-4 w-[100%] border boder-[#3466f6]">
         <div className="flex justify-start items-center gap-4">
           <div className="avatar">
