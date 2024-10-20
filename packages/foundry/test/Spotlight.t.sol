@@ -3,15 +3,10 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "../contracts/Spotlight.sol";
+import "../contracts/Events.sol";
 
 contract SpotlightTest is Test {
     Spotlight public spotlight;
-
-    // Declare events for testing
-    event ProfileRegistered(address indexed user, string username);
-    event ProfileUpdated(address indexed user, string newUsername);
-    event ProfileDeleted(address indexed user);
-    event CommentPosted(address indexed user, string comment);
 
     function setUp() public {
         spotlight = new Spotlight(vm.addr(1));
@@ -116,28 +111,6 @@ contract SpotlightTest is Test {
         spotlight.deleteProfile();
     }
 
-    function testPostComment() public {
-        address user = vm.addr(1);
-        vm.prank(user);
-        spotlight.registerProfile("Username");
-
-        vm.prank(user);
-        spotlight.postComment("Hello, world!");
-
-        // Check that the comment is stored
-        uint256 length = spotlight.getCommentsLength(user);
-        assertEq(length, 1);
-
-        string memory comment = spotlight.getCommentByIndex(user, 0);
-        assertEq(comment, "Hello, world!");
-    }
-
-
-    function testCannotPostCommentIfNotRegistered() public {
-        vm.expectRevert("Profile does not exist");
-        spotlight.postComment("Hello, world!");
-    }
-
     function testIsRegistered() public {
         address user = vm.addr(1);
         assertFalse(spotlight.isRegistered(user));
@@ -179,12 +152,6 @@ contract SpotlightTest is Test {
         emit ProfileUpdated(user, "NewUsername");
         vm.prank(user);
         spotlight.updateUsername("NewUsername");
-
-        // Test CommentPosted event
-        vm.expectEmit(true, true, false, true);
-        emit CommentPosted(user, "Hello, world!");
-        vm.prank(user);
-        spotlight.postComment("Hello, world!");
 
         // Test ProfileDeleted event
         vm.expectEmit(true, true, false, true);

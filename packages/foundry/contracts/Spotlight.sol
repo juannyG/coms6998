@@ -3,10 +3,11 @@ pragma solidity >=0.8.0 <0.9.0;
 
 // Forge debugging tool, useful for testing purposes. Remove before deploying to live network.
 import "forge-std/console.sol";
+import "./Events.sol";
 
-/// @title Spotlight - A decentralized user profile and comment system
+/// @title Spotlight - A decentralized reddit
 /// @author Team
-/// @notice You can use this contract to manage user profiles and post comments.
+/// @notice You can use this contract to manage user profiles and create posts.
 /// @dev This contract is intended to be deployed on Ethereum-compatible networks.
 contract Spotlight {
     /// @notice The owner of the contract.
@@ -15,37 +16,18 @@ contract Spotlight {
     /// @notice Structure to store profile information.
     struct Profile {
         // TODO: avatar, bio, etc.
-        
         string username; // The username of the profile
+        bytes[] posts; // Array of post signatures (aka - post IDs) made by the user
     }
+
+    /// @dev Mapping from signature of post to post content
+    mapping(bytes => bytes) private posts;
 
     /// @dev Mapping from an address to its associated profile.
     mapping(address => Profile) private profiles;
 
     /// @dev Mapping to keep track of the hashes of normalized usernames to ensure uniqueness.
     mapping(bytes32 => bool) private normalized_username_hashes;
-
-    /// @dev Mapping from an address to the array of comments it has posted.
-    mapping(address => string[]) private address_to_comments;
-
-    /// @notice Emitted when a new profile is registered.
-    /// @param user The address of the user who registered the profile.
-    /// @param username The username associated with the profile.
-    event ProfileRegistered(address indexed user, string username);
-
-    /// @notice Emitted when a profile's username is updated.
-    /// @param user The address of the user who updated the profile.
-    /// @param newUsername The new username associated with the profile.
-    event ProfileUpdated(address indexed user, string newUsername);
-
-    /// @notice Emitted when a profile is deleted.
-    /// @param user The address of the user whose profile was deleted.
-    event ProfileDeleted(address indexed user);
-
-    /// @notice Emitted when a comment is posted.
-    /// @param user The address of the user who posted the comment.
-    /// @param comment The content of the posted comment.
-    event CommentPosted(address indexed user, string comment);
 
     /// @notice Constructor sets the contract owner during deployment.
     /// @param _owner The address of the owner.
@@ -77,7 +59,8 @@ contract Spotlight {
         require(!normalized_username_hashes[usernameHash], "Username is already taken");
 
         normalized_username_hashes[usernameHash] = true;
-        profiles[msg.sender] = Profile({username: _username});
+        bytes[] memory _posts = new bytes[](0);
+        profiles[msg.sender] = Profile({username: _username, posts: _posts});
 
         emit ProfileRegistered(msg.sender, _username);
     }
@@ -125,30 +108,6 @@ contract Spotlight {
         delete profiles[msg.sender];
         emit ProfileDeleted(msg.sender);
     }
-
-    /// @notice Post a comment from the caller's address.
-    /// @param _comment The content of the comment to post.
-    function postComment(string memory _comment) public onlyRegistered {
-        address_to_comments[msg.sender].push(_comment);
-        emit CommentPosted(msg.sender, _comment);
-    }
-
-    /// @notice Get the number of comments posted by a given user.
-    /// @param user The address of the user.
-    /// @return The number of comments the user has posted.
-    function getCommentsLength(address user) public view returns (uint256) {
-        return address_to_comments[user].length;
-    }
-
-    /// @notice Get a specific comment by its index for a given user.
-    /// @param user The address of the user.
-    /// @param index The index of the comment.
-    /// @return The content of the comment at the specified index.
-    function getCommentByIndex(address user, uint256 index) public view returns (string memory) {
-        require(index < address_to_comments[user].length, "Index out of bounds");
-        return address_to_comments[user][index];
-    }
-
     /// @dev Generate a hash from a normalized (lowercase) username.
     /// @param _username The original username.
     /// @return The keccak256 hash of the lowercase username.
@@ -176,5 +135,15 @@ contract Spotlight {
             }
         }
         return string(new_s);
+    }
+
+    /// @notice Create a post from the caller's address.
+    /// @param _post The content of the post.
+    function createPost(bytes memory _post) public onlyRegistered {
+    }
+
+    // TODO: Do we want posts to be completely public or only registered users can read?
+    // Currently public
+    function getPostsOfAddress(address ) public view {
     }
 }
