@@ -3,6 +3,9 @@ pragma solidity >=0.8.0 <0.9.0;
 
 // Forge debugging tool, useful for testing purposes. Remove before deploying to live network.
 import "forge-std/console.sol";
+import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
+import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+
 import "./Events.sol";
 
 /// @title Spotlight - A decentralized reddit
@@ -18,17 +21,32 @@ contract Spotlight {
         address creator;
         bytes signature;
         bytes content;
+        // TODO: Add a community pointer
     }
+
+    // TODO: Move to off-chain storage - sig => off-chain storage location
+    /// @dev Mapping from signature of post to post content
+    mapping(bytes => Post) private posts;
+
+    // TODO: Support >1 community
+    /* TODO:
+       We should probably uses openzeppelin's DoubleEndedQueue here
+       https://docs.openzeppelin.com/contracts/5.x/api/utils#DoubleEndedQueue
+
+       An array adds to the end, so newer items are in the "back", forcing full traversal for
+       "the latest" posts.
+
+       Where as with a DoubleEndedQueue, all ops are O(1) and would work nicely with pagination
+    */
+    /// @dev Array of all post signatures in the community
+    bytes[] private communityPosts;
 
     /// @notice Structure to store profile information.
     struct Profile {
         // TODO: avatar, bio, etc.
         string username; // The username of the profile
-        Post[] posts; // Array of post signatures (aka - post IDs) made by the user
+        bytes[] post_sigs; // Array of post signatures (aka - post IDs) made by the user
     }
-
-    /// @dev Mapping from signature of post to post content
-    mapping(bytes => Post) private posts;
 
     /// @dev Mapping from an address to its associated profile.
     mapping(address => Profile) private profiles;
@@ -149,21 +167,51 @@ contract Spotlight {
     /// @notice Create a post from the caller's address.
     /// @param _content The content of the post.
     /// @param _sig The signature of the post.
-    function createPost(bytes memory _content, bytes memory _sig) public onlyRegistered {
-        // TODO: Require non empty post content & signature
-        // TODO: Verify sig
+    function createPost(bytes calldata _content, bytes calldata _sig) public onlyRegistered {
+        require(_content.length > 0, "Post content cannot be empty");
+        bytes32 data_hash = MessageHashUtils.toEthSignedMessageHash(_content);
+        require(SignatureChecker.isValidSignatureNow(msg.sender, data_hash, _sig), "Invalid signature");
+
         Post memory p = Post({
             creator: msg.sender,
             signature: _sig,
             content: _content
             });
         posts[_sig] = p;
-        profiles[msg.sender].posts.push(p);
+        communityPosts.push(_sig);
+        profiles[msg.sender].post_sigs.push(_sig);
         emit PostCreated(msg.sender, _sig);
     }
 
-    // TODO: Do we want posts to be completely public or only registered users can read?
-    // Currently public
-    function getPostsOfAddress(address ) public view {
+    /// @notice Get all posts for a given address
+    /// @param _addr Wallet address of the registered user whose posts we wish to retrieve
+    function getPostsOfAddress(address _addr) public view onlyRegistered returns (Post[] memory) {
+        // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
+        require(isRegistered(_addr), "Requested address is not registered");
+
+        bytes[] memory sigs = profiles[_addr].post_sigs;
+        Post[] memory userPosts = new Post[](sigs.length);
+        for (uint i = 0; i < sigs.length; i++) {
+            // NOTE: Cannot use userPosts.push because push is only for dynamic arrays in STORAGE
+            userPosts[i] = posts[sigs[i]];
+        }
+        return userPosts;
+    }
+
+    function getPost(bytes calldata _post_sig) public view onlyRegistered returns (Post memory) {
+        Post memory p = posts[_post_sig];
+        require(p.creator != address(0), "Requested post not found");
+        return p;
+    }
+
+    // TODO: add community ID argument - what community are you trying to posts for?
+    /// @notice Get all posts from a community
+    function getCommunityPosts() public view onlyRegistered returns (Post[] memory) {
+        // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
+        Post[] memory p = new Post[](communityPosts.length);
+        for (uint i = 0; i < communityPosts.length; i++) {
+            p[i] = posts[communityPosts[i]];
+        }
+        return p;
     }
 }

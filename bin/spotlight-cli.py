@@ -76,12 +76,14 @@ if __name__ == '__main__':
 
     _set_cwd()
 
-    args = parser.parse_args()
+    args, extra_args = parser.parse_known_args()
     if args.command == 'build':
         build(args.env, args.prune, args.local_run)
     elif args.command == 'deploy':
         deploy(args.env)
     elif args.command == 'test':
-        os.system('docker exec -ti coms6998_yarn-chain_1 yarn test')
+        # extra_args allows for passing arguments into the the `forge test` command.
+        # see: https://book.getfoundry.sh/reference/cli/forge/test
+        os.system(f'docker exec -ti coms6998_yarn-chain_1 yarn test {" ".join(extra_args)}')
 
     exit(0)
