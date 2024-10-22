@@ -204,7 +204,7 @@ contract Spotlight {
         return p;
     }
 
-    // TODO: add community ID argument - what community are you trying to posts for?
+    // TODO: add community ID argument - what community are you trying to get posts for?
     /// @notice Get all posts from a community
     function getCommunityPosts() public view onlyRegistered returns (Post[] memory) {
         // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
