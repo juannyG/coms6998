@@ -19,4 +19,3 @@ event ProfileDeleted(address indexed user);
 /// @param user The address of the user who created the post.
 /// @param signature The signature of the post.
 event PostCreated(address indexed user, bytes indexed signature);
-

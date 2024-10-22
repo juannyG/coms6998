@@ -19,14 +19,14 @@ contract Spotlight {
     /// @notice Structure to store the reference to a post
     struct Post {
         address creator;
-        bytes signature;
+        bytes id;
         bytes content;
         // TODO: Add a community pointer
     }
 
     // TODO: Move to off-chain storage - sig => off-chain storage location
-    /// @dev Mapping from signature of post to post content
-    mapping(bytes => Post) private posts;
+    /// @dev Mapping from signature of post (post ID) to post content
+    mapping(bytes => Post) private postStore;
 
     // TODO: Support >1 community
     /* TODO:
@@ -39,13 +39,13 @@ contract Spotlight {
        Where as with a DoubleEndedQueue, all ops are O(1) and would work nicely with pagination
     */
     /// @dev Array of all post signatures in the community
-    bytes[] private communityPosts;
+    bytes[] private communityPostIDs;
 
     /// @notice Structure to store profile information.
     struct Profile {
         // TODO: avatar, bio, etc.
         string username; // The username of the profile
-        bytes[] post_sigs; // Array of post signatures (aka - post IDs) made by the user
+        bytes[] postIDs; // Array of post signatures (aka - post IDs) made by the user
     }
 
     /// @dev Mapping from an address to its associated profile.
@@ -174,12 +174,12 @@ contract Spotlight {
 
         Post memory p = Post({
             creator: msg.sender,
-            signature: _sig,
+            id: _sig,
             content: _content
             });
-        posts[_sig] = p;
-        communityPosts.push(_sig);
-        profiles[msg.sender].post_sigs.push(_sig);
+        postStore[_sig] = p;
+        communityPostIDs.push(_sig);
+        profiles[msg.sender].postIDs.push(_sig);
         emit PostCreated(msg.sender, _sig);
     }
 
@@ -189,17 +189,17 @@ contract Spotlight {
         // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
         require(isRegistered(_addr), "Requested address is not registered");
 
-        bytes[] memory sigs = profiles[_addr].post_sigs;
+        bytes[] memory sigs = profiles[_addr].postIDs;
         Post[] memory userPosts = new Post[](sigs.length);
         for (uint i = 0; i < sigs.length; i++) {
             // NOTE: Cannot use userPosts.push because push is only for dynamic arrays in STORAGE
-            userPosts[i] = posts[sigs[i]];
+            userPosts[i] = postStore[sigs[i]];
         }
         return userPosts;
     }
 
     function getPost(bytes calldata _post_sig) public view onlyRegistered returns (Post memory) {
-        Post memory p = posts[_post_sig];
+        Post memory p = postStore[_post_sig];
         require(p.creator != address(0), "Requested post not found");
         return p;
     }
@@ -208,9 +208,9 @@ contract Spotlight {
     /// @notice Get all posts from a community
     function getCommunityPosts() public view onlyRegistered returns (Post[] memory) {
         // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
-        Post[] memory p = new Post[](communityPosts.length);
-        for (uint i = 0; i < communityPosts.length; i++) {
-            p[i] = posts[communityPosts[i]];
+        Post[] memory p = new Post[](communityPostIDs.length);
+        for (uint i = 0; i < communityPostIDs.length; i++) {
+            p[i] = postStore[communityPostIDs[i]];
         }
         return p;
     }

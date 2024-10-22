@@ -65,7 +65,7 @@ contract PostManagementTest is Test {
         Spotlight.Post memory p = spotlight.getPost(signContentViaWallet(wallet, "2"));
         assertEq("2", string(p.content));
         assertEq(wallet.addr, p.creator);
-        assertEq(signContentViaWallet(wallet, "2"), p.signature);
+        assertEq(signContentViaWallet(wallet, "2"), p.id);
     }
 
     function testGettingNonexistentPostReverts() public {
@@ -101,16 +101,16 @@ contract PostManagementTest is Test {
         assertEq("1", string(posts[1].content));
         assertEq("2", string(posts[2].content));
 
-        assertEq(signContentViaWallet(wallet, "0"), posts[0].signature);
-        assertEq(signContentViaWallet(wallet, "1"), posts[1].signature);
-        assertEq(signContentViaWallet(wallet, "2"), posts[2].signature);
+        assertEq(signContentViaWallet(wallet, "0"), posts[0].id);
+        assertEq(signContentViaWallet(wallet, "1"), posts[1].id);
+        assertEq(signContentViaWallet(wallet, "2"), posts[2].id);
 
         // We can also get the post of the first user, right?
         posts = spotlight.getPostsOfAddress(_w.addr);
         assertEq(1, posts.length);
         assertEq(_w.addr, posts[0].creator);
         assertEq(bytes("_w"), posts[0].content);
-        assertEq(signContentViaWallet(_w, "_w"), posts[0].signature);
+        assertEq(signContentViaWallet(_w, "_w"), posts[0].id);
     }
 
     function testUserCanGetListOfAllPostsInCommunity() public {
@@ -145,9 +145,9 @@ contract PostManagementTest is Test {
         assertEq(wallets[1].addr, posts[1].creator);
         assertEq(wallets[2].addr, posts[2].creator);
 
-        assertEq(signContentViaWallet(wallets[0], "0"), posts[0].signature);
-        assertEq(signContentViaWallet(wallets[1], "1"), posts[1].signature);
-        assertEq(signContentViaWallet(wallets[2], "2"), posts[2].signature);
+        assertEq(signContentViaWallet(wallets[0], "0"), posts[0].id);
+        assertEq(signContentViaWallet(wallets[1], "1"), posts[1].id);
+        assertEq(signContentViaWallet(wallets[2], "2"), posts[2].id);
 
         assertEq(bytes("0"), posts[0].content);
         assertEq(bytes("1"), posts[1].content);
