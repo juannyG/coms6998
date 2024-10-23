@@ -1,3 +1,4 @@
+import Image from "next/image";
 import CreatePage from "./createPost";
 import { NextPage } from "next";
 
@@ -9,7 +10,7 @@ const ContentPage: NextPage = function () {
         <div className="flex justify-start items-center gap-4">
           <div className="avatar">
             <div className="w-10 h-10 rounded-full">
-              <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+              <Image alt="" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
             </div>
           </div>
           <p className="text-sm font-semibold text-left text-black">Garfield</p>
@@ -24,7 +25,7 @@ const ContentPage: NextPage = function () {
         <div className="flex justify-start items-center gap-4">
           <div className="avatar">
             <div className="w-10 h-10 rounded-full">
-              <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+              <Image alt="" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
             </div>
           </div>
           <p className="text-sm font-semibold text-left text-black">Garfield</p>

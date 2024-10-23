@@ -1,28 +1,26 @@
-import ExampleTheme from "./themes/ExampleTheme";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import TreeViewPlugin from "./plugins/TreeViewPlugin";
+import { useContext } from "react";
+import { EditorContext } from "../context";
+import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
+import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
+import EditorContentPlugin from "./plugins/EditorContentPlugin";
+import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
 import ToolbarPlugin from "./plugins/ToolbarPlugin";
-import { HeadingNode, QuoteNode } from "@lexical/rich-text";
-import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { ListItemNode, ListNode } from "@lexical/list";
+import ExampleTheme from "./themes/ExampleTheme";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import { AutoLinkNode, LinkNode } from "@lexical/link";
+import { ListItemNode, ListNode } from "@lexical/list";
+import { TRANSFORMERS } from "@lexical/markdown";
+import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
+import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
-import { TRANSFORMERS } from "@lexical/markdown";
-
-import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
-import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
-import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
-import EditorContentPlugin from "./plugins/EditorContentPlugin";
-import { useContext } from "react";
-import { EditorContext } from "../context";
+import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { HeadingNode, QuoteNode } from "@lexical/rich-text";
+import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
@@ -47,12 +45,12 @@ const editorConfig = {
     TableCellNode,
     TableRowNode,
     AutoLinkNode,
-    LinkNode
-  ]
+    LinkNode,
+  ],
 };
 
 export default function Editor() {
-  const {confirmPost} = useContext(EditorContext);
+  const { confirmPost } = useContext(EditorContext);
 
   return (
     <LexicalComposer initialConfig={editorConfig}>
@@ -66,7 +64,6 @@ export default function Editor() {
           />
           <EditorContentPlugin />
           <HistoryPlugin />
-          {/* <TreeViewPlugin /> */}
           <AutoFocusPlugin />
           <CodeHighlightPlugin />
           <ListPlugin />
@@ -75,10 +72,10 @@ export default function Editor() {
           <ListMaxIndentLevelPlugin maxDepth={7} />
           <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
         </div>
-        <div className='flex justify-end pt-2'>
-            <button className='btn btn-outline rounded text-[#3466f6] border border-[#3466f6]'
-              onClick={confirmPost}
-            >Post</button>
+        <div className="flex justify-end pt-2">
+          <button className="btn btn-outline rounded text-[#3466f6] border border-[#3466f6]" onClick={confirmPost}>
+            Post
+          </button>
         </div>
       </div>
     </LexicalComposer>
