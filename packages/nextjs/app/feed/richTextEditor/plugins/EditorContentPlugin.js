@@ -9,7 +9,7 @@ export default function EditorContentPlugin() {
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
       const json = JSON.stringify(editorState.toJSON());
-      if (setContent) {
+      if (updateContent) {
         updateContent(json);
       }
     });

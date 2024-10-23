@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { NextPage } from "next";
 
 const FeedHeaderPage: NextPage = () => {
@@ -83,7 +82,7 @@ const FeedHeaderPage: NextPage = () => {
               </svg>
             </div>
           </div>
-          <Image alt="" src="avatar.png" className="w-10 h-10 rounded-[40px] object-cover ml-2" />
+          <img alt="" src="/avatar.png" className="w-10 h-10 rounded-[40px] object-cover ml-2" />
         </div>
       </div>
     </div>
