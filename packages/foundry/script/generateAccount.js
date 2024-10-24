@@ -34,16 +34,14 @@ async function main() {
   // .env file exists
   const existingEnvConfig = parse(fs.readFileSync(envFilePath).toString());
   if (existingEnvConfig.DEPLOYER_PRIVATE_KEY) {
-    console.log(
-      "⚠️ You already have a deployer account. Check the packages/foundry/.env file"
-    );
+    console.log("⚠️ You already have a deployer account. Check the packages/foundry/.env file");
     return;
   }
 
   setNewEnvConfig(existingEnvConfig);
 }
 
-main().catch((error) => {
+main().catch(error => {
   console.error(error);
   process.exitCode = 1;
 });

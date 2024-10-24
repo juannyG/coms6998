@@ -56,9 +56,7 @@ contract Spotlight {
 
   /// @notice Constructor sets the contract owner during deployment.
   /// @param _owner The address of the owner.
-  constructor(
-    address _owner
-  ) {
+  constructor(address _owner) {
     owner = _owner;
   }
 
@@ -70,9 +68,7 @@ contract Spotlight {
 
   /// @notice Modifier to ensure that a username meets the length requirements.
   /// @param _username The username to be validated.
-  modifier usernameValid(
-    string memory _username
-  ) {
+  modifier usernameValid(string memory _username) {
     require(bytes(_username).length > 0, "Username cannot be empty");
     require(bytes(_username).length < 32, "Username too long");
     _;
@@ -81,15 +77,11 @@ contract Spotlight {
   /// @notice Register a new profile with a unique username.
   /// @dev The username is checked for uniqueness after normalization (case-insensitive).
   /// @param _username The desired username for the profile.
-  function registerProfile(
-    string memory _username
-  ) public usernameValid(_username) {
+  function registerProfile(string memory _username) public usernameValid(_username) {
     require(!isRegistered(msg.sender), "Profile already exists");
 
     bytes32 usernameHash = _getUsernameHash(_username);
-    require(
-      !normalized_username_hashes[usernameHash], "Username is already taken"
-    );
+    require(!normalized_username_hashes[usernameHash], "Username is already taken");
 
     normalized_username_hashes[usernameHash] = true;
 
@@ -103,9 +95,7 @@ contract Spotlight {
   /// @notice Check if an address is registered with a profile.
   /// @param a The address to check.
   /// @return True if the address has a registered profile, false otherwise.
-  function isRegistered(
-    address a
-  ) public view returns (bool) {
+  function isRegistered(address a) public view returns (bool) {
     return bytes(profiles[a].username).length > 0;
   }
 
@@ -113,9 +103,7 @@ contract Spotlight {
   /// @dev The profile must exist for the specified address.
   /// @param a The address of the profile owner.
   /// @return The username associated with the address.
-  function getProfile(
-    address a
-  ) public view returns (string memory) {
+  function getProfile(address a) public view returns (string memory) {
     require(bytes(profiles[a].username).length > 0, "Profile does not exist");
     return profiles[a].username;
   }
@@ -123,9 +111,7 @@ contract Spotlight {
   /// @notice Update the username of the caller's profile.
   /// @dev The new username must be unique and meet length requirements.
   /// @param _newUsername The new username to set for the profile.
-  function updateUsername(
-    string memory _newUsername
-  ) public onlyRegistered usernameValid(_newUsername) {
+  function updateUsername(string memory _newUsername) public onlyRegistered usernameValid(_newUsername) {
     bytes32 newHash = _getUsernameHash(_newUsername);
     require(!normalized_username_hashes[newHash], "Username is already taken");
 
@@ -149,13 +135,12 @@ contract Spotlight {
     delete profiles[msg.sender];
     emit ProfileDeleted(msg.sender);
   }
+
   /// @dev Generate a hash from a normalized (lowercase) username.
   /// @param _username The original username.
   /// @return The keccak256 hash of the lowercase username.
 
-  function _getUsernameHash(
-    string memory _username
-  ) private pure returns (bytes32) {
+  function _getUsernameHash(string memory _username) private pure returns (bytes32) {
     string memory lowercaseUsername = _toLower(_username);
     return keccak256(abi.encodePacked(lowercaseUsername));
   }
@@ -163,9 +148,7 @@ contract Spotlight {
   /// @dev Convert a string to lowercase.
   /// @param _s The original string.
   /// @return The lowercase version of the input string.
-  function _toLower(
-    string memory _s
-  ) private pure returns (string memory) {
+  function _toLower(string memory _s) private pure returns (string memory) {
     bytes memory orig_s = bytes(_s);
     bytes memory new_s = new bytes(orig_s.length);
 
@@ -186,18 +169,12 @@ contract Spotlight {
   /// @notice Create a post from the caller's address.
   /// @param _content The content of the post.
   /// @param _sig The signature of the post.
-  function createPost(
-    bytes calldata _content,
-    bytes calldata _sig
-  ) public onlyRegistered {
+  function createPost(bytes calldata _content, bytes calldata _sig) public onlyRegistered {
     require(_content.length > 0, "Post content cannot be empty");
     bytes32 data_hash = MessageHashUtils.toEthSignedMessageHash(_content);
-    require(
-      SignatureChecker.isValidSignatureNow(msg.sender, data_hash, _sig),
-      "Invalid signature"
-    );
+    require(SignatureChecker.isValidSignatureNow(msg.sender, data_hash, _sig), "Invalid signature");
 
-    Post memory p = Post({ creator: msg.sender, id: _sig, content: _content });
+    Post memory p = Post({creator: msg.sender, id: _sig, content: _content});
     postStore[_sig] = p;
     communityPostIDs.push(_sig);
     profiles[msg.sender].postIDs.push(_sig);
@@ -206,9 +183,7 @@ contract Spotlight {
 
   /// @notice Get all posts for a given address
   /// @param _addr Wallet address of the registered user whose posts we wish to retrieve
-  function getPostsOfAddress(
-    address _addr
-  ) public view onlyRegistered returns (Post[] memory) {
+  function getPostsOfAddress(address _addr) public view onlyRegistered returns (Post[] memory) {
     // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
     require(isRegistered(_addr), "Requested address is not registered");
 
@@ -221,9 +196,7 @@ contract Spotlight {
     return userPosts;
   }
 
-  function getPost(
-    bytes calldata _post_sig
-  ) public view onlyRegistered returns (Post memory) {
+  function getPost(bytes calldata _post_sig) public view onlyRegistered returns (Post memory) {
     Post memory p = postStore[_post_sig];
     require(p.creator != address(0), "Requested post not found");
     return p;
@@ -231,12 +204,7 @@ contract Spotlight {
 
   // TODO: add community ID argument - what community are you trying to get posts for?
   /// @notice Get all posts from a community
-  function getCommunityPosts()
-    public
-    view
-    onlyRegistered
-    returns (Post[] memory)
-  {
+  function getCommunityPosts() public view onlyRegistered returns (Post[] memory) {
     // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
     Post[] memory p = new Post[](communityPostIDs.length);
     for (uint256 i = 0; i < communityPostIDs.length; i++) {
