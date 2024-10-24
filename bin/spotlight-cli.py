@@ -20,6 +20,9 @@ def build(target_env, prune, local_run):
             exit(res)
 
     if target_env == 'local':
+        # Bring down any active container references, just in case to make sure we start fresh
+        os.system(f'COMPOSE_COMPATIBILITY=true {DOCKER_COMPOSE_CMD} down')
+
         cmd = f'COMPOSE_COMPATIBILITY=true {DOCKER_COMPOSE_CMD} build'
         if local_run:
             cmd = f'COMPOSE_COMPATIBILITY=true {DOCKER_COMPOSE_CMD} up --build'
