@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
       abi: [
         {
           type: "constructor",
@@ -22,6 +22,56 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "createPost",
+          inputs: [
+            {
+              name: "_p",
+              type: "tuple",
+              internalType: "struct PostLib.Post",
+              components: [
+                {
+                  name: "creator",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "id",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "content",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "title",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "createdAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "lastUpdatedAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+              ],
+            },
+            {
+              name: "_sig",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
           name: "deleteProfile",
           inputs: [],
           outputs: [],
@@ -29,34 +79,106 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getCommentByIndex",
-          inputs: [
-            {
-              name: "user",
-              type: "address",
-              internalType: "address",
-            },
-            {
-              name: "index",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
+          name: "getCommunityPosts",
+          inputs: [],
           outputs: [
             {
               name: "",
-              type: "string",
-              internalType: "string",
+              type: "tuple[]",
+              internalType: "struct PostLib.Post[]",
+              components: [
+                {
+                  name: "creator",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "id",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "content",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "title",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "createdAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "lastUpdatedAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+              ],
             },
           ],
           stateMutability: "view",
         },
         {
           type: "function",
-          name: "getCommentsLength",
+          name: "getPost",
           inputs: [
             {
-              name: "user",
+              name: "_post_sig",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "tuple",
+              internalType: "struct PostLib.Post",
+              components: [
+                {
+                  name: "creator",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "id",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "content",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "title",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "createdAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "lastUpdatedAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+              ],
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getPostsOfAddress",
+          inputs: [
+            {
+              name: "_addr",
               type: "address",
               internalType: "address",
             },
@@ -64,8 +186,40 @@ const deployedContracts = {
           outputs: [
             {
               name: "",
-              type: "uint256",
-              internalType: "uint256",
+              type: "tuple[]",
+              internalType: "struct PostLib.Post[]",
+              components: [
+                {
+                  name: "creator",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "id",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "content",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "title",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "createdAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "lastUpdatedAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+              ],
             },
           ],
           stateMutability: "view",
@@ -123,19 +277,6 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "postComment",
-          inputs: [
-            {
-              name: "_comment",
-              type: "string",
-              internalType: "string",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
           name: "registerProfile",
           inputs: [
             {
@@ -162,7 +303,7 @@ const deployedContracts = {
         },
         {
           type: "event",
-          name: "CommentPosted",
+          name: "PostCreated",
           inputs: [
             {
               name: "user",
@@ -171,10 +312,10 @@ const deployedContracts = {
               internalType: "address",
             },
             {
-              name: "comment",
-              type: "string",
-              indexed: false,
-              internalType: "string",
+              name: "signature",
+              type: "bytes",
+              indexed: true,
+              internalType: "bytes",
             },
           ],
           anonymous: false,
