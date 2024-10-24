@@ -174,7 +174,7 @@ contract Spotlight {
     bytes32 data_hash = MessageHashUtils.toEthSignedMessageHash(_content);
     require(SignatureChecker.isValidSignatureNow(msg.sender, data_hash, _sig), "Invalid signature");
 
-    Post memory p = Post({creator: msg.sender, id: _sig, content: _content});
+    Post memory p = Post({ creator: msg.sender, id: _sig, content: _content });
     postStore[_sig] = p;
     communityPostIDs.push(_sig);
     profiles[msg.sender].postIDs.push(_sig);

@@ -37,5 +37,5 @@ contract DeployScript is ScaffoldETHDeploy {
     exportDeployments();
   }
 
-  function test() public {}
+  function test() public { }
 }
