@@ -17,10 +17,7 @@ contract PostManagementTest is Test {
     wallet = vm.createWallet(1);
   }
 
-  function signContentViaWallet(
-    Vm.Wallet memory _w,
-    string memory _content
-  ) internal returns (bytes memory) {
+  function signContentViaWallet(Vm.Wallet memory _w, string memory _content) internal returns (bytes memory) {
     bytes32 digest = MessageHashUtils.toEthSignedMessageHash(bytes(_content));
     (uint8 v, bytes32 r, bytes32 s) = vm.sign(_w, digest);
     bytes memory signature = abi.encodePacked(r, s, v);
@@ -42,9 +39,7 @@ contract PostManagementTest is Test {
     spotlight.createPost("Hello, world!", signature);
   }
 
-  function testSignatureThatCannotBeVerifiedResultsInRevertingPostCreation()
-    public
-  {
+  function testSignatureThatCannotBeVerifiedResultsInRevertingPostCreation() public {
     vm.startPrank(wallet.addr);
     spotlight.registerProfile("username");
 
@@ -67,8 +62,7 @@ contract PostManagementTest is Test {
     spotlight.createPost("2", signContentViaWallet(wallet, "2"));
     spotlight.createPost("3", signContentViaWallet(wallet, "3"));
 
-    Spotlight.Post memory p =
-      spotlight.getPost(signContentViaWallet(wallet, "2"));
+    Spotlight.Post memory p = spotlight.getPost(signContentViaWallet(wallet, "2"));
     assertEq("2", string(p.content));
     assertEq(wallet.addr, p.creator);
     assertEq(signContentViaWallet(wallet, "2"), p.id);
