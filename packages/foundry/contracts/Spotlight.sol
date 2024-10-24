@@ -6,6 +6,7 @@ import "forge-std/console.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
+import "./PostLib.sol";
 import "./Events.sol";
 
 /// @title Spotlight - A decentralized reddit
@@ -16,17 +17,9 @@ contract Spotlight {
   /// @notice The owner of the contract.
   address public owner;
 
-  /// @notice Structure to store the reference to a post
-  struct Post {
-    address creator;
-    bytes id;
-    bytes content;
-  }
-  // TODO: Add a community pointer
-
   // TODO: Move to off-chain storage - sig => off-chain storage location
   /// @dev Mapping from signature of post (post ID) to post content
-  mapping(bytes => Post) private postStore;
+  mapping(bytes => PostLib.Post) private postStore;
 
   // TODO: Support >1 community
   /* TODO:
@@ -167,15 +160,21 @@ contract Spotlight {
   }
 
   /// @notice Create a post from the caller's address.
-  /// @param _content The content of the post.
+  /// @param _p The post to create.
   /// @param _sig The signature of the post.
-  function createPost(bytes calldata _content, bytes calldata _sig) public onlyRegistered {
-    require(_content.length > 0, "Post content cannot be empty");
-    bytes32 data_hash = MessageHashUtils.toEthSignedMessageHash(_content);
-    require(SignatureChecker.isValidSignatureNow(msg.sender, data_hash, _sig), "Invalid signature");
+  function createPost(PostLib.Post memory _p, bytes calldata _sig) public onlyRegistered {
+    require(bytes(_p.content).length > 0, "Content cannot be empty");
+    require(bytes(_p.title).length > 0, "Title cannot be empty");
+    require(_p.createdAt > 0, "Created timestamp is missing");
+    require(_p.lastUpdatedAt > 0, "Last updated timestamp is missing");
+    require(PostLib.isValidPostSignature(msg.sender, _p, _sig), "Invalid signature");
 
-    Post memory p = Post({ creator: msg.sender, id: _sig, content: _content });
-    postStore[_sig] = p;
+    // TODO: Check that the signature doesn't already exist in the postStore!
+
+    _p.creator = msg.sender;
+    _p.id = _sig;
+
+    postStore[_sig] = _p;
     communityPostIDs.push(_sig);
     profiles[msg.sender].postIDs.push(_sig);
     emit PostCreated(msg.sender, _sig);
@@ -183,12 +182,13 @@ contract Spotlight {
 
   /// @notice Get all posts for a given address
   /// @param _addr Wallet address of the registered user whose posts we wish to retrieve
-  function getPostsOfAddress(address _addr) public view onlyRegistered returns (Post[] memory) {
+  function getPostsOfAddress(address _addr) public view onlyRegistered returns (PostLib.Post[] memory) {
     // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
     require(isRegistered(_addr), "Requested address is not registered");
 
     bytes[] memory sigs = profiles[_addr].postIDs;
-    Post[] memory userPosts = new Post[](sigs.length);
+    console.log("Sigs length", sigs.length);
+    PostLib.Post[] memory userPosts = new PostLib.Post[](sigs.length);
     for (uint256 i = 0; i < sigs.length; i++) {
       // NOTE: Cannot use userPosts.push because push is only for dynamic arrays in STORAGE
       userPosts[i] = postStore[sigs[i]];
@@ -196,17 +196,17 @@ contract Spotlight {
     return userPosts;
   }
 
-  function getPost(bytes calldata _post_sig) public view onlyRegistered returns (Post memory) {
-    Post memory p = postStore[_post_sig];
+  function getPost(bytes calldata _post_sig) public view onlyRegistered returns (PostLib.Post memory) {
+    PostLib.Post memory p = postStore[_post_sig];
     require(p.creator != address(0), "Requested post not found");
     return p;
   }
 
   // TODO: add community ID argument - what community are you trying to get posts for?
   /// @notice Get all posts from a community
-  function getCommunityPosts() public view onlyRegistered returns (Post[] memory) {
+  function getCommunityPosts() public view onlyRegistered returns (PostLib.Post[] memory) {
     // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
-    Post[] memory p = new Post[](communityPostIDs.length);
+    PostLib.Post[] memory p = new PostLib.Post[](communityPostIDs.length);
     for (uint256 i = 0; i < communityPostIDs.length; i++) {
       p[i] = postStore[communityPostIDs[i]];
     }
