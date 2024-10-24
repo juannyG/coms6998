@@ -34,7 +34,7 @@ def build(target_env, prune, local_run):
 
 def deploy(target_env):
     if target_env == 'local':
-        os.system('docker exec -ti coms6998_yarn-chain_1 forge clean')
+        os.system('docker exec -ti coms6998_yarn-chain_1 bash -c "cd packages/foundry; forge clean"')
         os.system('docker exec -ti coms6998_yarn-chain_1 yarn deploy')
     else:
         print(f"Deployments for {target_env} are not currently supported.")
