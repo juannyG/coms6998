@@ -21,7 +21,7 @@ const RegistrationForm = () => {
 
   if (userProfile.isRegistered === true) {
     // Already registered
-    router.push("/home");
+    router.push("/feed");
   }
 
   return (
