@@ -1,30 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { EditorContext } from "./context";
 import Editor from "./richTextEditor/Editor";
 import "./richTextEditor/styles.css";
 import { NextPage } from "next";
+import { set } from "nprogress";
 
 const CreatePage: NextPage = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [clickPost, setClickPost] = useState(false);
+  const router = useRouter();
 
   function handleTitleChange(e: any) {
     setTitle(e.target.value);
   }
 
   useEffect(() => {
-    // We can get the editor content.
-    // console.log("TITLE: ", title);
-    // console.log("CONTENT: ", content);
-    // console.log("CLICK POST: ", clickPost);
-    // if(clickPost) {
-    //     // console.log("Post is clicked");
-    //     setClickPost(false);
-    // }
-  }, [title, content, clickPost]);
+    if (clickPost) {
+      // jump to display page and pass the content to new page
+      sessionStorage.setItem("postContent", content);
+      sessionStorage.setItem("postTitle", title);
+      router.push("/feed/viewPost");
+      setClickPost(false);
+    }
+  }, [clickPost, router]);
 
   const value = {
     setContent,

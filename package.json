@@ -51,6 +51,7 @@
     "@mui/material": "^6.1.4",
     "@mui/styles": "^6.1.4",
     "lexical": "^0.18.0",
-    "mui-rte": "^2.0.1"
+    "mui-rte": "^2.0.1",
+    "react-use": "^17.5.1"
   }
 }
