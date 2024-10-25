@@ -5,11 +5,16 @@ import { EditorContext } from "./context";
 import Editor from "./richTextEditor/Editor";
 import "./richTextEditor/styles.css";
 import { NextPage } from "next";
+import { useAccount } from "wagmi";
+import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { notification } from "~~/utils/scaffold-eth";
 
 const CreatePage: NextPage = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [clickPost, setClickPost] = useState(false);
+  const { address } = useAccount();
+  const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
 
   function handleTitleChange(e: any) {
     setTitle(e.target.value);
@@ -20,15 +25,41 @@ const CreatePage: NextPage = () => {
     // console.log("TITLE: ", title);
     // console.log("CONTENT: ", content);
     // console.log("CLICK POST: ", clickPost);
-    // if(clickPost) {
-    //     // console.log("Post is clicked");
-    //     setClickPost(false);
-    // }
+    if (clickPost) {
+      // console.log("Post is clicked");
+      setClickPost(false);
+    }
   }, [title, content, clickPost]);
 
   const value = {
     setContent,
-    confirmPost: () => {
+    confirmPost: async () => {
+      if (!address) {
+        return;
+      }
+      console.log("Title to be posted", title);
+      console.log("Content to be posted", content);
+      console.log("Creator", address);
+      const ts = BigInt(Date.now());
+      try {
+        await writeSpotlightContractAsync({
+          functionName: "createPost",
+          args: [
+            {
+              id: "0x0",
+              creator: address,
+              title: title,
+              content: content,
+              createdAt: ts,
+              lastUpdatedAt: ts,
+            },
+            "0x0",
+          ],
+        });
+      } catch (e: any) {
+        console.log(e);
+      }
+
       setClickPost(true);
     },
   };
