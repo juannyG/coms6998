@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      address: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
       abi: [
         {
           type: "constructor",
@@ -72,8 +72,39 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "deletePost",
+          inputs: [
+            {
+              name: "_sig",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
           name: "deleteProfile",
           inputs: [],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "editPost",
+          inputs: [
+            {
+              name: "_sig",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "newContent",
+              type: "string",
+              internalType: "string",
+            },
+          ],
           outputs: [],
           stateMutability: "nonpayable",
         },
@@ -304,6 +335,44 @@ const deployedContracts = {
         {
           type: "event",
           name: "PostCreated",
+          inputs: [
+            {
+              name: "user",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "signature",
+              type: "bytes",
+              indexed: true,
+              internalType: "bytes",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "PostDeleted",
+          inputs: [
+            {
+              name: "user",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "signature",
+              type: "bytes",
+              indexed: true,
+              internalType: "bytes",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "PostEdited",
           inputs: [
             {
               name: "user",
