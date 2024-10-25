@@ -212,4 +212,48 @@ contract Spotlight {
     }
     return p;
   }
+
+  function editPost(bytes calldata _sig, string calldata newContent) public onlyRegistered {
+    // Ensure post exists
+    PostLib.Post storage post = postStore[_sig];
+    require(post.creator == msg.sender, "Only the creator can edit this post");
+    require(bytes(post.content).length > 0, "Post does not exist");
+    require(bytes(newContent).length > 0, "Content cannot be empty");
+
+    post.content = newContent;
+    post.lastUpdatedAt = block.timestamp;
+
+    emit PostEdited(msg.sender, _sig);
+  }
+
+  function deletePost(bytes calldata _sig) public onlyRegistered {
+    // Ensure the post exists
+    PostLib.Post storage post = postStore[_sig];
+    require(post.creator == msg.sender, "Only the creator can delete this post");
+    require(bytes(post.content).length > 0, "Post does not exist");
+
+    // Remove post from user's profile
+    bytes[] storage userPosts = profiles[msg.sender].postIDs;
+    for (uint256 i = 0; i < userPosts.length; i++) {
+      // Solidity doesn’t have native string comparison, so keccak256 is often used to compare strings by hashing them
+      if (keccak256(userPosts[i]) == keccak256(_sig)) {
+        userPosts[i] = userPosts[userPosts.length - 1]; // Efficient gas usage: O(1) rather than O(n).
+        userPosts.pop();
+        break;
+      }
+    }
+
+    // Remove post from communityPostIDs
+    for (uint256 i = 0; i < communityPostIDs.length; i++) {
+      // Solidity doesn’t have native string comparison, so keccak256 is often used to compare strings by hashing them
+      if (keccak256(communityPostIDs[i]) == keccak256(_sig)) {
+        communityPostIDs[i] = communityPostIDs[communityPostIDs.length - 1]; // Efficient gas usage: O(1) rather than O(n).
+        communityPostIDs.pop();
+        break;
+      }
+    }
+
+    delete postStore[_sig];
+    emit PostDeleted(msg.sender, _sig);
+  }
 }
