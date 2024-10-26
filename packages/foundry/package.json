@@ -13,6 +13,8 @@
     "generate": "node script/generateAccount.js",
     "lint": "forge fmt --check && prettier --check ./script/**/*.js",
     "test": "forge test",
+    "coverage": "forge coverage",
+    "clean": "forge clean",
     "verify": "forge build --build-info --build-info-path out/build-info/ && forge script script/VerifyAll.s.sol --ffi --rpc-url ${1:-default_network}"
   },
   "dependencies": {
