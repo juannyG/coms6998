@@ -23,7 +23,6 @@ import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { use, useEffect } from "react";
 
 const editorConfig = {
-    editorState: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"你好，","type":"text","version":1},{"detail":0,"format":14,"mode":"normal","style":"","text":"这是","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"一个","type":"text","version":1},{"detail":0,"format":1,"mode":"normal","style":"","text":"测试","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0,"textStyle":""},{"children":[{"detail":0,"format":1,"mode":"normal","style":"","text":"居中显示","type":"text","version":1}],"direction":"ltr","format":"center","indent":0,"type":"paragraph","version":1,"textFormat":1,"textStyle":""}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
   // The editor theme
   theme: ExampleTheme,
   editable: false,

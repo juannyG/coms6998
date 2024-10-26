@@ -9,7 +9,6 @@ export default function RestoreFromLocalStoragePlugin() {
   const [serializedEditorState, setSerializedEditorState] = useSessionStorage('postContent', null);
   const isFirstRender = useRef(true);
 
-
   useEffect(() => {
     if (isFirstRender.current) {
         isFirstRender.current = false;
