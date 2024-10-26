@@ -46,7 +46,7 @@ const editorConfig = {
   ],
 };
 
-export default function Viewer() {
+export default function Viewer({data}) {
 
   return (
     <LexicalComposer initialConfig={editorConfig}>
@@ -56,7 +56,7 @@ export default function Viewer() {
             contentEditable={<ContentEditable className="editor-input" />}
             ErrorBoundary={LexicalErrorBoundary}
           />
-          <RestoreFromLocalStoragePlugin />
+          <RestoreFromLocalStoragePlugin data={data}/>
           <CodeHighlightPlugin />
           <ListPlugin />
           <LinkPlugin />

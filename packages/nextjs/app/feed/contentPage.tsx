@@ -1,6 +1,7 @@
 "use client";
 
 import CreatePage from "./createPost";
+import Viewer from "./richTextEditor/Viewer";
 import { NextPage } from "next";
 import { useAccount } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
@@ -14,6 +15,7 @@ const RenderPosts = ({ data }: { data: any }) => {
   if (data.length == 0) {
     return <>No posts yet (To be styled!)</>;
   }
+
   return (
     <>
       {data.map((p: TPost) => {
@@ -25,10 +27,13 @@ const RenderPosts = ({ data }: { data: any }) => {
                   <img alt="" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
                 </div>
               </div>
-              <p className="text-sm font-semibold text-left text-black">{p.creator}</p>
+              <p className="text-sm font-semibold text-left text-black">
+                {p.creator.substring(0, 6) + "..." + p.creator.substring(p.creator.length - 4)}
+              </p>
             </div>
             <p className="w-[100%]text-lg font-bold text-left text-black">{p.title}</p>
-            <p className="w-[100%]text-lg text-left text-black" dangerouslySetInnerHTML={{ __html: p.content }} />
+            {/* <p className="w-[100%]text-lg text-left text-black" dangerouslySetInnerHTML={{ __html: p.content }} /> */}
+            <Viewer data={p.content} />
             <div className="flex justify-start gap-4 w-[100%] h-5">
               <p className="text-sm text-left text-gray-500">#web3</p>
               <p className="text-sm text-left text-gray-500">#eth</p>

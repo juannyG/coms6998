@@ -16,6 +16,7 @@ const CreatePage: NextPage = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [clickPost, setClickPost] = useState(false);
+  const [postSig, setPostSig] = useState("");
   const router = useRouter();
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
@@ -26,14 +27,12 @@ const CreatePage: NextPage = () => {
   }
 
   useEffect(() => {
-    if (clickPost) {
-      // jump to display page and pass the content to new page
-      sessionStorage.setItem("postContent", content);
-      sessionStorage.setItem("postTitle", title);
-      router.push("/feed/viewPost");
+    if (clickPost && postSig) {
+      const query = new URLSearchParams({ postSig: postSig }).toString();
+      router.push(`/feed/viewPost?${query}`);
       setClickPost(false);
     }
-  }, [clickPost, router]);
+  }, [clickPost, router, postSig]);
 
   const value = {
     setContent,
@@ -52,6 +51,7 @@ const CreatePage: NextPage = () => {
           lastUpdatedAt: ts,
         };
         const postSig = await createPostSignature({ signMessageAsync, post });
+        setPostSig(postSig);
 
         console.log("Signature of post:", postSig);
 
