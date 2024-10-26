@@ -5,15 +5,17 @@ import { EditorContext } from "./context";
 import Editor from "./richTextEditor/Editor";
 import "./richTextEditor/styles.css";
 import { NextPage } from "next";
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { notification } from "~~/utils/scaffold-eth";
+import { TPost } from "~~/types/spotlight";
+import { createPostSignature } from "~~/utils/spotlight";
 
 const CreatePage: NextPage = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [clickPost, setClickPost] = useState(false);
   const { address } = useAccount();
+  const { signMessageAsync } = useSignMessage();
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
 
   function handleTitleChange(e: any) {
@@ -21,12 +23,7 @@ const CreatePage: NextPage = () => {
   }
 
   useEffect(() => {
-    // We can get the editor content.
-    // console.log("TITLE: ", title);
-    // console.log("CONTENT: ", content);
-    // console.log("CLICK POST: ", clickPost);
     if (clickPost) {
-      // console.log("Post is clicked");
       setClickPost(false);
     }
   }, [title, content, clickPost]);
@@ -37,25 +34,21 @@ const CreatePage: NextPage = () => {
       if (!address) {
         return;
       }
-      console.log("Title to be posted", title);
-      console.log("Content to be posted", content);
-      console.log("Creator", address);
-      const ts = BigInt(Date.now());
       try {
-        await writeSpotlightContractAsync({
-          functionName: "createPost",
-          args: [
-            {
-              id: "0x0",
-              creator: address,
-              title: title,
-              content: content,
-              createdAt: ts,
-              lastUpdatedAt: ts,
-            },
-            "0x0",
-          ],
-        });
+        const ts = BigInt(Date.now());
+        const post: TPost = {
+          id: "0x0", // The contract will overwrite this. This is just for typescript type consistency
+          creator: address, // The contract will overwrite this. This is just for typescript type consistency
+          title,
+          content,
+          createdAt: ts,
+          lastUpdatedAt: ts,
+        };
+        const postSig = await createPostSignature({ signMessageAsync, post });
+
+        console.log("Signature of post:", postSig);
+
+        await writeSpotlightContractAsync({ functionName: "createPost", args: [post, postSig] });
       } catch (e: any) {
         console.log(e);
       }

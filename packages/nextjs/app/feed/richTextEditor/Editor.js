@@ -5,7 +5,6 @@ import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import EditorContentPlugin from "./plugins/EditorContentPlugin";
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
 import ToolbarPlugin from "./plugins/ToolbarPlugin";
-import TreeViewPlugin from "./plugins/TreeViewPlugin";
 import ExampleTheme from "./themes/ExampleTheme";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import { AutoLinkNode, LinkNode } from "@lexical/link";

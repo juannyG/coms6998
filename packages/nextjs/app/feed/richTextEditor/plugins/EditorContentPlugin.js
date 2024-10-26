@@ -8,7 +8,7 @@ export default function EditorContentPlugin() {
   const { setContent: updateContent } = useContext(EditorContext);
 
   useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
+    return editor.registerUpdateListener(() => {
       editor.update(() => {
         if (updateContent) {
           // TODO: Empty posts still have a parent node - can this be detected and avoided?
