@@ -19,6 +19,8 @@
     "foundry:format": "yarn workspace @se-2/foundry format",
     "foundry:lint": "yarn workspace @se-2/foundry lint",
     "foundry:test": "yarn workspace @se-2/foundry test",
+    "foundry:coverage": "yarn workspace @se-2/foundry coverage",
+    "foundry:clean": "yarn workspace @se-2/foundry clean",
     "generate": "yarn workspace @se-2/foundry generate",
     "postinstall": "husky install",
     "next:build": "yarn workspace @se-2/nextjs build",
