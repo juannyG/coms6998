@@ -64,7 +64,6 @@ export default function Editor() {
           />
           <EditorContentPlugin />
           <HistoryPlugin />
-          {/* <TreeViewPlugin /> */}
           <AutoFocusPlugin />
           <CodeHighlightPlugin />
           <ListPlugin />
