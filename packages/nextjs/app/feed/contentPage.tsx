@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import CreatePage from "./createPost";
+import Viewer from "./richTextEditor/Viewer";
 import { NextPage } from "next";
 import { useAccount } from "wagmi";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
@@ -56,7 +57,9 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
                   <img alt="" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
                 </div>
               </div>
-              <p className="text-sm font-semibold text-left text-black">{p.creator}</p>
+              <p className="text-sm font-semibold text-left text-black">
+                {p.creator.substring(0, 6) + "..." + p.creator.substring(p.creator.length - 4)}
+              </p>
             </div>
             {address === p.creator && (
               <div className="flex gap-2">
@@ -67,7 +70,8 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
             )}
           </div>
           <p className="w-[100%] text-lg font-bold text-left text-black">{p.title}</p>
-          <p className="w-[100%] text-lg text-left text-black" dangerouslySetInnerHTML={{ __html: p.content }} />
+          {/* <p className="w-[100%] text-lg text-left text-black" dangerouslySetInnerHTML={{ __html: p.content }} /> */}
+          <Viewer data={p.content} />
           <div className="flex justify-start gap-4 w-[100%] h-5">
             <p className="text-sm text-left text-gray-500">#web3</p>
             <p className="text-sm text-left text-gray-500">#eth</p>
