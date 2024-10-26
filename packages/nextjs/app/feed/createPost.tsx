@@ -5,30 +5,54 @@ import { EditorContext } from "./context";
 import Editor from "./richTextEditor/Editor";
 import "./richTextEditor/styles.css";
 import { NextPage } from "next";
+import { useAccount, useSignMessage } from "wagmi";
+import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { TPost } from "~~/types/spotlight";
+import { createPostSignature } from "~~/utils/spotlight";
 
 const CreatePage: NextPage = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [clickPost, setClickPost] = useState(false);
+  const { address } = useAccount();
+  const { signMessageAsync } = useSignMessage();
+  const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
 
   function handleTitleChange(e: any) {
     setTitle(e.target.value);
   }
 
   useEffect(() => {
-    // We can get the editor content.
-    // console.log("TITLE: ", title);
-    // console.log("CONTENT: ", content);
-    // console.log("CLICK POST: ", clickPost);
-    // if(clickPost) {
-    //     // console.log("Post is clicked");
-    //     setClickPost(false);
-    // }
+    if (clickPost) {
+      setClickPost(false);
+    }
   }, [title, content, clickPost]);
 
   const value = {
     setContent,
-    confirmPost: () => {
+    confirmPost: async () => {
+      if (!address) {
+        return;
+      }
+      try {
+        const ts = BigInt(Date.now());
+        const post: TPost = {
+          id: "0x0", // The contract will overwrite this. This is just for typescript type consistency
+          creator: address, // The contract will overwrite this. This is just for typescript type consistency
+          title,
+          content,
+          createdAt: ts,
+          lastUpdatedAt: ts,
+        };
+        const postSig = await createPostSignature({ signMessageAsync, post });
+
+        console.log("Signature of post:", postSig);
+
+        await writeSpotlightContractAsync({ functionName: "createPost", args: [post, postSig] });
+      } catch (e: any) {
+        console.log(e);
+      }
+
       setClickPost(true);
     },
   };
