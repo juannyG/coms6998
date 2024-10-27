@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { EditorContext } from "./context";
 import Editor from "./richTextEditor/Editor";
 import "./richTextEditor/styles.css";
@@ -14,6 +15,8 @@ const CreatePage: NextPage = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [clickPost, setClickPost] = useState(false);
+  const [postSig, setPostSig] = useState("");
+  const router = useRouter();
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
@@ -23,10 +26,12 @@ const CreatePage: NextPage = () => {
   }
 
   useEffect(() => {
-    if (clickPost) {
+    if (clickPost && postSig) {
+      const query = new URLSearchParams({ postSig: postSig }).toString();
+      router.push(`/feed/viewPost?${query}`);
       setClickPost(false);
     }
-  }, [title, content, clickPost]);
+  }, [clickPost, router, postSig]);
 
   const value = {
     setContent,
@@ -45,6 +50,7 @@ const CreatePage: NextPage = () => {
           lastUpdatedAt: ts,
         };
         const postSig = await createPostSignature({ signMessageAsync, post });
+        setPostSig(postSig);
 
         console.log("Signature of post:", postSig);
 

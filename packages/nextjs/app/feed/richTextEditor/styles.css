@@ -57,12 +57,32 @@ h1 {
   border-top-right-radius: 10px;
 }
 
+.view-editor-container {
+  margin: 0 auto 10px auto;
+  border-radius: 2px;
+  width: 100%;
+  color: #000;
+  position: relative;
+  line-height: 20px;
+  font-weight: 400;
+  text-align: left;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
 .editor-inner {
   background: #fff;
   position: relative;
   border: 1px solid #e6ebf1;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+}
+
+.view-editor-inner {
+  background: #fff;
+  position: relative;
+  /* border: 1px solid #e6ebf1; */
+  border-radius: 10px;
 }
 
 .editor-input {
