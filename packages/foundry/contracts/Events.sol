@@ -29,3 +29,9 @@ event PostEdited(address indexed user, bytes indexed signature);
 /// @param user The address of the user who created the post.
 /// @param signature The signature of the post.
 event PostDeleted(address indexed user, bytes indexed signature);
+
+
+/// @notice Emitted when issued a token
+/// @param receiver The address that received the tokens
+/// @param amount The number of tokens issued
+event TokenIssued(address indexed receiver, uint256 amount);
