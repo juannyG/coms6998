@@ -42,7 +42,6 @@ const editorConfig = {
 };
 
 export default function Viewer({ data }) {
-  console.log(data);
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="view-editor-container">
