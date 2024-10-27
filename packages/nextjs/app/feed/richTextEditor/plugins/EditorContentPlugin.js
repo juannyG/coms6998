@@ -1,6 +1,5 @@
 import { useContext, useEffect } from "react";
 import { EditorContext } from "../../context";
-import { $generateHtmlFromNodes } from "@lexical/html";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 export default function EditorContentPlugin() {

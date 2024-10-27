@@ -1,24 +1,21 @@
-import { useSessionStorage } from 'react-use'
-import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin'
-import {EditorState} from 'lexical';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { useRef, useEffect, useCallback } from 'react';
+import { useEffect, useRef } from "react";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
-export default function RestoreFromLocalStoragePlugin({data}) {
-  const [editor] = useLexicalComposerContext()
+export default function RestoreFromLocalStoragePlugin({ data }) {
+  const [editor] = useLexicalComposerContext();
   // const [serializedEditorState, setSerializedEditorState] = useSessionStorage('postContent', null);
   const isFirstRender = useRef(true);
 
   useEffect(() => {
     if (isFirstRender.current) {
-
       if (data && editor && editor.parseEditorState) {
-        const initialEditorState = editor.parseEditorState(data)
-        editor.setEditorState(initialEditorState)
+        const initialEditorState = editor.parseEditorState(data);
+        editor.setEditorState(initialEditorState);
         isFirstRender.current = false;
       }
     }
-  }, [isFirstRender.current, data, editor])
+  }, [data, editor]);
 
-  return <OnChangePlugin  />
+  return <OnChangePlugin />;
 }

@@ -6,7 +6,6 @@ import { EditorContext } from "./context";
 import Editor from "./richTextEditor/Editor";
 import "./richTextEditor/styles.css";
 import { NextPage } from "next";
-import { set } from "nprogress";
 import { useAccount, useSignMessage } from "wagmi";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { TPost } from "~~/types/spotlight";

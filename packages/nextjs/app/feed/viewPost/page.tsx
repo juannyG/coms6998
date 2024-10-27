@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import FeedHeaderPage from "../header";
 import Viewer from "../richTextEditor/Viewer";
@@ -12,8 +10,6 @@ import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { TPost } from "~~/types/spotlight";
 
 const ViewPostPage: NextPage = () => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
   const searchParams = useSearchParams();
   const postSig = searchParams.get("postSig") || "";
   const { address } = useAccount();
@@ -25,13 +21,6 @@ const ViewPostPage: NextPage = () => {
     args: [postSig as `0x${string}`],
     watch: true,
   }) as { data: TPost | undefined };
-
-  useEffect(() => {
-    if (data) {
-      setTitle(data.title);
-      setContent(data.content);
-    }
-  }, [data]);
 
   if (!postSig) {
     return <div>Loading...</div>; // Handle case where postSig is not yet available
@@ -70,9 +59,9 @@ const ViewPostPage: NextPage = () => {
             <p className="text-lg  text-left text-black">{data?.creator}</p>
           </div>
           <div className="p-[10px]">
-            <h1 className="text-2xl font-bold">{title}</h1>
+            <h1 className="text-2xl font-bold">{data?.title}</h1>
           </div>
-          <Viewer data={content} />
+          <Viewer data={data?.content} />
         </div>
       </div>
     </div>

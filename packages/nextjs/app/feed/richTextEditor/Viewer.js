@@ -1,26 +1,21 @@
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
-import EditorContentPlugin from "./plugins/EditorContentPlugin";
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
-import ToolbarPlugin from "./plugins/ToolbarPlugin";
-import ExampleTheme from "./themes/ExampleTheme";
 import RestoreFromLocalStoragePlugin from "./plugins/RestoreFromLocalStoragePlugin";
+import ExampleTheme from "./themes/ExampleTheme";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { TRANSFORMERS } from "@lexical/markdown";
-import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { use, useEffect } from "react";
 
 const editorConfig = {
   // The editor theme
@@ -46,8 +41,8 @@ const editorConfig = {
   ],
 };
 
-export default function Viewer({data}) {
-
+export default function Viewer({ data }) {
+  console.log(data);
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="view-editor-container">
@@ -56,7 +51,7 @@ export default function Viewer({data}) {
             contentEditable={<ContentEditable className="editor-input" />}
             ErrorBoundary={LexicalErrorBoundary}
           />
-          <RestoreFromLocalStoragePlugin data={data}/>
+          <RestoreFromLocalStoragePlugin data={data} />
           <CodeHighlightPlugin />
           <ListPlugin />
           <LinkPlugin />
