@@ -25,11 +25,11 @@ library PostLib {
       exactly 1 + userProfile.postNonce
   */
 
-  function abiEncodePost(
-    string memory _title,
-    string memory _content,
-    uint256 _nonce
-  ) internal pure returns (bytes memory) {
+  function abiEncodePost(string memory _title, string memory _content, uint256 _nonce)
+    internal
+    pure
+    returns (bytes memory)
+  {
     // Include everything EXCEPT `id` which is the signature itself and `creator`
     return abi.encodePacked(_title, _content, _nonce);
   }

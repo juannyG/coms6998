@@ -170,12 +170,10 @@ contract Spotlight {
   /// @param _content The content of the post.
   /// @param _nonce The nonce used for signature generation
   /// @param _sig The signature of the post.
-  function createPost(
-    string memory _title,
-    string memory _content,
-    uint256 _nonce,
-    bytes calldata _sig
-  ) public onlyRegistered {
+  function createPost(string memory _title, string memory _content, uint256 _nonce, bytes calldata _sig)
+    public
+    onlyRegistered
+  {
     require(bytes(_content).length > 0, "Content cannot be empty");
     require(bytes(_title).length > 0, "Title cannot be empty");
     require(PostLib.isValidPostSignature(msg.sender, _title, _content, _nonce, _sig), "Invalid signature");
