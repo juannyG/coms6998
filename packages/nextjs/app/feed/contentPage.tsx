@@ -24,7 +24,7 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
       router.push(`/feed/viewPost?${query}`);
       setClickViewPost(false);
     }
-  }, [clickViewPost, router]);
+  }, [clickViewPost, selectedPostId, router]);
 
   const handleDelete = async (postId: `0x${string}`) => {
     try {
