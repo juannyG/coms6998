@@ -7,7 +7,7 @@ import { useAccount } from "wagmi";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { TPost } from "~~/types/spotlight";
 
-const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => void }) => {
+const RenderPosts = ({ data, refreshPosts }: { data: readonly TPost[] | undefined; refreshPosts: () => void }) => {
   const { address } = useAccount();
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
   const [loading, setLoading] = useState(false);
@@ -48,7 +48,7 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
   return (
     <>
       {data.map((p: TPost) => (
-        <div key={p.createdAt} className="flex flex-col justify-start gap-4 p-4 w-[100%]">
+        <div key={p.id} className="flex flex-col justify-start gap-4 p-4 w-[100%]">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
               <div className="avatar">

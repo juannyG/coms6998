@@ -6,11 +6,14 @@ export interface TPost {
   creator: Address;
   title: string;
   content: string;
+  nonce: bigint;
   createdAt: bigint;
   lastUpdatedAt: bigint;
 }
 
 export interface TPostSig {
   signMessageAsync: SignMessageMutateAsync;
-  post: TPost;
+  title: string;
+  content: string;
+  nonce: bigint;
 }
