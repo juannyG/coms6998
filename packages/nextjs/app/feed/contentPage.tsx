@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import CreatePage from "./createPost";
 import Viewer from "./richTextEditor/Viewer";
 import { NextPage } from "next";
@@ -9,11 +10,21 @@ import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaf
 import { TPost } from "~~/types/spotlight";
 
 const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => void }) => {
+  const router = useRouter();
   const { address } = useAccount();
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [clickViewPost, setClickViewPost] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<`0x${string}` | null>(null);
+
+  useEffect(() => {
+    if (clickViewPost) {
+      const query = new URLSearchParams({ postSig: String(selectedPostId) }).toString();
+      router.push(`/feed/viewPost?${query}`);
+      setClickViewPost(false);
+    }
+  }, [clickViewPost, router]);
 
   const handleDelete = async (postId: `0x${string}`) => {
     try {
@@ -38,6 +49,11 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
     setShowConfirm(true);
   };
 
+  const onClickViewPost = (postId: `0x${string}`) => {
+    setSelectedPostId(postId);
+    setClickViewPost(true);
+  };
+
   if (data === undefined) {
     return <>Loading...</>;
   }
@@ -60,6 +76,11 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
               <p className="text-sm font-semibold text-left text-black">
                 {p.creator.substring(0, 6) + "..." + p.creator.substring(p.creator.length - 4)}
               </p>
+            </div>
+            <div className="flex gap-2">
+              <button className="btn btn-danger btn-sm" onClick={() => onClickViewPost(p.id)}>
+                View
+              </button>
             </div>
             {address === p.creator && (
               <div className="flex gap-2">
