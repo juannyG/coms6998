@@ -45,7 +45,8 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
     }
   };
 
-  const confirmDelete = (postId: `0x${string}`) => {
+  const confirmDelete = (event: React.MouseEvent<HTMLButtonElement>, postId: `0x${string}`) => {
+    event.stopPropagation();
     setSelectedPostId(postId);
     setShowConfirm(true);
   };
@@ -86,7 +87,11 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
             </div>
             <div className="flex gap-2">
               {address === p.creator && (
-                <button className="btn btn-danger btn-sm" onClick={() => confirmDelete(p.id)} disabled={loading}>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={event => confirmDelete(event, p.id)}
+                  disabled={loading}
+                >
                   {loading && selectedPostId === p.id ? "Deleting..." : "Delete"}
                 </button>
               )}
