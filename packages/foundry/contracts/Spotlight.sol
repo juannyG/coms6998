@@ -71,6 +71,8 @@ contract Spotlight {
   /// @dev The username is checked for uniqueness after normalization (case-insensitive).
   /// @param _username The desired username for the profile.
   function registerProfile(string memory _username) public usernameValid(_username) {
+    console.log(msg.sender);
+    // TODO: Ensure msg.sender != address(0)
     require(!isRegistered(msg.sender), "Profile already exists");
 
     bytes32 usernameHash = _getUsernameHash(_username);
