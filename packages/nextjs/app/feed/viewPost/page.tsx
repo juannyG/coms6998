@@ -61,7 +61,7 @@ const ViewPostPage: NextPage = () => {
               <p className="text-lg  text-left text-black">{data?.creator}</p>
             </div>
             <div className="flex gap-2">
-              <button className="btn btn-danger btn-sm">Edit</button>
+              {address === data?.creator && <button className="btn btn-danger btn-sm">Edit</button>}
             </div>
           </div>
           <div className="p-[10px]">
