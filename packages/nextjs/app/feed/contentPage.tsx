@@ -23,6 +23,7 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
       const query = new URLSearchParams({ postSig: String(selectedPostId) }).toString();
       router.push(`/feed/viewPost?${query}`);
       setClickViewPost(false);
+      setSelectedPostId(null);
     }
   }, [clickViewPost, selectedPostId, router]);
 
@@ -81,14 +82,12 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
               <button className="btn btn-danger btn-sm" onClick={() => onClickViewPost(p.id)}>
                 View
               </button>
-            </div>
-            {address === p.creator && (
-              <div className="flex gap-2">
+              {address === p.creator && (
                 <button className="btn btn-danger btn-sm" onClick={() => confirmDelete(p.id)} disabled={loading}>
                   {loading && selectedPostId === p.id ? "Deleting..." : "Delete"}
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
           <p className="w-[100%] text-lg font-bold text-left text-black">{p.title}</p>
           {/* <p className="w-[100%] text-lg text-left text-black" dangerouslySetInnerHTML={{ __html: p.content }} /> */}
