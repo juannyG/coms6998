@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import FeedHeaderPage from "../header";
 import Viewer from "../richTextEditor/Viewer";
 import "../richTextEditor/styles.css";
+import Comments from "./comments";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
@@ -62,6 +63,7 @@ const ViewPostPage: NextPage = () => {
             <h1 className="text-2xl font-bold">{data?.title}</h1>
           </div>
           <Viewer data={data?.content} />
+          <Comments />
         </div>
       </div>
     </div>
