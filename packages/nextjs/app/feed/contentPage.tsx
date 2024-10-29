@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import CreatePage from "./createPost";
 import Viewer from "./richTextEditor/Viewer";
 import { NextPage } from "next";
@@ -9,11 +10,22 @@ import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaf
 import { TPost } from "~~/types/spotlight";
 
 const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => void }) => {
+  const router = useRouter();
   const { address } = useAccount();
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [clickViewPost, setClickViewPost] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<`0x${string}` | null>(null);
+
+  useEffect(() => {
+    if (clickViewPost) {
+      const query = new URLSearchParams({ postSig: String(selectedPostId) }).toString();
+      router.push(`/feed/viewPost?${query}`);
+      setClickViewPost(false);
+      setSelectedPostId(null);
+    }
+  }, [clickViewPost, selectedPostId, router]);
 
   const handleDelete = async (postId: `0x${string}`) => {
     try {
@@ -38,6 +50,11 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
     setShowConfirm(true);
   };
 
+  const onClickViewPost = (postId: `0x${string}`) => {
+    setSelectedPostId(postId);
+    setClickViewPost(true);
+  };
+
   if (data === undefined) {
     return <>Loading...</>;
   }
@@ -49,7 +66,13 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
   return (
     <>
       {data.map((p: TPost) => (
-        <div key={p.createdAt} className="flex flex-col justify-start gap-4 p-4 w-[100%]">
+        <div
+          key={p.createdAt}
+          onClick={() => onClickViewPost(p.id)}
+          className="flex flex-col w-full p-4 gap-4 cursor-pointer justify-start
+            transition-all duration-300 ease-in-out
+            hover:bg-gray-200 hover:shadow-lg hover:scale-105"
+        >
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
               <div className="avatar">
@@ -61,13 +84,13 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
                 {p.creator.substring(0, 6) + "..." + p.creator.substring(p.creator.length - 4)}
               </p>
             </div>
-            {address === p.creator && (
-              <div className="flex gap-2">
+            <div className="flex gap-2">
+              {address === p.creator && (
                 <button className="btn btn-danger btn-sm" onClick={() => confirmDelete(p.id)} disabled={loading}>
                   {loading && selectedPostId === p.id ? "Deleting..." : "Delete"}
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
           <p className="w-[100%] text-lg font-bold text-left text-black">{p.title}</p>
           {/* <p className="w-[100%] text-lg text-left text-black" dangerouslySetInnerHTML={{ __html: p.content }} /> */}
