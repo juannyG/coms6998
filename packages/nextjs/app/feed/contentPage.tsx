@@ -66,7 +66,13 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
   return (
     <>
       {data.map((p: TPost) => (
-        <div key={p.createdAt} className="flex flex-col justify-start gap-4 p-4 w-[100%]">
+        <div
+          key={p.createdAt}
+          onClick={() => onClickViewPost(p.id)}
+          className="flex flex-col w-full p-4 gap-4 cursor-pointer justify-start
+            transition-all duration-300 ease-in-out
+            hover:bg-gray-200 hover:shadow-lg hover:scale-105"
+        >
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
               <div className="avatar">
@@ -79,9 +85,6 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
               </p>
             </div>
             <div className="flex gap-2">
-              <button className="btn btn-danger btn-sm" onClick={() => onClickViewPost(p.id)}>
-                View
-              </button>
               {address === p.creator && (
                 <button className="btn btn-danger btn-sm" onClick={() => confirmDelete(p.id)} disabled={loading}>
                   {loading && selectedPostId === p.id ? "Deleting..." : "Delete"}
