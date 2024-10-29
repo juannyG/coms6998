@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 
 const Comments: NextPage = () => {
   return (
-    <div className="flex flex-col w-[790px] h-[542px] bg-[url(/rectangle-6.svg)] bg-[100%_100%]">
+    <div className="flex flex-col h-dvh bg-[url(/rectangle-6.svg)] bg-[100%_100%]">
       {/* Comments Header */}
       <div className="px-10 pt-[30px] [font-family:'Inter-Bold',Helvetica] font-bold text-black text-lg tracking-[0] leading-[normal]">
         Comments (1)

@@ -55,9 +55,14 @@ const ViewPostPage: NextPage = () => {
             </a>
           </div>
 
-          <div className="flex flex-row items-center gap-4">
-            <img alt="" src="/avatar.png" className="w-10 h-10 rounded-[40px] object-cover ml-2" />
-            <p className="text-lg  text-left text-black">{data?.creator}</p>
+          <div className="flex justify-between items-center">
+            <div className="flex flex-row items-center justify-between gap-4">
+              <img alt="" src="/avatar.png" className="w-10 h-10 rounded-[40px] object-cover ml-2" />
+              <p className="text-lg  text-left text-black">{data?.creator}</p>
+            </div>
+            <div className="flex gap-2">
+              <button className="btn btn-danger btn-sm">Edit</button>
+            </div>
           </div>
           <div className="p-[10px]">
             <h1 className="text-2xl font-bold">{data?.title}</h1>
