@@ -46,13 +46,8 @@
     "node": ">=18.17.0"
   },
   "dependencies": {
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
     "@lexical/react": "^0.18.0",
-    "@mui/icons-material": "^6.1.4",
-    "@mui/material": "^6.1.4",
-    "@mui/styles": "^6.1.4",
     "lexical": "^0.18.0",
-    "mui-rte": "^2.0.1"
+    "react-use": "^17.5.1"
   }
 }
