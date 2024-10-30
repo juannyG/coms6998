@@ -58,8 +58,7 @@ contract ReputationTest is Test {
     vm.prank(spotlight);
     reputation.upvoteComment(user1);
 
-    // Check balance (1 token)
-    assertEq(reputation.balanceOf(user1), 1 * 10 ** 18);
+    assertEq(reputation.balanceOf(user1), 10 * 10 ** 18);
   }
 
   function testCannotIssueToZeroAddress() public {
@@ -94,10 +93,10 @@ contract ReputationTest is Test {
 
     // Give multiple upvotes
     reputation.upvotePost(user1); // 100 tokens
-    reputation.upvoteComment(user1); // 1 token
+    reputation.upvoteComment(user1); // 10 tokens
 
-    // Should have 101 tokens
-    assertEq(reputation.balanceOf(user1), 101 * 10 ** 18);
+    // Should have 110 tokens
+    assertEq(reputation.balanceOf(user1), 110 * 10 ** 18);
 
     vm.stopPrank();
   }
@@ -129,7 +128,7 @@ contract ReputationTest is Test {
   }
 
   function testDecayToZero() public {
-    // Give user1 1 token
+    // Give user1 10 tokens (using upvoteComment instead of 1 token)
     vm.prank(spotlight);
     reputation.upvoteComment(user1);
 
@@ -138,17 +137,112 @@ contract ReputationTest is Test {
 
     // Check if balance is less than initial amount
     uint256 balance = reputation.balanceOf(user1);
-    assertLt(balance, 1 * 10 ** 18);
+    assertLt(balance, 10 * 10 ** 18);
 
     // Verify balance is greater than 0
     assertGt(balance, 0);
 
     // Advance time significantly
-    skip(150 minutes); // 10 more decay periods
+    skip(450 minutes); // 30 more decay periods
 
     // Balance should be very small but might not be exactly zero
     // due to rounding in integer arithmetic
     uint256 finalBalance = reputation.balanceOf(user1);
     assertLt(finalBalance, balance);
+  }
+
+  function testDownvotePostOnlySpotlight() public {
+    // Give initial tokens
+    vm.prank(spotlight);
+    reputation.upvotePost(user1); // 100 tokens
+
+    // Test that non-spotlight address cannot downvote
+    vm.expectRevert("Only Spotlight contract can burn tokens");
+    reputation.downvotePost(user1);
+
+    // Test downvote from spotlight works
+    vm.prank(spotlight);
+    reputation.downvotePost(user1);
+
+    // Check balance (95 tokens)
+    assertEq(reputation.balanceOf(user1), 95 * 10 ** 18);
+  }
+
+  function testDownvoteCommentOnlySpotlight() public {
+    // Give initial tokens
+    vm.prank(spotlight);
+    reputation.upvotePost(user1); // 100 tokens
+
+    // Test that non-spotlight address cannot downvote
+    vm.expectRevert("Only Spotlight contract can burn tokens");
+    reputation.downvoteComment(user1);
+
+    // Test downvote from spotlight works
+    vm.prank(spotlight);
+    reputation.downvoteComment(user1);
+
+    // Check balance (99 tokens)
+    assertEq(reputation.balanceOf(user1), 99 * 10 ** 18);
+  }
+
+  function testBurnTokenEvent() public {
+    // Give initial tokens
+    vm.prank(spotlight);
+    reputation.upvotePost(user1); // 100 tokens
+
+    // Test event emission
+    vm.expectEmit(true, true, true, true);
+    emit TokenBurned(user1, 5 * 10 ** 18);
+
+    vm.prank(spotlight);
+    reputation.downvotePost(user1);
+  }
+
+  function testBurnTokenToZero() public {
+    // Give initial tokens
+    vm.prank(spotlight);
+    reputation.upvoteComment(user1); // 10 tokens
+
+    // Try to burn more tokens than available (burn twice)
+    vm.startPrank(spotlight);
+    reputation.downvotePost(user1); // Burn 5 tokens
+    reputation.downvotePost(user1); // Try to burn 5 more tokens when only 5 remain
+    vm.stopPrank();
+
+    // Balance should be 0, not negative
+    assertEq(reputation.balanceOf(user1), 0);
+  }
+
+  function testBurnTokenWithDecay() public {
+    // Give initial tokens
+    vm.prank(spotlight);
+    reputation.upvotePost(user1); // 100 tokens
+
+    // Advance time by 15 minutes
+    skip(15 minutes);
+
+    // Downvote (should apply decay first)
+    vm.prank(spotlight);
+    reputation.downvotePost(user1);
+
+    // Should have: (100 * 0.99) - 5 ≈ 94 tokens
+    assertApproxEqAbs(reputation.balanceOf(user1), 94 * 10 ** 18, 0.1 * 10 ** 18);
+  }
+
+  function testMultipleDownvotes() public {
+    vm.startPrank(spotlight);
+
+    // Give initial tokens
+    reputation.upvotePost(user1); // 100 tokens
+    reputation.upvoteComment(user1); // 10 tokens
+
+    // Multiple downvotes
+    reputation.downvotePost(user1); // -5 tokens
+    reputation.downvoteComment(user1); // -1 token
+
+    // Should have 104 tokens (100 + 10 - 5 - 1)
+    assertEq(reputation.balanceOf(user1), 104 * 10 ** 18);
+
+    vm.stopPrank();
   }
 }

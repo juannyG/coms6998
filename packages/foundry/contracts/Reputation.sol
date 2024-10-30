@@ -30,6 +30,25 @@ contract Reputation is ERC20 {
   }
 
   /**
+   * @dev Internal function to burn tokens
+   * @param account The address from which tokens will be burned
+   * @param amount The number of tokens to burn
+   */
+  function _burnToken(address account, uint256 amount) internal {
+    uint256 tokenAmount = amount * 10 ** decimals();
+    uint256 currentBalance = balanceOf(account);
+
+    if (currentBalance < tokenAmount) {
+      // If burning would reduce balance below zero, burn all remaining tokens
+      _burn(account, currentBalance);
+    } else {
+      _burn(account, tokenAmount);
+    }
+
+    emit TokenBurned(account, tokenAmount);
+  }
+
+  /**
    * @dev Issues 100 tokens for upvoting a post
    * @param receiver The address that will receive the tokens
    */
@@ -46,7 +65,27 @@ contract Reputation is ERC20 {
   function upvoteComment(address receiver) external {
     require(msg.sender == spotlightContract, "Only Spotlight contract can issue tokens");
     _applyDecay(receiver); // Apply decay before issuing new tokens
-    _issueToken(receiver, 1);
+    _issueToken(receiver, 10);
+  }
+
+  /**
+   * @dev Burns 5 tokens for downvoting a post
+   * @param account The address from which tokens will be burned
+   */
+  function downvotePost(address account) external {
+    require(msg.sender == spotlightContract, "Only Spotlight contract can burn tokens");
+    _applyDecay(account); // Apply decay before burning tokens
+    _burnToken(account, 5);
+  }
+
+  /**
+   * @dev Burns 1 token for downvoting a comment
+   * @param account The address from which tokens will be burned
+   */
+  function downvoteComment(address account) external {
+    require(msg.sender == spotlightContract, "Only Spotlight contract can burn tokens");
+    _applyDecay(account); // Apply decay before burning tokens
+    _burnToken(account, 1);
   }
 
   /**

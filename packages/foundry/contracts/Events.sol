@@ -34,3 +34,8 @@ event PostDeleted(address indexed user, bytes indexed signature);
 /// @param receiver The address that received the tokens
 /// @param amount The number of tokens issued
 event TokenIssued(address indexed receiver, uint256 amount);
+
+/// @notice Emitted when burned a token
+/// @param account The address that will be burned the tokens
+/// @param amount The number of tokens burned
+event TokenBurned(address indexed account, uint256 amount);
