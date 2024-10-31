@@ -25,41 +25,19 @@ const deployedContracts = {
           name: "createPost",
           inputs: [
             {
-              name: "_p",
-              type: "tuple",
-              internalType: "struct PostLib.Post",
-              components: [
-                {
-                  name: "creator",
-                  type: "address",
-                  internalType: "address",
-                },
-                {
-                  name: "id",
-                  type: "bytes",
-                  internalType: "bytes",
-                },
-                {
-                  name: "content",
-                  type: "string",
-                  internalType: "string",
-                },
-                {
-                  name: "title",
-                  type: "string",
-                  internalType: "string",
-                },
-                {
-                  name: "createdAt",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-                {
-                  name: "lastUpdatedAt",
-                  type: "uint256",
-                  internalType: "uint256",
-                },
-              ],
+              name: "_title",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "_content",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "_nonce",
+              type: "uint256",
+              internalType: "uint256",
             },
             {
               name: "_sig",
@@ -87,6 +65,19 @@ const deployedContracts = {
           type: "function",
           name: "deleteProfile",
           inputs: [],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "downvote",
+          inputs: [
+            {
+              name: "_sig",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
           outputs: [],
           stateMutability: "nonpayable",
         },
@@ -124,9 +115,9 @@ const deployedContracts = {
                   internalType: "address",
                 },
                 {
-                  name: "id",
-                  type: "bytes",
-                  internalType: "bytes",
+                  name: "title",
+                  type: "string",
+                  internalType: "string",
                 },
                 {
                   name: "content",
@@ -134,9 +125,14 @@ const deployedContracts = {
                   internalType: "string",
                 },
                 {
-                  name: "title",
-                  type: "string",
-                  internalType: "string",
+                  name: "id",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "nonce",
+                  type: "uint256",
+                  internalType: "uint256",
                 },
                 {
                   name: "createdAt",
@@ -145,6 +141,16 @@ const deployedContracts = {
                 },
                 {
                   name: "lastUpdatedAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "upvoteCount",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "downvoteCount",
                   type: "uint256",
                   internalType: "uint256",
                 },
@@ -175,9 +181,9 @@ const deployedContracts = {
                   internalType: "address",
                 },
                 {
-                  name: "id",
-                  type: "bytes",
-                  internalType: "bytes",
+                  name: "title",
+                  type: "string",
+                  internalType: "string",
                 },
                 {
                   name: "content",
@@ -185,9 +191,14 @@ const deployedContracts = {
                   internalType: "string",
                 },
                 {
-                  name: "title",
-                  type: "string",
-                  internalType: "string",
+                  name: "id",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "nonce",
+                  type: "uint256",
+                  internalType: "uint256",
                 },
                 {
                   name: "createdAt",
@@ -196,6 +207,16 @@ const deployedContracts = {
                 },
                 {
                   name: "lastUpdatedAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "upvoteCount",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "downvoteCount",
                   type: "uint256",
                   internalType: "uint256",
                 },
@@ -226,9 +247,9 @@ const deployedContracts = {
                   internalType: "address",
                 },
                 {
-                  name: "id",
-                  type: "bytes",
-                  internalType: "bytes",
+                  name: "title",
+                  type: "string",
+                  internalType: "string",
                 },
                 {
                   name: "content",
@@ -236,9 +257,14 @@ const deployedContracts = {
                   internalType: "string",
                 },
                 {
-                  name: "title",
-                  type: "string",
-                  internalType: "string",
+                  name: "id",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "nonce",
+                  type: "uint256",
+                  internalType: "uint256",
                 },
                 {
                   name: "createdAt",
@@ -247,6 +273,16 @@ const deployedContracts = {
                 },
                 {
                   name: "lastUpdatedAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "upvoteCount",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "downvoteCount",
                   type: "uint256",
                   internalType: "uint256",
                 },
@@ -327,6 +363,19 @@ const deployedContracts = {
               name: "_newUsername",
               type: "string",
               internalType: "string",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "upvote",
+          inputs: [
+            {
+              name: "_sig",
+              type: "bytes",
+              internalType: "bytes",
             },
           ],
           outputs: [],

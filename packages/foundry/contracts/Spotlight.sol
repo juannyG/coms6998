@@ -59,6 +59,12 @@ contract Spotlight {
     _;
   }
 
+  modifier postExists(bytes calldata _sig) {
+    PostLib.Post memory post = postStore[_sig];
+    require(bytes(post.content).length > 0, "Post does not exist");
+    _;
+  }
+
   /// @notice Modifier to ensure that a username meets the length requirements.
   /// @param _username The username to be validated.
   modifier usernameValid(string memory _username) {
@@ -160,21 +166,33 @@ contract Spotlight {
   }
 
   /// @notice Create a post from the caller's address.
-  /// @param _p The post to create.
+  /// @param _title The title of the post.
+  /// @param _content The content of the post.
+  /// @param _nonce The nonce used for signature generation
   /// @param _sig The signature of the post.
-  function createPost(PostLib.Post memory _p, bytes calldata _sig) public onlyRegistered {
-    require(bytes(_p.content).length > 0, "Content cannot be empty");
-    require(bytes(_p.title).length > 0, "Title cannot be empty");
-    require(_p.createdAt > 0, "Created timestamp is missing");
-    require(_p.lastUpdatedAt > 0, "Last updated timestamp is missing");
-    require(PostLib.isValidPostSignature(msg.sender, _p, _sig), "Invalid signature");
+  function createPost(string memory _title, string memory _content, uint256 _nonce, bytes calldata _sig)
+    public
+    onlyRegistered
+  {
+    require(bytes(_content).length > 0, "Content cannot be empty");
+    require(bytes(_title).length > 0, "Title cannot be empty");
+    require(PostLib.isValidPostSignature(msg.sender, _title, _content, _nonce, _sig), "Invalid signature");
 
     // TODO: Check that the signature doesn't already exist in the postStore!
 
-    _p.creator = msg.sender;
-    _p.id = _sig;
+    PostLib.Post memory p = PostLib.Post({
+      creator: msg.sender,
+      title: _title,
+      content: _content,
+      id: _sig,
+      nonce: _nonce,
+      createdAt: block.timestamp,
+      lastUpdatedAt: block.timestamp,
+      upvoteCount: 0,
+      downvoteCount: 0
+    });
 
-    postStore[_sig] = _p;
+    postStore[_sig] = p;
     communityPostIDs.push(_sig);
     profiles[msg.sender].postIDs.push(_sig);
     emit PostCreated(msg.sender, _sig);
@@ -213,11 +231,10 @@ contract Spotlight {
     return p;
   }
 
-  function editPost(bytes calldata _sig, string calldata newContent) public onlyRegistered {
+  function editPost(bytes calldata _sig, string calldata newContent) public onlyRegistered postExists(_sig) {
     // Ensure post exists
     PostLib.Post storage post = postStore[_sig];
     require(post.creator == msg.sender, "Only the creator can edit this post");
-    require(bytes(post.content).length > 0, "Post does not exist");
     require(bytes(newContent).length > 0, "Content cannot be empty");
 
     post.content = newContent;
@@ -226,11 +243,10 @@ contract Spotlight {
     emit PostEdited(msg.sender, _sig);
   }
 
-  function deletePost(bytes calldata _sig) public onlyRegistered {
+  function deletePost(bytes calldata _sig) public onlyRegistered postExists(_sig) {
     // Ensure the post exists
     PostLib.Post storage post = postStore[_sig];
     require(post.creator == msg.sender, "Only the creator can delete this post");
-    require(bytes(post.content).length > 0, "Post does not exist");
 
     // Remove post from user's profile
     bytes[] storage userPosts = profiles[msg.sender].postIDs;
@@ -256,4 +272,22 @@ contract Spotlight {
     delete postStore[_sig];
     emit PostDeleted(msg.sender, _sig);
   }
+
+  function upvote(bytes calldata _sig) public onlyRegistered postExists(_sig) {
+    // TODO: check for previous downvoteCount and decrement if necessary
+    // TODO: check for already upvoted - no-op in this case
+    PostLib.Post storage p = postStore[_sig];
+    p.upvoteCount++;
+  }
+
+  function downvote(bytes calldata _sig) public onlyRegistered postExists(_sig) {
+    // TODO: check for already upvoted - no-op in this case
+    // TODO: check for previous upvoteCount and decrement if necessary
+    PostLib.Post storage p = postStore[_sig];
+    p.downvoteCount++;
+  }
+
+  // TODO
+  // function clearVote(bytes calldata _sig) public onlyRegistered() postExists(_sig) {
+  // }
 }
