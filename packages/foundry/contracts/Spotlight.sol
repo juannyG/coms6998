@@ -59,8 +59,8 @@ contract Spotlight {
     _;
   }
 
-  modifier postExists(bytes calldata _sig) {
-    PostLib.Post memory post = postStore[_sig];
+  modifier postExists(bytes calldata _id) {
+    PostLib.Post memory post = postStore[_id];
     require(bytes(post.content).length > 0, "Post does not exist");
     _;
   }
@@ -185,6 +185,7 @@ contract Spotlight {
       title: _title,
       content: _content,
       id: _sig,
+      signature: _sig,
       nonce: _nonce,
       createdAt: block.timestamp,
       lastUpdatedAt: block.timestamp,
@@ -231,28 +232,30 @@ contract Spotlight {
     return p;
   }
 
-  function editPost(bytes calldata _sig, string calldata newContent) public onlyRegistered postExists(_sig) {
+  function editPost(bytes calldata _id, string calldata newContent) public onlyRegistered postExists(_id) {
     // Ensure post exists
-    PostLib.Post storage post = postStore[_sig];
+    PostLib.Post storage post = postStore[_id];
     require(post.creator == msg.sender, "Only the creator can edit this post");
     require(bytes(newContent).length > 0, "Content cannot be empty");
+
+    // TODO: Accept newSig arg and verify it against newContent
 
     post.content = newContent;
     post.lastUpdatedAt = block.timestamp;
 
-    emit PostEdited(msg.sender, _sig);
+    emit PostEdited(msg.sender, _id);
   }
 
-  function deletePost(bytes calldata _sig) public onlyRegistered postExists(_sig) {
+  function deletePost(bytes calldata _id) public onlyRegistered postExists(_id) {
     // Ensure the post exists
-    PostLib.Post storage post = postStore[_sig];
+    PostLib.Post storage post = postStore[_id];
     require(post.creator == msg.sender, "Only the creator can delete this post");
 
     // Remove post from user's profile
     bytes[] storage userPosts = profiles[msg.sender].postIDs;
     for (uint256 i = 0; i < userPosts.length; i++) {
       // Solidity doesn’t have native string comparison, so keccak256 is often used to compare strings by hashing them
-      if (keccak256(userPosts[i]) == keccak256(_sig)) {
+      if (keccak256(userPosts[i]) == keccak256(_id)) {
         userPosts[i] = userPosts[userPosts.length - 1]; // Efficient gas usage: O(1) rather than O(n).
         userPosts.pop();
         break;
@@ -262,28 +265,28 @@ contract Spotlight {
     // Remove post from communityPostIDs
     for (uint256 i = 0; i < communityPostIDs.length; i++) {
       // Solidity doesn’t have native string comparison, so keccak256 is often used to compare strings by hashing them
-      if (keccak256(communityPostIDs[i]) == keccak256(_sig)) {
+      if (keccak256(communityPostIDs[i]) == keccak256(_id)) {
         communityPostIDs[i] = communityPostIDs[communityPostIDs.length - 1]; // Efficient gas usage: O(1) rather than O(n).
         communityPostIDs.pop();
         break;
       }
     }
 
-    delete postStore[_sig];
-    emit PostDeleted(msg.sender, _sig);
+    delete postStore[_id];
+    emit PostDeleted(msg.sender, _id);
   }
 
-  function upvote(bytes calldata _sig) public onlyRegistered postExists(_sig) {
+  function upvote(bytes calldata _id) public onlyRegistered postExists(_id) {
     // TODO: check for previous downvoteCount and decrement if necessary
     // TODO: check for already upvoted - no-op in this case
-    PostLib.Post storage p = postStore[_sig];
+    PostLib.Post storage p = postStore[_id];
     p.upvoteCount++;
   }
 
-  function downvote(bytes calldata _sig) public onlyRegistered postExists(_sig) {
+  function downvote(bytes calldata _id) public onlyRegistered postExists(_id) {
     // TODO: check for already upvoted - no-op in this case
     // TODO: check for previous upvoteCount and decrement if necessary
-    PostLib.Post storage p = postStore[_sig];
+    PostLib.Post storage p = postStore[_id];
     p.downvoteCount++;
   }
 
