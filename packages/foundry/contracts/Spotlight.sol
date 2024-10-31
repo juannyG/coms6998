@@ -17,6 +17,10 @@ contract Spotlight {
   /// @notice The owner of the contract.
   address public owner;
 
+  // @notice Mappings of post IDs to the addresses that up/downvoted them
+  mapping(bytes => mapping(address => bool)) public upvotedBy;
+  mapping(bytes => mapping(address => bool)) public downvotedBy;
+
   // TODO: Move to off-chain storage - sig => off-chain storage location
   /// @dev Mapping from signature of post (post ID) to post content
   mapping(bytes => PostLib.Post) private postStore;
@@ -277,17 +281,31 @@ contract Spotlight {
   }
 
   function upvote(bytes calldata _id) public onlyRegistered postExists(_id) {
-    // TODO: check for previous downvoteCount and decrement if necessary
-    // TODO: check for already upvoted - no-op in this case
     PostLib.Post storage p = postStore[_id];
-    p.upvoteCount++;
+    if (downvotedBy[_id][msg.sender]) {
+      p.downvoteCount--;
+      delete downvotedBy[_id][msg.sender];
+    }
+
+    if (!upvotedBy[_id][msg.sender]) {
+      p.upvoteCount++;
+      upvotedBy[_id][msg.sender] = true;
+      emit PostUpvoted(msg.sender, _id);
+    }
   }
 
   function downvote(bytes calldata _id) public onlyRegistered postExists(_id) {
-    // TODO: check for already upvoted - no-op in this case
-    // TODO: check for previous upvoteCount and decrement if necessary
     PostLib.Post storage p = postStore[_id];
-    p.downvoteCount++;
+    if (upvotedBy[_id][msg.sender]) {
+      p.upvoteCount--;
+      delete upvotedBy[_id][msg.sender];
+    }
+
+    if (!downvotedBy[_id][msg.sender]) {
+      p.downvoteCount++;
+      downvotedBy[_id][msg.sender] = true;
+      emit PostDownvoted(msg.sender, _id);
+    }
   }
 
   // TODO

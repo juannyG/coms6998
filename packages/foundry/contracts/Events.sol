@@ -30,6 +30,12 @@ event PostEdited(address indexed user, bytes indexed id);
 /// @param id The id of the post.
 event PostDeleted(address indexed user, bytes indexed id);
 
+/// @notice Emitted when a user upvotes a post
+event PostUpvoted(address indexed user, bytes indexed id);
+
+/// @notice Emitted when a user downvotes a post
+event PostDownvoted(address indexed user, bytes indexed id);
+
 /// @notice Emitted when issued a token
 /// @param receiver The address that received the tokens
 /// @param amount The number of tokens issued
