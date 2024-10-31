@@ -84,7 +84,7 @@ class SpotlightBot:
         print(f"txID: {Web3.to_hex(tx_hash)}\n")
         self._post_ids.append(sig)
 
-    def delete_post(self, post_sig):
+    def delete_post(self):
         idx = random.randint(0, len(self._post_ids) - 1)
         post_sig = self._post_ids.pop(idx)
         print(f"Deleting post {post_sig}")
