@@ -12,6 +12,7 @@ library PostLib {
     string title;
     string content;
     bytes id;
+    bytes signature;
     uint256 nonce;
     uint256 createdAt;
     uint256 lastUpdatedAt;

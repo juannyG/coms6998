@@ -17,18 +17,18 @@ event ProfileDeleted(address indexed user);
 
 /// @notice Emitted when a post is created
 /// @param user The address of the user who created the post.
-/// @param signature The signature of the post.
-event PostCreated(address indexed user, bytes indexed signature);
+/// @param id The id of the post.
+event PostCreated(address indexed user, bytes indexed id);
 
 /// @notice Emitted when a post is edited
 /// @param user The address of the user who created the post.
-/// @param signature The signature of the post.
-event PostEdited(address indexed user, bytes indexed signature);
+/// @param id The id of the post.
+event PostEdited(address indexed user, bytes indexed id);
 
 /// @notice Emitted when a post is deleted
 /// @param user The address of the user who created the post.
-/// @param signature The signature of the post.
-event PostDeleted(address indexed user, bytes indexed signature);
+/// @param id The id of the post.
+event PostDeleted(address indexed user, bytes indexed id);
 
 /// @notice Emitted when issued a token
 /// @param receiver The address that received the tokens
