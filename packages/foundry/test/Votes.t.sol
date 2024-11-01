@@ -76,7 +76,7 @@ contract VotesTest is Test {
     PostLib.Post memory p = spotlight.getPost(postSig);
 
     spotlight.upvote(postSig);
-    spotlight.upvote(postSig);
+    vm.expectRevert("Already upvoted");
     spotlight.upvote(postSig);
 
     p = spotlight.getPost(postSig); // refresh data from contract
@@ -117,7 +117,7 @@ contract VotesTest is Test {
     PostLib.Post memory p = spotlight.getPost(postSig);
 
     spotlight.downvote(postSig);
-    spotlight.downvote(postSig);
+    vm.expectRevert("Already downvoted");
     spotlight.downvote(postSig);
 
     p = spotlight.getPost(postSig); // refresh data from contract

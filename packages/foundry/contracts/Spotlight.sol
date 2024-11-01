@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 import "./PostLib.sol";
 import "./Events.sol";
+import "./Reputation.sol";
 
 /// @title Spotlight - A decentralized reddit
 /// @author Team
@@ -17,13 +18,16 @@ contract Spotlight {
   /// @notice The owner of the contract.
   address public owner;
 
+  /// @notice Reputation token contract
+  Reputation private reputationToken;
+
   // @notice Mappings of post IDs to the addresses that up/downvoted them
   mapping(bytes => mapping(address => bool)) public upvotedBy;
   mapping(bytes => mapping(address => bool)) public downvotedBy;
 
   // TODO: Move to off-chain storage - sig => off-chain storage location
   /// @dev Mapping from signature of post (post ID) to post content
-  mapping(bytes => PostLib.Post) private postStore;
+  mapping(bytes => PostLib.Post) internal postStore;
 
   // TODO: Support >1 community
   /* TODO:
@@ -36,25 +40,29 @@ contract Spotlight {
        Where as with a DoubleEndedQueue, all ops are O(1) and would work nicely with pagination
     */
   /// @dev Array of all post signatures in the community
-  bytes[] private communityPostIDs;
+  bytes[] internal communityPostIDs;
 
   /// @notice Structure to store profile information.
   struct Profile {
     // TODO: avatar, bio, etc.
     string username; // The username of the profile
-    bytes[] postIDs; // Array of post signatures (aka - post IDs) made by the user
+    uint256 reputation;
   }
 
+  /// @dev Mapping from address to it's post IDs
+  mapping(address => bytes[]) internal profilePostIDs;
+
   /// @dev Mapping from an address to its associated profile.
-  mapping(address => Profile) private profiles;
+  mapping(address => Profile) internal profiles;
 
   /// @dev Mapping to keep track of the hashes of normalized usernames to ensure uniqueness.
-  mapping(bytes32 => bool) private normalized_username_hashes;
+  mapping(bytes32 => bool) internal normalized_username_hashes;
 
   /// @notice Constructor sets the contract owner during deployment.
   /// @param _owner The address of the owner.
   constructor(address _owner) {
     owner = _owner;
+    reputationToken = new Reputation(address(this));
   }
 
   /// @notice Modifier to ensure that only registered users can perform certain actions.
@@ -106,9 +114,9 @@ contract Spotlight {
   /// @dev The profile must exist for the specified address.
   /// @param a The address of the profile owner.
   /// @return The username associated with the address.
-  function getProfile(address a) public view returns (string memory) {
+  function getProfile(address a) public view returns (Profile memory) {
     require(bytes(profiles[a].username).length > 0, "Profile does not exist");
-    return profiles[a].username;
+    return profiles[a];
   }
 
   /// @notice Update the username of the caller's profile.
@@ -199,7 +207,7 @@ contract Spotlight {
 
     postStore[_sig] = p;
     communityPostIDs.push(_sig);
-    profiles[msg.sender].postIDs.push(_sig);
+    profilePostIDs[msg.sender].push(_sig);
     emit PostCreated(msg.sender, _sig);
   }
 
@@ -209,7 +217,7 @@ contract Spotlight {
     // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
     require(isRegistered(_addr), "Requested address is not registered");
 
-    bytes[] memory sigs = profiles[_addr].postIDs;
+    bytes[] memory sigs = profilePostIDs[_addr];
     console.log("Sigs length", sigs.length);
     PostLib.Post[] memory userPosts = new PostLib.Post[](sigs.length);
     for (uint256 i = 0; i < sigs.length; i++) {
@@ -256,7 +264,7 @@ contract Spotlight {
     require(post.creator == msg.sender, "Only the creator can delete this post");
 
     // Remove post from user's profile
-    bytes[] storage userPosts = profiles[msg.sender].postIDs;
+    bytes[] storage userPosts = profilePostIDs[msg.sender];
     for (uint256 i = 0; i < userPosts.length; i++) {
       // Solidity doesn’t have native string comparison, so keccak256 is often used to compare strings by hashing them
       if (keccak256(userPosts[i]) == keccak256(_id)) {
@@ -282,30 +290,34 @@ contract Spotlight {
 
   function upvote(bytes calldata _id) public onlyRegistered postExists(_id) {
     PostLib.Post storage p = postStore[_id];
+    require(!upvotedBy[_id][msg.sender], "Already upvoted");
+
     if (downvotedBy[_id][msg.sender]) {
+      // TODO: undo downvote in reputationToken
       p.downvoteCount--;
       delete downvotedBy[_id][msg.sender];
     }
 
-    if (!upvotedBy[_id][msg.sender]) {
-      p.upvoteCount++;
-      upvotedBy[_id][msg.sender] = true;
-      emit PostUpvoted(msg.sender, _id);
-    }
+    p.upvoteCount++;
+    upvotedBy[_id][msg.sender] = true;
+    reputationToken.upvotePost(p.creator);
+    emit PostUpvoted(msg.sender, _id);
   }
 
   function downvote(bytes calldata _id) public onlyRegistered postExists(_id) {
     PostLib.Post storage p = postStore[_id];
+    require(!downvotedBy[_id][msg.sender], "Already downvoted");
+
     if (upvotedBy[_id][msg.sender]) {
+      // TODO: undo upvote in reputationToken
       p.upvoteCount--;
       delete upvotedBy[_id][msg.sender];
     }
 
-    if (!downvotedBy[_id][msg.sender]) {
-      p.downvoteCount++;
-      downvotedBy[_id][msg.sender] = true;
-      emit PostDownvoted(msg.sender, _id);
-    }
+    p.downvoteCount++;
+    downvotedBy[_id][msg.sender] = true;
+    reputationToken.downvotePost(p.creator);
+    emit PostDownvoted(msg.sender, _id);
   }
 
   // TODO
