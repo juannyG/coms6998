@@ -1,19 +1,13 @@
 import { createContext } from "react";
-
-export type TUserProfile = {
-  username: string | undefined;
-  isRegistered: boolean | undefined;
-};
+import { TUserProfile } from "~~/types/spotlight";
 
 interface IUserProfileContext {
-  userProfile: TUserProfile;
-  setUserProfile: React.Dispatch<React.SetStateAction<TUserProfile>>;
+  userProfile: TUserProfile | undefined;
+  setUserProfile: React.Dispatch<React.SetStateAction<TUserProfile | undefined>>;
 }
+
 export const UserProfileContext = createContext<IUserProfileContext>({
-  userProfile: {
-    username: undefined,
-    isRegistered: undefined,
-  },
+  userProfile: undefined,
   setUserProfile: () => {
     return null;
   },

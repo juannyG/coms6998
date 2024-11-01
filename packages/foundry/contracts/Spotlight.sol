@@ -116,7 +116,11 @@ contract Spotlight {
   /// @return The username associated with the address.
   function getProfile(address a) public view returns (Profile memory) {
     require(bytes(profiles[a].username).length > 0, "Profile does not exist");
-    return profiles[a];
+
+    // We want to update this on the way out and NOT the storage state - that costs gas!
+    Profile memory profile = profiles[a];
+    profile.reputation = reputationToken.balanceOf(a);
+    return profile;
   }
 
   /// @notice Update the username of the caller's profile.
