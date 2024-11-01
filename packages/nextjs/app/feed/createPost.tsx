@@ -39,7 +39,7 @@ const CreatePage: NextPage = () => {
         return;
       }
       try {
-        const nonce = BigInt(Math.random() * 10 ** 17);
+        const nonce = BigInt(Math.ceil(Math.random() * 10 ** 17));
         const postSig = await createPostSignature({ signMessageAsync, title, content, nonce });
         setPostSig(postSig);
 
