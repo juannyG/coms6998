@@ -26,7 +26,9 @@ contract SpotlightTest is Test {
     vm.prank(newUser);
     spotlight.registerProfile("newUser");
 
-    assertEq("newUser", spotlight.getProfile(newUser));
+    Spotlight.Profile memory p = spotlight.getProfile(newUser);
+    assertEq("newUser", p.username);
+    assertEq(0, p.reputation);
   }
 
   function testCannotRegisterEmptyUsername() public {
@@ -59,13 +61,15 @@ contract SpotlightTest is Test {
     vm.prank(user);
     spotlight.updateUsername("NewUsername");
 
-    assertEq("NewUsername", spotlight.getProfile(user));
+    Spotlight.Profile memory p = spotlight.getProfile(user);
+    assertEq("NewUsername", p.username);
 
     // Old username should now be available
     address anotherUser = vm.addr(2);
     vm.prank(anotherUser);
     spotlight.registerProfile("OldUsername");
-    assertEq("OldUsername", spotlight.getProfile(anotherUser));
+    p = spotlight.getProfile(anotherUser);
+    assertEq("OldUsername", p.username);
   }
 
   function testCannotUpdateUsernameIfNotRegistered() public {
@@ -103,7 +107,8 @@ contract SpotlightTest is Test {
     address anotherUser = vm.addr(2);
     vm.prank(anotherUser);
     spotlight.registerProfile("Username");
-    assertEq("Username", spotlight.getProfile(anotherUser));
+    Spotlight.Profile memory p = spotlight.getProfile(anotherUser);
+    assertEq("Username", p.username);
   }
 
   function testCannotDeleteProfileIfNotRegistered() public {
@@ -135,7 +140,8 @@ contract SpotlightTest is Test {
     spotlight.registerProfile("NewUsername");
 
     assertTrue(spotlight.isRegistered(user));
-    assertEq("NewUsername", spotlight.getProfile(user));
+    Spotlight.Profile memory p = spotlight.getProfile(user);
+    assertEq("NewUsername", p.username);
   }
 
   function testEventsEmitted() public {

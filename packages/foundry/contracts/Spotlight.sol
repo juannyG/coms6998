@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 import "./PostLib.sol";
 import "./Events.sol";
+import "./Reputation.sol";
 
 /// @title Spotlight - A decentralized reddit
 /// @author Team
@@ -17,9 +18,16 @@ contract Spotlight {
   /// @notice The owner of the contract.
   address public owner;
 
+  /// @notice Reputation token contract
+  Reputation private reputationToken;
+
+  // @notice Mappings of post IDs to the addresses that up/downvoted them
+  mapping(bytes => mapping(address => bool)) public upvotedBy;
+  mapping(bytes => mapping(address => bool)) public downvotedBy;
+
   // TODO: Move to off-chain storage - sig => off-chain storage location
   /// @dev Mapping from signature of post (post ID) to post content
-  mapping(bytes => PostLib.Post) private postStore;
+  mapping(bytes => PostLib.Post) internal postStore;
 
   // TODO: Support >1 community
   /* TODO:
@@ -32,30 +40,40 @@ contract Spotlight {
        Where as with a DoubleEndedQueue, all ops are O(1) and would work nicely with pagination
     */
   /// @dev Array of all post signatures in the community
-  bytes[] private communityPostIDs;
+  bytes[] internal communityPostIDs;
 
   /// @notice Structure to store profile information.
   struct Profile {
     // TODO: avatar, bio, etc.
     string username; // The username of the profile
-    bytes[] postIDs; // Array of post signatures (aka - post IDs) made by the user
+    uint256 reputation;
   }
 
+  /// @dev Mapping from address to it's post IDs
+  mapping(address => bytes[]) internal profilePostIDs;
+
   /// @dev Mapping from an address to its associated profile.
-  mapping(address => Profile) private profiles;
+  mapping(address => Profile) internal profiles;
 
   /// @dev Mapping to keep track of the hashes of normalized usernames to ensure uniqueness.
-  mapping(bytes32 => bool) private normalized_username_hashes;
+  mapping(bytes32 => bool) internal normalized_username_hashes;
 
   /// @notice Constructor sets the contract owner during deployment.
   /// @param _owner The address of the owner.
   constructor(address _owner) {
     owner = _owner;
+    reputationToken = new Reputation(address(this));
   }
 
   /// @notice Modifier to ensure that only registered users can perform certain actions.
   modifier onlyRegistered() {
     require(isRegistered(msg.sender), "Profile does not exist");
+    _;
+  }
+
+  modifier postExists(bytes calldata _id) {
+    PostLib.Post memory post = postStore[_id];
+    require(bytes(post.content).length > 0, "Post does not exist");
     _;
   }
 
@@ -97,9 +115,13 @@ contract Spotlight {
   /// @dev The profile must exist for the specified address.
   /// @param a The address of the profile owner.
   /// @return The username associated with the address.
-  function getProfile(address a) public view returns (string memory) {
+  function getProfile(address a) public view returns (Profile memory) {
     require(bytes(profiles[a].username).length > 0, "Profile does not exist");
-    return profiles[a].username;
+
+    // We want to update this on the way out and NOT the storage state - that costs gas!
+    Profile memory profile = profiles[a];
+    profile.reputation = reputationToken.balanceOf(a);
+    return profile;
   }
 
   /// @notice Update the username of the caller's profile.
@@ -162,23 +184,36 @@ contract Spotlight {
   }
 
   /// @notice Create a post from the caller's address.
-  /// @param _p The post to create.
+  /// @param _title The title of the post.
+  /// @param _content The content of the post.
+  /// @param _nonce The nonce used for signature generation
   /// @param _sig The signature of the post.
-  function createPost(PostLib.Post memory _p, bytes calldata _sig) public onlyRegistered {
-    require(bytes(_p.content).length > 0, "Content cannot be empty");
-    require(bytes(_p.title).length > 0, "Title cannot be empty");
-    require(_p.createdAt > 0, "Created timestamp is missing");
-    require(_p.lastUpdatedAt > 0, "Last updated timestamp is missing");
-    require(PostLib.isValidPostSignature(msg.sender, _p, _sig), "Invalid signature");
+  function createPost(string memory _title, string memory _content, uint256 _nonce, bytes calldata _sig)
+    public
+    onlyRegistered
+  {
+    require(bytes(_content).length > 0, "Content cannot be empty");
+    require(bytes(_title).length > 0, "Title cannot be empty");
+    require(PostLib.isValidPostSignature(msg.sender, _title, _content, _nonce, _sig), "Invalid signature");
 
     // TODO: Check that the signature doesn't already exist in the postStore!
 
-    _p.creator = msg.sender;
-    _p.id = _sig;
+    PostLib.Post memory p = PostLib.Post({
+      creator: msg.sender,
+      title: _title,
+      content: _content,
+      id: _sig,
+      signature: _sig,
+      nonce: _nonce,
+      createdAt: block.timestamp,
+      lastUpdatedAt: block.timestamp,
+      upvoteCount: 0,
+      downvoteCount: 0
+    });
 
-    postStore[_sig] = _p;
+    postStore[_sig] = p;
     communityPostIDs.push(_sig);
-    profiles[msg.sender].postIDs.push(_sig);
+    profilePostIDs[msg.sender].push(_sig);
     emit PostCreated(msg.sender, _sig);
   }
 
@@ -188,7 +223,7 @@ contract Spotlight {
     // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
     require(isRegistered(_addr), "Requested address is not registered");
 
-    bytes[] memory sigs = profiles[_addr].postIDs;
+    bytes[] memory sigs = profilePostIDs[_addr];
     console.log("Sigs length", sigs.length);
     PostLib.Post[] memory userPosts = new PostLib.Post[](sigs.length);
     for (uint256 i = 0; i < sigs.length; i++) {
@@ -215,30 +250,30 @@ contract Spotlight {
     return p;
   }
 
-  function editPost(bytes calldata _sig, string calldata newContent) public onlyRegistered {
+  function editPost(bytes calldata _id, string calldata newContent) public onlyRegistered postExists(_id) {
     // Ensure post exists
-    PostLib.Post storage post = postStore[_sig];
+    PostLib.Post storage post = postStore[_id];
     require(post.creator == msg.sender, "Only the creator can edit this post");
-    require(bytes(post.content).length > 0, "Post does not exist");
     require(bytes(newContent).length > 0, "Content cannot be empty");
+
+    // TODO: Accept newSig arg and verify it against newContent
 
     post.content = newContent;
     post.lastUpdatedAt = block.timestamp;
 
-    emit PostEdited(msg.sender, _sig);
+    emit PostEdited(msg.sender, _id);
   }
 
-  function deletePost(bytes calldata _sig) public onlyRegistered {
+  function deletePost(bytes calldata _id) public onlyRegistered postExists(_id) {
     // Ensure the post exists
-    PostLib.Post storage post = postStore[_sig];
+    PostLib.Post storage post = postStore[_id];
     require(post.creator == msg.sender, "Only the creator can delete this post");
-    require(bytes(post.content).length > 0, "Post does not exist");
 
     // Remove post from user's profile
-    bytes[] storage userPosts = profiles[msg.sender].postIDs;
+    bytes[] storage userPosts = profilePostIDs[msg.sender];
     for (uint256 i = 0; i < userPosts.length; i++) {
       // Solidity doesn’t have native string comparison, so keccak256 is often used to compare strings by hashing them
-      if (keccak256(userPosts[i]) == keccak256(_sig)) {
+      if (keccak256(userPosts[i]) == keccak256(_id)) {
         userPosts[i] = userPosts[userPosts.length - 1]; // Efficient gas usage: O(1) rather than O(n).
         userPosts.pop();
         break;
@@ -248,14 +283,50 @@ contract Spotlight {
     // Remove post from communityPostIDs
     for (uint256 i = 0; i < communityPostIDs.length; i++) {
       // Solidity doesn’t have native string comparison, so keccak256 is often used to compare strings by hashing them
-      if (keccak256(communityPostIDs[i]) == keccak256(_sig)) {
+      if (keccak256(communityPostIDs[i]) == keccak256(_id)) {
         communityPostIDs[i] = communityPostIDs[communityPostIDs.length - 1]; // Efficient gas usage: O(1) rather than O(n).
         communityPostIDs.pop();
         break;
       }
     }
 
-    delete postStore[_sig];
-    emit PostDeleted(msg.sender, _sig);
+    delete postStore[_id];
+    emit PostDeleted(msg.sender, _id);
   }
+
+  function upvote(bytes calldata _id) public onlyRegistered postExists(_id) {
+    PostLib.Post storage p = postStore[_id];
+    require(!upvotedBy[_id][msg.sender], "Already upvoted");
+
+    if (downvotedBy[_id][msg.sender]) {
+      // TODO: undo downvote in reputationToken
+      p.downvoteCount--;
+      delete downvotedBy[_id][msg.sender];
+    }
+
+    p.upvoteCount++;
+    upvotedBy[_id][msg.sender] = true;
+    reputationToken.upvotePost(p.creator);
+    emit PostUpvoted(msg.sender, _id);
+  }
+
+  function downvote(bytes calldata _id) public onlyRegistered postExists(_id) {
+    PostLib.Post storage p = postStore[_id];
+    require(!downvotedBy[_id][msg.sender], "Already downvoted");
+
+    if (upvotedBy[_id][msg.sender]) {
+      // TODO: undo upvote in reputationToken
+      p.upvoteCount--;
+      delete upvotedBy[_id][msg.sender];
+    }
+
+    p.downvoteCount++;
+    downvotedBy[_id][msg.sender] = true;
+    reputationToken.downvotePost(p.creator);
+    emit PostDownvoted(msg.sender, _id);
+  }
+
+  // TODO
+  // function clearVote(bytes calldata _sig) public onlyRegistered() postExists(_sig) {
+  // }
 }

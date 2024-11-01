@@ -16,9 +16,12 @@ contract DeployScript is ScaffoldETHDeploy {
     }
     vm.startBroadcast(deployerPrivateKey);
 
+    // Deploy Spotlight first
     Spotlight spotlight = new Spotlight(vm.addr(deployerPrivateKey));
     console.logString(string.concat("Spotlight deployed at: ", vm.toString(address(spotlight))));
 
+    // Store deployments for export
+    deployments.push(Deployment("Spotlight", address(spotlight)));
     vm.stopBroadcast();
 
     /**

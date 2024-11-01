@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import FeedHeaderPage from "../header";
 import Viewer from "../richTextEditor/Viewer";
@@ -7,10 +9,15 @@ import "../richTextEditor/styles.css";
 import Comments from "./comments";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { TPost } from "~~/types/spotlight";
 
 const ViewPostPage: NextPage = () => {
+  const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
+
+  const [liked, setLiked] = useState(false);
+  const imgSrc = liked ? "/liked.png" : "/not-liked.png";
+
   const searchParams = useSearchParams();
   const postSig = searchParams.get("postSig") || "";
   const { address } = useAccount();
@@ -22,10 +29,28 @@ const ViewPostPage: NextPage = () => {
     args: [postSig as `0x${string}`],
     watch: true,
   }) as { data: TPost | undefined };
+  console.log("data:", data);
 
   if (!postSig) {
     return <div>Loading...</div>; // Handle case where postSig is not yet available
   }
+
+  // TODO: Disable clickability until tx complete!
+  const handleLike = async () => {
+    // intent of click === inversion of state, hence "!liked"
+    console.log(!liked);
+    if (!liked === true) {
+      try {
+        await writeSpotlightContractAsync({
+          functionName: "upvote",
+          args: [postSig as `0x${string}`],
+        });
+      } catch (e: any) {
+        console.log(e);
+      }
+    }
+    setLiked(!liked);
+  };
 
   return (
     <div className="w-full h-full  relative  bg-white box-border">
@@ -45,9 +70,9 @@ const ViewPostPage: NextPage = () => {
                 className="h-6 w-6"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="M7 16l-4-4m0 0l4-4m-4 4h18"
                 ></path>
               </svg>
@@ -68,6 +93,16 @@ const ViewPostPage: NextPage = () => {
             <h1 className="text-2xl font-bold">{data?.title}</h1>
           </div>
           <Viewer data={data?.content} />
+          <div className="flex">
+            <div className="columns-2 text-xs text-left">
+              <div className="pl-2">
+                <Image alt="Like" className="cursor-pointer" width="20" height="20" src={imgSrc} onClick={handleLike} />
+              </div>
+              <div className="items-right text-right">
+                <div className="pr-2">12345 likes</div>
+              </div>
+            </div>
+          </div>
           <Comments />
         </div>
       </div>

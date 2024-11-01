@@ -11,15 +11,19 @@ const RegistrationForm = () => {
   const { address: connectedAddress } = useAccount();
   const router = useRouter();
   const { userProfile } = useContext(UserProfileContext);
+  console.log("connectedAddress:", connectedAddress);
+  console.log("userProfile:", userProfile);
 
-  if (connectedAddress) {
-    if (userProfile.isRegistered === undefined && userProfile.username === undefined) {
-      // We cannot render anything
-      return;
-    }
+  if (!connectedAddress) {
+    return;
   }
 
-  if (userProfile.isRegistered === true) {
+  if (userProfile === undefined) {
+    // We cannot render anything
+    return;
+  }
+
+  if (userProfile.username !== "") {
     // Already registered
     router.push("/feed");
   }
@@ -30,8 +34,8 @@ const RegistrationForm = () => {
       style={{ boxShadow: "0px 1px 3px 0 rgba(0,0,0,0.1), 0px 1px 2px 0 rgba(0,0,0,0.06)" }}
     >
       {!connectedAddress && <Loading />}
-      {connectedAddress && !userProfile.isRegistered && <Register />}
-      {connectedAddress && userProfile.isRegistered && <>Redirecting...</>}
+      {connectedAddress && userProfile.username === "" && <Register />}
+      {connectedAddress && userProfile.username !== "" && <>Redirecting...</>}
       <div className="flex justify-center items-center self-stretch flex-grow-0 flex-shrink-0 w-[368px] h-5 gap-2" />
     </div>
   );

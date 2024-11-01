@@ -8,7 +8,6 @@ import "./richTextEditor/styles.css";
 import { NextPage } from "next";
 import { useAccount, useSignMessage } from "wagmi";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { TPost } from "~~/types/spotlight";
 import { createPostSignature } from "~~/utils/spotlight";
 
 const CreatePage: NextPage = () => {
@@ -40,21 +39,13 @@ const CreatePage: NextPage = () => {
         return;
       }
       try {
-        const ts = BigInt(Date.now());
-        const post: TPost = {
-          id: "0x0", // The contract will overwrite this. This is just for typescript type consistency
-          creator: address, // The contract will overwrite this. This is just for typescript type consistency
-          title,
-          content,
-          createdAt: ts,
-          lastUpdatedAt: ts,
-        };
-        const postSig = await createPostSignature({ signMessageAsync, post });
+        const nonce = BigInt(Math.ceil(Math.random() * 10 ** 17));
+        const postSig = await createPostSignature({ signMessageAsync, title, content, nonce });
         setPostSig(postSig);
 
         console.log("Signature of post:", postSig);
 
-        await writeSpotlightContractAsync({ functionName: "createPost", args: [post, postSig] });
+        await writeSpotlightContractAsync({ functionName: "createPost", args: [title, content, nonce, postSig] });
       } catch (e: any) {
         console.log(e);
       }

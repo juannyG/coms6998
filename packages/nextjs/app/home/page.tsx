@@ -48,12 +48,12 @@ const Home: NextPage = () => {
   };
 
   const { userProfile } = useContext(UserProfileContext);
-  if (userProfile.isRegistered === undefined && userProfile.username === undefined) {
+  if (userProfile === undefined) {
     // We cannot render anything
     return;
   }
 
-  if (userProfile.isRegistered === false) {
+  if (userProfile.username === "") {
     // They need to go register first...
     router.push("/");
   }
@@ -67,6 +67,7 @@ const Home: NextPage = () => {
           ) : (
             <>
               <h2 className="text-2xl font-bold text-gray-800 text-center">Welcome back, {userProfile.username}!</h2>
+              <div>Reputation: {Number(userProfile.reputation)} RPT</div>
               {isChangingUsername ? (
                 // Render the form for changing username
                 <div className="w-full flex flex-col items-center">
