@@ -45,4 +45,4 @@ def prep_create_post_args():
     )
     msg_p = encode_packed(['string', 'string', 'uint256'], [title, editor_json, nonce])
     msg = encode_defunct(hexstr=f"{msg_p.hex()}")
-    return title, nonce, msg
+    return title, editor_json, nonce, msg

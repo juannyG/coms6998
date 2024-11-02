@@ -1,6 +1,8 @@
 '''
 pip install web3
 
+yarn chain --balance 1000000
+
 Usage: python3 spotlight-bot/bot
 
 '''
