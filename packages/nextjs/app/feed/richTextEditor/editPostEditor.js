@@ -4,7 +4,7 @@ import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import EditorContentPlugin from "./plugins/EditPostEditorContentPlugin";
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
-import RestoreFromLocalStoragePlugin from "./plugins/RestoreFromLocalStoragePlugin";
+import RestoreFromLocalStoragePlugin from "./plugins/RestoreContentFromData";
 import ToolbarPlugin from "./plugins/ToolbarPlugin";
 import ExampleTheme from "./themes/ExampleTheme";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";

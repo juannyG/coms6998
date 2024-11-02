@@ -1,7 +1,7 @@
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
-import RestoreFromLocalStoragePlugin from "./plugins/RestoreFromLocalStoragePlugin";
+import RestoreFromLocalStoragePlugin from "./plugins/RestoreContentFromData";
 import ExampleTheme from "./themes/ExampleTheme";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import { AutoLinkNode, LinkNode } from "@lexical/link";
