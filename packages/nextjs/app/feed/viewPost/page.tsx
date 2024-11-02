@@ -35,6 +35,10 @@ const ViewPostPage: NextPage = () => {
     refetch: ReturnType<typeof useScaffoldReadContract>["refetch"];
   };
 
+  if (!postSig) {
+    return <div>Loading...</div>; // Handle case where postSig is not yet available
+  }
+
   const onclickEdit = () => {
     setOpenEditPage(true);
   };
