@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Editor from "../richTextEditor/editPostEditor";
+import Editor from "../richTextEditor/EditPostEditor";
 import "../richTextEditor/styles.css";
 import { EditPostEditorContext } from "./editPostContext";
 import { useAccount } from "wagmi";
