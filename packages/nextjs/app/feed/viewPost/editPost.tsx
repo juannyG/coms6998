@@ -40,7 +40,7 @@ const EditPost = ({ tPost, closeEditPage }: { tPost: TPost; closeEditPage: () =>
       <div className="w-full h-[30%] flex flex-col justify-between px-4 border border-[#e6ebf1]">
         <div className="w-full flex flex-row items-center justify-start gap-4 pt-2">
           <p className="text-lg font-semibold text-left text-black">Title</p>
-          <input type="text" className="input input-bordered rounded-lg w-full max-w-xs" value={tPost.title} />
+          <input type="text" className="input input-bordered rounded-lg w-full max-w-xs" value={tPost.title} readOnly />
         </div>
         <div className="divider"></div>
         <div className="w-full flex flex-col">
