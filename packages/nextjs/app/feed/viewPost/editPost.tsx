@@ -23,8 +23,6 @@ const EditPost = ({ tPost, closeEditPage }: { tPost: TPost; closeEditPage: () =>
         return;
       }
       try {
-        const ts = BigInt(Date.now());
-        const nonce = BigInt(Math.ceil(Math.random() * 10 ** 17));
         const postId = tPost.signature; // use old signature as post id
 
         console.log("Edited Post Id", postId);
