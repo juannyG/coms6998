@@ -13,4 +13,6 @@ yarn chain --balance 1000000
 Usage:
 ```sh
 python3 spotlight-bot/bot
+python3 spotlight-bot/bot --help
+python3 spotlight-bot/bot --sleep-range 1 5
 ```

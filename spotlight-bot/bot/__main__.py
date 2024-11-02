@@ -2,6 +2,7 @@
 A simple bot to interact with the Spotlight contract
 '''
 
+import argparse
 import json
 import os
 import pathlib
@@ -46,16 +47,18 @@ class SpotlightBot:
     GET_COMMUNITY_POSTS_OP = "getCommunityPosts"
     OPS = [CREATE_POST_OP, DELETE_POST_OP, UPVOTE_POST_OP, DOWNVOTE_POST_OP, GET_PROFILE_OP, GET_COMMUNITY_POSTS_OP]
 
-    def __init__(self, w3, bot_acct, spotlight):
+    def __init__(self, w3, bot_acct, spotlight, sleep_range):
         self.w3 = w3
         self.bot_acct = bot_acct
         self.spotlight = spotlight
+        self.sleep_range = sleep_range
 
         self._community_post_ids = []
         self._bot_post_ids = []
 
     def run(self):
-        print("Starting up bot operations...\n")
+        print("Starting up bot operations.")
+        print(f"Sleep range configuration: {self.sleep_range}\n")
         try:
             while not TERMINATING:
                 op = self.get_next_op()
@@ -78,7 +81,7 @@ class SpotlightBot:
                     # Default case, just create a post
                     self.create_post()
 
-                sleep_duration = random.randint(1, 3)
+                sleep_duration = random.randint(*self.sleep_range)
                 print(f"sleeping for {sleep_duration}s...\n")
                 time.sleep(sleep_duration)
         except Exception as exc:
@@ -164,6 +167,21 @@ class SpotlightBot:
 if __name__ == '__main__':
     set_cwd()
 
+    parser = argparse.ArgumentParser("Spotlight-Bot CLI")
+    parser.add_argument(
+        "--sleep-range",
+        default=[5, 10],
+        nargs=2,
+        type=int,
+        help='The desired sleep interval range between contract operations.',
+    )
+    args = parser.parse_args()
+    if args.sleep_range[0] > args.sleep_range[1]:
+        print("The first value in --sleep-range must be less than or equal to the second value")
+        print("Exiting...")
+        exit(1)
+
     w3, bot_acct, spotlight = setup_bot_deps()
-    bot = SpotlightBot(w3, bot_acct, spotlight)
+    bot = SpotlightBot(w3, bot_acct, spotlight, args.sleep_range)
     bot.run()
+    exit(0)
