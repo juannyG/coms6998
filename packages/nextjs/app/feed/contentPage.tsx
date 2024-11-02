@@ -9,7 +9,7 @@ import { useAccount } from "wagmi";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { TPost } from "~~/types/spotlight";
 
-const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => void }) => {
+const RenderPosts = ({ data, refreshPosts }: { data: readonly TPost[] | undefined; refreshPosts: () => void }) => {
   const router = useRouter();
   const { address } = useAccount();
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
@@ -68,7 +68,7 @@ const RenderPosts = ({ data, refreshPosts }: { data: any; refreshPosts: () => vo
     <>
       {data.map((p: TPost) => (
         <div
-          key={p.createdAt}
+          key={p.id}
           onClick={() => onClickViewPost(p.id)}
           className="flex flex-col w-full p-4 gap-4 cursor-pointer justify-start
             transition-all duration-300 ease-in-out

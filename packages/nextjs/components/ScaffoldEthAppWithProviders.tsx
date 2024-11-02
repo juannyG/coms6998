@@ -10,10 +10,11 @@ import { Footer } from "~~/components/Footer";
 import { Header } from "~~/components/Header";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { ProgressBar } from "~~/components/scaffold-eth/ProgressBar";
-import { TUserProfile, UserProfileContext } from "~~/contexts/UserProfile";
+import { UserProfileContext } from "~~/contexts/UserProfile";
 import { useInitializeNativeCurrencyPrice } from "~~/hooks/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
+import { TUserProfile } from "~~/types/spotlight";
 
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   useInitializeNativeCurrencyPrice();
@@ -26,16 +27,26 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
     args: [connectedAddress],
     watch: true,
   });
-  const { data: username } = useScaffoldReadContract({
+
+  const { data: userProfile } = useScaffoldReadContract({
     contractName: "Spotlight",
     functionName: "getProfile",
     args: [connectedAddress],
     watch: true,
-  });
+  }) as { data: TUserProfile };
 
   useEffect(() => {
-    setUserProfile({ username, isRegistered });
-  }, [isRegistered, username, connectedAddress, setUserProfile]);
+    if (isRegistered === undefined) {
+      return;
+    }
+
+    if (isRegistered) {
+      setUserProfile(userProfile);
+      console.log(userProfile);
+    } else {
+      setUserProfile({ username: "", reputation: BigInt(0) });
+    }
+  }, [isRegistered, userProfile, setUserProfile]);
 
   return (
     <>
@@ -61,7 +72,7 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
   const { resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === "dark";
   const [mounted, setMounted] = useState(false);
-  const [userProfile, setUserProfile] = useState<TUserProfile>({ username: undefined, isRegistered: undefined });
+  const [userProfile, setUserProfile] = useState<TUserProfile>();
 
   useEffect(() => {
     setMounted(true);
