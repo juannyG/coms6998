@@ -89,6 +89,7 @@ contract Spotlight {
   /// @dev The username is checked for uniqueness after normalization (case-insensitive).
   /// @param _username The desired username for the profile.
   function registerProfile(string memory _username) public usernameValid(_username) {
+    // TODO: Ensure msg.sender != address(0)
     require(!isRegistered(msg.sender), "Profile already exists");
 
     bytes32 usernameHash = _getUsernameHash(_username);
@@ -144,6 +145,7 @@ contract Spotlight {
   /// @notice Delete the caller's profile.
   /// @dev The profile is removed and its associated username is freed.
   function deleteProfile() public onlyRegistered {
+    // TODO: delete posts in postStore & communityPostIDs
     bytes32 oldHash = _getUsernameHash(profiles[msg.sender].username);
     normalized_username_hashes[oldHash] = false;
 
