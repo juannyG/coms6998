@@ -3,6 +3,7 @@
 import { useContext } from "react";
 import { useRouter } from "next/navigation";
 import ContentPage from "./contentPage";
+import CreatePage from "./createPost";
 import FeedHeaderPage from "./header";
 import LeftPage from "./leftPage";
 import RightPage from "./rightPage";
@@ -31,7 +32,10 @@ const FeedPage: NextPage = () => {
             <LeftPage />
           </div>
           <div className="w-[50%] mt-6">
-            <ContentPage />
+            <div className="flex flex-col gap-10">
+              <CreatePage />
+              <ContentPage />
+            </div>
           </div>
           <div className="w-[20%] mt-6">
             <RightPage />
