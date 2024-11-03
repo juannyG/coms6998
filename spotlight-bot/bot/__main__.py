@@ -126,10 +126,7 @@ class SpotlightBot:
             tx_hash = self.spotlight.functions.upvote(post_sig).transact()
             print(f"txID: {Web3.to_hex(tx_hash)}\n")
         except Exception as exc:
-            if "Already upvoted" in exc.message:
-                print("Already upvoted\n")
-                return
-            elif "Post does not exist" in exc.message:
+            if "Post does not exist" in exc.message:
                 print("Post no longer exists\n")
                 self._community_post_ids.remove(post_sig)
                 return
@@ -143,10 +140,7 @@ class SpotlightBot:
             tx_hash = self.spotlight.functions.downvote(post_sig).transact()
             print(f"txID: {Web3.to_hex(tx_hash)}\n")
         except Exception as exc:
-            if "Already downvoted" in exc.message:
-                print("Already downvoted\n")
-                return
-            elif "Post does not exist" in exc.message:
+            if "Post does not exist" in exc.message:
                 print("Post no longer exists\n")
                 self._community_post_ids.remove(post_sig)
                 return

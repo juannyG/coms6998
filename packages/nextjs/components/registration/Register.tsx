@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useContext, useState } from "react";
+import { UserProfileContext } from "~~/contexts/UserProfile";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 import { notification } from "~~/utils/scaffold-eth";
 
 const Register = () => {
-  const router = useRouter();
+  const { refetchProfile } = useContext(UserProfileContext);
   const [username, setUsername] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
@@ -23,7 +23,7 @@ const Register = () => {
         args: [username],
       });
       setCompleted(true);
-      router.push("/feed");
+      refetchProfile();
     } catch (e: any) {
       console.error(e);
       if (e.message.includes("Username is already taken")) {

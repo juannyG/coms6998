@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Viewer from "./richTextEditor/Viewer";
 import { NextPage } from "next";
 import { Hex } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useConfig } from "wagmi";
+import { UserProfileContext } from "~~/contexts/UserProfile";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { TPost, TUserProfile } from "~~/types/spotlight";
 
@@ -25,6 +26,7 @@ const Post = ({
 }) => {
   const { address } = useAccount();
   const router = useRouter();
+  const { refetchProfile } = useContext(UserProfileContext);
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
   const { data: creatorProfile } = useScaffoldReadContract({
     contractName: "Spotlight",
@@ -70,6 +72,7 @@ const Post = ({
       refreshPosts();
       refetchHasUpvoted();
       refetchHasDownvoted();
+      refetchProfile();
     } catch (e: any) {
       console.log(e);
     }
@@ -83,6 +86,7 @@ const Post = ({
       refreshPosts();
       refetchHasDownvoted();
       refetchHasUpvoted();
+      refetchProfile();
     } catch (e: any) {
       console.log(e);
     }
@@ -96,13 +100,13 @@ const Post = ({
             hover:bg-gray-200 hover:shadow-lg hover:scale-105"
       >
         <div className="flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <div className="avatar">
-              <div className="w-10 h-10 rounded-full">
-                <img alt="" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+          <div className="tooltip tooltip-neutral cursor-pointer" data-tip={`${creatorRep.toFixed(4)} RPT`}>
+            <div className="flex items-center gap-4">
+              <div className="avatar">
+                <div className="w-10 h-10 rounded-full">
+                  <img alt="" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                </div>
               </div>
-            </div>
-            <div className="tooltip cursor-pointer " data-tip={`${creatorRep.toFixed(4)} RPT`}>
               <p className="text-sm font-semibold text-left text-black">
                 <a>
                   {creatorProfile.username} @ {shortenedCreatorAddr}

@@ -245,4 +245,31 @@ contract ReputationTest is Test {
 
     vm.stopPrank();
   }
+
+  function testRevertingUpvoteIssuance() public {
+    vm.startPrank(spotlight);
+
+    reputation.upvotePost(user1); // 100 tokens
+    assertEq(100 * 10 ** 18, reputation.balanceOf(user1));
+
+    reputation.revertUpvotePost(user1);
+    assertEq(0, reputation.balanceOf(user1));
+
+    vm.stopPrank();
+  }
+
+  function testRevertingDownvoteBurning() public {
+    vm.startPrank(spotlight);
+
+    reputation.upvotePost(user1); // 100 tokens
+    assertEq(100 * 10 ** 18, reputation.balanceOf(user1));
+
+    reputation.downvotePost(user1); // 95 tokens
+    assertEq(95 * 10 ** 18, reputation.balanceOf(user1));
+
+    reputation.revertDownvotePost(user1); // Back to 100 tokens
+    assertEq(100 * 10 ** 18, reputation.balanceOf(user1));
+
+    vm.stopPrank();
+  }
 }

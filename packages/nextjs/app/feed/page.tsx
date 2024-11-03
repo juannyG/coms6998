@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ContentPage from "./contentPage";
 import CreatePage from "./createPost";
@@ -13,14 +13,16 @@ import { UserProfileContext } from "~~/contexts/UserProfile";
 const FeedPage: NextPage = () => {
   const router = useRouter();
   const { userProfile } = useContext(UserProfileContext);
+  useEffect(() => {
+    if (userProfile && userProfile.username === "") {
+      // They need to go register first...
+      router.push("/");
+    }
+  });
+
   if (userProfile === undefined) {
     // We cannot render anything
     return;
-  }
-
-  if (userProfile.username === "") {
-    // They need to go register first...
-    router.push("/");
   }
 
   return (
