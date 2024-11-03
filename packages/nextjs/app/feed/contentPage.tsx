@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Viewer from "./richTextEditor/Viewer";
 import { NextPage } from "next";
 import { Hex } from "viem";
-import { useAccount, useConfig } from "wagmi";
+import { useAccount } from "wagmi";
 import { UserProfileContext } from "~~/contexts/UserProfile";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { TPost, TUserProfile } from "~~/types/spotlight";
