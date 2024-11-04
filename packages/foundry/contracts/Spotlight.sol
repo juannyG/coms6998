@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "./PostLib.sol";
 import "./Events.sol";
 import "./Reputation.sol";
+import "./Error.sol";
 
 /// @title Spotlight - A decentralized reddit
 /// @author Team
@@ -67,21 +68,23 @@ contract Spotlight {
 
   /// @notice Modifier to ensure that only registered users can perform certain actions.
   modifier onlyRegistered() {
-    require(isRegistered(msg.sender), "Profile does not exist");
+    if (!isRegistered(msg.sender)) revert ProfileNotExist();
     _;
   }
 
   modifier postExists(bytes calldata _id) {
     PostLib.Post memory post = postStore[_id];
-    require(bytes(post.content).length > 0, "Post does not exist");
+    if (bytes(post.content).length == 0) {
+      revert PostNotFound();
+    }
     _;
   }
 
   /// @notice Modifier to ensure that a username meets the length requirements.
   /// @param _username The username to be validated.
   modifier usernameValid(string memory _username) {
-    require(bytes(_username).length > 0, "Username cannot be empty");
-    require(bytes(_username).length < 32, "Username too long");
+    if (bytes(_username).length == 0)  revert UsernameCannotBeEmpty();
+    if (bytes(_username).length > 32) revert UsernameTooLong();
     _;
   }
 
@@ -90,10 +93,10 @@ contract Spotlight {
   /// @param _username The desired username for the profile.
   function registerProfile(string memory _username) public usernameValid(_username) {
     // TODO: Ensure msg.sender != address(0)
-    require(!isRegistered(msg.sender), "Profile already exists");
+    if (isRegistered(msg.sender)) revert ProfileAlreadyExist();
 
     bytes32 usernameHash = _getUsernameHash(_username);
-    require(!normalized_username_hashes[usernameHash], "Username is already taken");
+    if (normalized_username_hashes[usernameHash]) revert UsernameTaken();
 
     normalized_username_hashes[usernameHash] = true;
 
@@ -116,7 +119,7 @@ contract Spotlight {
   /// @param a The address of the profile owner.
   /// @return The username associated with the address.
   function getProfile(address a) public view returns (Profile memory) {
-    require(bytes(profiles[a].username).length > 0, "Profile does not exist");
+    if (bytes(profiles[a].username).length == 0) revert ProfileNotExist();
 
     // We want to update this on the way out and NOT the storage state - that costs gas!
     Profile memory profile = profiles[a];
@@ -129,7 +132,7 @@ contract Spotlight {
   /// @param _newUsername The new username to set for the profile.
   function updateUsername(string memory _newUsername) public onlyRegistered usernameValid(_newUsername) {
     bytes32 newHash = _getUsernameHash(_newUsername);
-    require(!normalized_username_hashes[newHash], "Username is already taken");
+    if (normalized_username_hashes[newHash]) revert UsernameTaken();
 
     // Remove the old username hash.
     bytes32 oldHash = _getUsernameHash(profiles[msg.sender].username);
@@ -188,13 +191,15 @@ contract Spotlight {
   /// @param _content The content of the post.
   /// @param _nonce The nonce used for signature generation
   /// @param _sig The signature of the post.
-  function createPost(string memory _title, string memory _content, uint256 _nonce, bytes calldata _sig)
-    public
-    onlyRegistered
-  {
-    require(bytes(_content).length > 0, "Content cannot be empty");
-    require(bytes(_title).length > 0, "Title cannot be empty");
-    require(PostLib.isValidPostSignature(msg.sender, _title, _content, _nonce, _sig), "Invalid signature");
+  function createPost(
+    string memory _title,
+    string memory _content,
+    uint256 _nonce,
+    bytes calldata _sig
+  ) public onlyRegistered {
+    if (bytes(_content).length == 0) revert ContentCannotBeEmpty();
+    if (bytes(_title).length == 0) revert TitleCannotBeEmpty();
+    if (!PostLib.isValidPostSignature(msg.sender, _title, _content, _nonce, _sig)) revert InvalidSignature();
 
     // TODO: Check that the signature doesn't already exist in the postStore!
 
@@ -221,7 +226,7 @@ contract Spotlight {
   /// @param _addr Wallet address of the registered user whose posts we wish to retrieve
   function getPostsOfAddress(address _addr) public view onlyRegistered returns (PostLib.Post[] memory) {
     // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
-    require(isRegistered(_addr), "Requested address is not registered");
+    if (!isRegistered(_addr)) revert AddressNotRegistered();
 
     bytes[] memory sigs = profilePostIDs[_addr];
     console.log("Sigs length", sigs.length);
@@ -235,7 +240,7 @@ contract Spotlight {
 
   function getPost(bytes calldata _post_sig) public view onlyRegistered returns (PostLib.Post memory) {
     PostLib.Post memory p = postStore[_post_sig];
-    require(p.creator != address(0), "Requested post not found");
+    if (p.creator == address(0)) revert PostNotFound();
     return p;
   }
 
@@ -253,8 +258,8 @@ contract Spotlight {
   function editPost(bytes calldata _id, string calldata newContent) public onlyRegistered postExists(_id) {
     // Ensure post exists
     PostLib.Post storage post = postStore[_id];
-    require(post.creator == msg.sender, "Only the creator can edit this post");
-    require(bytes(newContent).length > 0, "Content cannot be empty");
+    if (post.creator != msg.sender) revert OnlyCreatorCanEdit();
+    if (bytes(newContent).length == 0) revert ContentCannotBeEmpty();
 
     // TODO: Accept newSig arg and verify it against newContent
 
@@ -267,7 +272,7 @@ contract Spotlight {
   function deletePost(bytes calldata _id) public onlyRegistered postExists(_id) {
     // Ensure the post exists
     PostLib.Post storage post = postStore[_id];
-    require(post.creator == msg.sender, "Only the creator can delete this post");
+    if (post.creator != msg.sender) revert OnlyCreatorCanEdit();
 
     // Remove post from user's profile
     bytes[] storage userPosts = profilePostIDs[msg.sender];
@@ -296,7 +301,7 @@ contract Spotlight {
 
   function upvote(bytes calldata _id) public onlyRegistered postExists(_id) {
     PostLib.Post storage p = postStore[_id];
-    require(!upvotedBy[_id][msg.sender], "Already upvoted");
+    if (upvotedBy[_id][msg.sender]) revert AlreadyVoted();
 
     if (downvotedBy[_id][msg.sender]) {
       // TODO: undo downvote in reputationToken
@@ -312,7 +317,7 @@ contract Spotlight {
 
   function downvote(bytes calldata _id) public onlyRegistered postExists(_id) {
     PostLib.Post storage p = postStore[_id];
-    require(!downvotedBy[_id][msg.sender], "Already downvoted");
+    if (downvotedBy[_id][msg.sender]) revert AlreadyDownvoted();
 
     if (upvotedBy[_id][msg.sender]) {
       // TODO: undo upvote in reputationToken

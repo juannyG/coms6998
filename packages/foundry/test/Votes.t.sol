@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 import "../contracts/Spotlight.sol";
 import "../contracts/Events.sol";
 import "../contracts/PostLib.sol";
+import "../contracts/Error.sol";
 
 contract VotesTest is Test {
   Spotlight public spotlight;
@@ -38,7 +39,7 @@ contract VotesTest is Test {
   ////////////////////////////////
   function testNonRegisteredUserCannotUpvoteAPost() public {
     vm.startPrank(wallet2.addr);
-    vm.expectRevert("Profile does not exist");
+    vm.expectRevert(ProfileNotExist.selector);
     spotlight.upvote(postSig);
   }
 
@@ -76,7 +77,7 @@ contract VotesTest is Test {
     PostLib.Post memory p = spotlight.getPost(postSig);
 
     spotlight.upvote(postSig);
-    vm.expectRevert("Already upvoted");
+    vm.expectRevert(AlreadyVoted.selector);
     spotlight.upvote(postSig);
 
     p = spotlight.getPost(postSig); // refresh data from contract
@@ -88,7 +89,7 @@ contract VotesTest is Test {
   ////////////////////////////////
   function testNonRegisteredUserCannotDownvoteAPost() public {
     vm.startPrank(wallet2.addr);
-    vm.expectRevert("Profile does not exist");
+    vm.expectRevert(ProfileNotExist.selector);
     spotlight.downvote(postSig);
   }
 
@@ -117,7 +118,7 @@ contract VotesTest is Test {
     PostLib.Post memory p = spotlight.getPost(postSig);
 
     spotlight.downvote(postSig);
-    vm.expectRevert("Already downvoted");
+    vm.expectRevert(AlreadyDownvoted.selector);
     spotlight.downvote(postSig);
 
     p = spotlight.getPost(postSig); // refresh data from contract

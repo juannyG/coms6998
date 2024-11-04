@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "../contracts/Spotlight.sol";
 import "../contracts/Events.sol";
 import "../contracts/PostLib.sol";
+import "../contracts/Error.sol";
 
 contract PostManagementTest is Test {
   Spotlight public spotlight;
@@ -40,7 +41,7 @@ contract PostManagementTest is Test {
   }
 
   function testCannotCreatePostIfAddressNotRegistered() public {
-    vm.expectRevert("Profile does not exist");
+    vm.expectRevert(ProfileNotExist.selector);
     PostLib.Post memory p = createTestPost();
     spotlight.createPost(p.title, p.content, p.nonce, "not a sig");
   }
@@ -61,7 +62,7 @@ contract PostManagementTest is Test {
     vm.startPrank(wallet.addr);
     spotlight.registerProfile("username");
 
-    vm.expectRevert("Invalid signature");
+    vm.expectRevert(InvalidSignature.selector);
     PostLib.Post memory p = createTestPost();
     spotlight.createPost(p.title, p.content, p.nonce, "Fake signature");
   }
@@ -72,7 +73,7 @@ contract PostManagementTest is Test {
 
     PostLib.Post memory p = createTestPost();
     p.content = "";
-    vm.expectRevert("Content cannot be empty");
+    vm.expectRevert(ContentCannotBeEmpty.selector);
     spotlight.createPost(p.title, p.content, p.nonce, "Sig won't be checked here");
   }
 
@@ -82,7 +83,7 @@ contract PostManagementTest is Test {
 
     PostLib.Post memory p = createTestPost();
     p.title = "";
-    vm.expectRevert("Title cannot be empty");
+    vm.expectRevert(TitleCannotBeEmpty.selector);
     spotlight.createPost(p.title, p.content, p.nonce, "Sig won't be checked here");
   }
 
@@ -106,7 +107,7 @@ contract PostManagementTest is Test {
     vm.startPrank(wallet.addr);
     spotlight.registerProfile("username");
 
-    vm.expectRevert("Requested post not found");
+    vm.expectRevert(PostNotFound.selector);
     spotlight.getPost(bytes("sig-does-not-exist"));
   }
 
@@ -201,7 +202,7 @@ contract PostManagementTest is Test {
     vm.startPrank(wallet.addr);
     spotlight.registerProfile("username");
 
-    vm.expectRevert("Requested address is not registered");
+    vm.expectRevert(AddressNotRegistered.selector);
     address _addr = vm.addr(2);
     spotlight.getPostsOfAddress(_addr);
   }
@@ -215,7 +216,7 @@ contract PostManagementTest is Test {
 
     address _addr = vm.addr(2);
     vm.startPrank(_addr);
-    vm.expectRevert("Profile does not exist");
+    vm.expectRevert(ProfileNotExist.selector);
     spotlight.getPostsOfAddress(wallet.addr);
   }
 
@@ -228,7 +229,7 @@ contract PostManagementTest is Test {
 
     address _addr = vm.addr(2);
     vm.startPrank(_addr);
-    vm.expectRevert("Profile does not exist");
+    vm.expectRevert(ProfileNotExist.selector);
     spotlight.getCommunityPosts();
   }
 
@@ -262,7 +263,7 @@ contract PostManagementTest is Test {
     address otherUser = vm.addr(2);
     vm.startPrank(otherUser);
     spotlight.registerProfile("username2");
-    vm.expectRevert("Only the creator can edit this post");
+    vm.expectRevert(OnlyCreatorCanEdit.selector);
     spotlight.editPost(signature, "Updated content by another user");
     vm.stopPrank();
   }
@@ -275,7 +276,7 @@ contract PostManagementTest is Test {
     bytes memory signature = signContentViaWallet(wallet, post);
     spotlight.createPost(post.title, post.content, post.nonce, signature);
 
-    vm.expectRevert("Content cannot be empty");
+    vm.expectRevert(ContentCannotBeEmpty.selector);
     spotlight.editPost(signature, "");
     vm.stopPrank();
   }
@@ -292,7 +293,7 @@ contract PostManagementTest is Test {
     emit PostDeleted(wallet.addr, signature);
     spotlight.deletePost(signature);
 
-    vm.expectRevert("Requested post not found");
+    vm.expectRevert(PostNotFound.selector);
     spotlight.getPost(signature);
     vm.stopPrank();
   }
@@ -309,7 +310,7 @@ contract PostManagementTest is Test {
     address otherUser = vm.addr(2);
     vm.startPrank(otherUser);
     spotlight.registerProfile("username2");
-    vm.expectRevert("Only the creator can delete this post");
+    vm.expectRevert(OnlyCreatorCanEdit.selector);
     spotlight.deletePost(signature);
 
     vm.stopPrank();
