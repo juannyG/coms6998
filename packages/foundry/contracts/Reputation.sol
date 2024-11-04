@@ -59,6 +59,16 @@ contract Reputation is ERC20 {
   }
 
   /**
+   * @dev Burns 100 tokens for reverting a previously upvoted post
+   * @param receiver The address that will lose the tokens
+   */
+  function revertUpvotePost(address receiver) external {
+    require(msg.sender == spotlightContract, "Only Spotlight contract can issue tokens");
+    _applyDecay(receiver); // Apply decay before burning new tokens
+    _burnToken(receiver, 100);
+  }
+
+  /**
    * @dev Issues 1 token for upvoting a comment
    * @param receiver The address that will receive the tokens
    */
@@ -70,6 +80,19 @@ contract Reputation is ERC20 {
 
   /**
    * @dev Burns 5 tokens for downvoting a post
+   * @param account The address from which tokens will be burned
+   */
+  function revertDownvotePost(address account) external {
+    require(msg.sender == spotlightContract, "Only Spotlight contract can burn tokens");
+    _applyDecay(account); // Apply decay before issuing tokens
+    if (balanceOf(account) >= 5 * 10 ** decimals()) {
+      // Otherwise we're giving away 5 RPT
+      _issueToken(account, 5);
+    }
+  }
+
+  /**
+   * @dev Issues 5 tokens for reverting a previously downvoted a post
    * @param account The address from which tokens will be burned
    */
   function downvotePost(address account) external {

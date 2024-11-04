@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { NextPage } from "next";
 import { UserProfileContext } from "~~/contexts/UserProfile";
@@ -13,6 +13,15 @@ const Home: NextPage = () => {
   const [isChangingUsername, setIsChangingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState<string>("");
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
+  const { userProfile } = useContext(UserProfileContext);
+
+  useEffect(() => {
+    if (userProfile && userProfile.username === "") {
+      // They need to go register first...
+      router.push("/");
+    }
+  }, [userProfile, router]);
+
   const handleDeleteProfile = async () => {
     const confirmDelete = window.confirm("Are you sure you want to delete your profile?");
     if (!confirmDelete) return;
@@ -47,15 +56,9 @@ const Home: NextPage = () => {
     }
   };
 
-  const { userProfile } = useContext(UserProfileContext);
   if (userProfile === undefined) {
     // We cannot render anything
     return;
-  }
-
-  if (userProfile.username === "") {
-    // They need to go register first...
-    router.push("/");
   }
 
   return (

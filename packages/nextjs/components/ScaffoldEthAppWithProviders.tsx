@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useTheme } from "next-themes";
@@ -19,7 +19,7 @@ import { TUserProfile } from "~~/types/spotlight";
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   useInitializeNativeCurrencyPrice();
   const { address: connectedAddress } = useAccount();
-  const { setUserProfile } = useContext(UserProfileContext);
+  const [userProfile, setUserProfile] = useState<TUserProfile>();
 
   const { data: isRegistered } = useScaffoldReadContract({
     contractName: "Spotlight",
@@ -28,12 +28,12 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
     watch: true,
   });
 
-  const { data: userProfile } = useScaffoldReadContract({
+  const { data: readUserProfile, refetch: refetchProfile } = useScaffoldReadContract({
     contractName: "Spotlight",
     functionName: "getProfile",
     args: [connectedAddress],
     watch: true,
-  }) as { data: TUserProfile };
+  });
 
   useEffect(() => {
     if (isRegistered === undefined) {
@@ -41,21 +41,23 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
     }
 
     if (isRegistered) {
-      setUserProfile(userProfile);
-      console.log(userProfile);
+      setUserProfile(readUserProfile);
+      console.log(readUserProfile);
     } else {
       setUserProfile({ username: "", reputation: BigInt(0) });
     }
-  }, [isRegistered, userProfile, setUserProfile]);
+  }, [isRegistered, readUserProfile, setUserProfile]);
 
   return (
     <>
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="relative flex flex-col flex-1">{children}</main>
-        <Footer />
-      </div>
-      <Toaster />
+      <UserProfileContext.Provider value={{ userProfile, setUserProfile, refetchProfile }}>
+        <div className="flex flex-col min-h-screen">
+          <Header />
+          <main className="relative flex flex-col flex-1">{children}</main>
+          <Footer />
+        </div>
+        <Toaster />
+      </UserProfileContext.Provider>
     </>
   );
 };
@@ -72,7 +74,6 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
   const { resolvedTheme } = useTheme();
   const isDarkMode = resolvedTheme === "dark";
   const [mounted, setMounted] = useState(false);
-  const [userProfile, setUserProfile] = useState<TUserProfile>();
 
   useEffect(() => {
     setMounted(true);
@@ -86,9 +87,7 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
           avatar={BlockieAvatar}
           theme={mounted ? (isDarkMode ? darkTheme() : lightTheme()) : lightTheme()}
         >
-          <UserProfileContext.Provider value={{ userProfile, setUserProfile }}>
-            <ScaffoldEthApp>{children}</ScaffoldEthApp>
-          </UserProfileContext.Provider>
+          <ScaffoldEthApp>{children}</ScaffoldEthApp>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

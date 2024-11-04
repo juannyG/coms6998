@@ -70,17 +70,21 @@ contract VotesTest is Test {
     assertEq(1, p.upvoteCount);
   }
 
-  function testAUserCannotDoubleUpvoteTheSamePost() public {
+  function testWhenAUserUpvotesAPostASecondTimeItUndoesTheFirstUpvote() public {
     vm.startPrank(wallet2.addr);
     spotlight.registerProfile("u2");
     PostLib.Post memory p = spotlight.getPost(postSig);
 
     spotlight.upvote(postSig);
-    vm.expectRevert("Already upvoted");
-    spotlight.upvote(postSig);
-
     p = spotlight.getPost(postSig); // refresh data from contract
     assertEq(1, p.upvoteCount);
+    assertTrue(spotlight.upvotedBy(postSig, wallet2.addr));
+
+    // This should undo the upvote
+    spotlight.upvote(postSig);
+    p = spotlight.getPost(postSig); // refresh data from contract
+    assertEq(0, p.upvoteCount);
+    assertFalse(spotlight.upvotedBy(postSig, wallet2.addr));
   }
 
   ////////////////////////////////
@@ -111,17 +115,20 @@ contract VotesTest is Test {
     assertEq(1, p.downvoteCount);
   }
 
-  function testAUserCannotDoubleDownvoteTheSamePost() public {
+  function testWhenAUserDownvotesAPostASecondTimeItUndoesTheFirstDownvote() public {
     vm.startPrank(wallet2.addr);
     spotlight.registerProfile("u2");
     PostLib.Post memory p = spotlight.getPost(postSig);
 
     spotlight.downvote(postSig);
-    vm.expectRevert("Already downvoted");
-    spotlight.downvote(postSig);
-
     p = spotlight.getPost(postSig); // refresh data from contract
     assertEq(1, p.downvoteCount);
+    assertTrue(spotlight.downvotedBy(postSig, wallet2.addr));
+
+    spotlight.downvote(postSig);
+    p = spotlight.getPost(postSig); // refresh data from contract
+    assertEq(0, p.downvoteCount);
+    assertFalse(spotlight.downvotedBy(postSig, wallet2.addr));
   }
 
   ////////////////////////////////
