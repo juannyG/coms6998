@@ -4,6 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import "../contracts/Spotlight.sol";
 import "../contracts/Events.sol";
+import "../contracts/Error.sol";
 
 contract SpotlightTest is Test {
   Spotlight public spotlight;
@@ -17,7 +18,7 @@ contract SpotlightTest is Test {
   }
 
   function testCannotGetProfileIfNotRegistered() public {
-    vm.expectRevert("Profile does not exist");
+    vm.expectRevert(ProfileNotExist.selector);
     spotlight.getProfile(vm.addr(2));
   }
 
@@ -32,13 +33,13 @@ contract SpotlightTest is Test {
   }
 
   function testCannotRegisterEmptyUsername() public {
-    vm.expectRevert("Username cannot be empty");
+    vm.expectRevert(UsernameCannotBeEmpty.selector);
     spotlight.registerProfile("");
   }
 
   function testCannotRegisterUsernameMoreThan32bytes() public {
     // Username too long
-    vm.expectRevert("Username too long");
+    vm.expectRevert(UsernameTooLong.selector);
     spotlight.registerProfile("abcdefghijklmnopqrstuvwxyz-abcdefg");
   }
 
@@ -49,7 +50,7 @@ contract SpotlightTest is Test {
 
     address second_u = vm.addr(2);
     vm.prank(second_u);
-    vm.expectRevert("Username is already taken");
+    vm.expectRevert(UsernameTaken.selector);
     spotlight.registerProfile("USERname1");
   }
 
@@ -73,7 +74,7 @@ contract SpotlightTest is Test {
   }
 
   function testCannotUpdateUsernameIfNotRegistered() public {
-    vm.expectRevert("Profile does not exist");
+    vm.expectRevert(ProfileNotExist.selector);
     spotlight.updateUsername("NewUsername");
   }
 
@@ -87,7 +88,7 @@ contract SpotlightTest is Test {
     spotlight.registerProfile("Username2");
 
     vm.prank(user2);
-    vm.expectRevert("Username is already taken");
+    vm.expectRevert(UsernameTaken.selector);
     spotlight.updateUsername("Username1");
   }
 
@@ -100,7 +101,7 @@ contract SpotlightTest is Test {
     spotlight.deleteProfile();
 
     // Now, getProfile should revert
-    vm.expectRevert("Profile does not exist");
+    vm.expectRevert(ProfileNotExist.selector);
     spotlight.getProfile(user);
 
     // Username should now be available
@@ -112,7 +113,7 @@ contract SpotlightTest is Test {
   }
 
   function testCannotDeleteProfileIfNotRegistered() public {
-    vm.expectRevert("Profile does not exist");
+    vm.expectRevert(ProfileNotExist.selector);
     spotlight.deleteProfile();
   }
 

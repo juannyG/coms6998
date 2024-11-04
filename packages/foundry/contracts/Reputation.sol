@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./Events.sol";
+import "./Error.sol";
 
 contract Reputation is ERC20 {
   address public immutable spotlightContract;
@@ -11,7 +12,7 @@ contract Reputation is ERC20 {
   mapping(address => uint256) private lastDecayTime;
 
   constructor(address _spotlightContract) ERC20("Reputation", "RPT") {
-    require(_spotlightContract != address(0), "Spotlight address cannot be zero");
+    if (_spotlightContract == address(0)) revert SpotlightAddressCannotBeZero();
     spotlightContract = _spotlightContract;
   }
 
@@ -21,7 +22,7 @@ contract Reputation is ERC20 {
    * @param amount The number of tokens to issue (will be multiplied by 10^decimals)
    */
   function _issueToken(address receiver, uint256 amount) internal {
-    require(receiver != address(0), "Cannot issue to zero address");
+    if (receiver == address(0)) revert CannotIssueToZeroAddress();
 
     uint256 tokenAmount = amount * 10 ** decimals();
     _mint(receiver, tokenAmount);
@@ -53,7 +54,7 @@ contract Reputation is ERC20 {
    * @param receiver The address that will receive the tokens
    */
   function upvotePost(address receiver) external {
-    require(msg.sender == spotlightContract, "Only Spotlight contract can issue tokens");
+    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanIssueTokens();
     _applyDecay(receiver); // Apply decay before issuing new tokens
     _issueToken(receiver, 100);
   }
@@ -63,7 +64,7 @@ contract Reputation is ERC20 {
    * @param receiver The address that will lose the tokens
    */
   function revertUpvotePost(address receiver) external {
-    require(msg.sender == spotlightContract, "Only Spotlight contract can issue tokens");
+    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanIssueTokens();
     _applyDecay(receiver); // Apply decay before burning new tokens
     _burnToken(receiver, 100);
   }
@@ -73,7 +74,7 @@ contract Reputation is ERC20 {
    * @param receiver The address that will receive the tokens
    */
   function upvoteComment(address receiver) external {
-    require(msg.sender == spotlightContract, "Only Spotlight contract can issue tokens");
+    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanIssueTokens();
     _applyDecay(receiver); // Apply decay before issuing new tokens
     _issueToken(receiver, 10);
   }
@@ -83,7 +84,7 @@ contract Reputation is ERC20 {
    * @param account The address from which tokens will be burned
    */
   function revertDownvotePost(address account) external {
-    require(msg.sender == spotlightContract, "Only Spotlight contract can burn tokens");
+    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanBurnTokens();
     _applyDecay(account); // Apply decay before issuing tokens
     if (balanceOf(account) >= 5 * 10 ** decimals()) {
       // Otherwise we're giving away 5 RPT
@@ -96,7 +97,7 @@ contract Reputation is ERC20 {
    * @param account The address from which tokens will be burned
    */
   function downvotePost(address account) external {
-    require(msg.sender == spotlightContract, "Only Spotlight contract can burn tokens");
+    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanBurnTokens();
     _applyDecay(account); // Apply decay before burning tokens
     _burnToken(account, 5);
   }
@@ -106,7 +107,7 @@ contract Reputation is ERC20 {
    * @param account The address from which tokens will be burned
    */
   function downvoteComment(address account) external {
-    require(msg.sender == spotlightContract, "Only Spotlight contract can burn tokens");
+    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanBurnTokens();
     _applyDecay(account); // Apply decay before burning tokens
     _burnToken(account, 1);
   }

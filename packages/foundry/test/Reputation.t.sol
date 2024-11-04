@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import "../contracts/Reputation.sol";
 import "../contracts/Events.sol";
+import "../contracts/Error.sol";
 
 contract ReputationTest is Test {
   Reputation public reputation;
@@ -29,7 +30,7 @@ contract ReputationTest is Test {
 
   function testConstructor() public {
     // Test constructor requirements
-    vm.expectRevert("Spotlight address cannot be zero");
+    vm.expectRevert(SpotlightAddressCannotBeZero.selector);
     new Reputation(address(0));
 
     // Test spotlight address is set correctly
@@ -38,7 +39,7 @@ contract ReputationTest is Test {
 
   function testUpvotePostOnlySpotlight() public {
     // Test that non-spotlight address cannot upvote
-    vm.expectRevert("Only Spotlight contract can issue tokens");
+    vm.expectRevert(OnlySpotlightContractCanIssueTokens.selector);
     reputation.upvotePost(user1);
 
     // Test upvote from spotlight works
@@ -51,7 +52,7 @@ contract ReputationTest is Test {
 
   function testUpvoteCommentOnlySpotlight() public {
     // Test that non-spotlight address cannot upvote
-    vm.expectRevert("Only Spotlight contract can issue tokens");
+    vm.expectRevert(OnlySpotlightContractCanIssueTokens.selector);
     reputation.upvoteComment(user1);
 
     // Test upvote from spotlight works
@@ -63,7 +64,7 @@ contract ReputationTest is Test {
 
   function testCannotIssueToZeroAddress() public {
     vm.prank(spotlight);
-    vm.expectRevert("Cannot issue to zero address");
+    vm.expectRevert(CannotIssueToZeroAddress.selector);
     reputation.upvotePost(address(0));
   }
 
@@ -157,7 +158,7 @@ contract ReputationTest is Test {
     reputation.upvotePost(user1); // 100 tokens
 
     // Test that non-spotlight address cannot downvote
-    vm.expectRevert("Only Spotlight contract can burn tokens");
+    vm.expectRevert(OnlySpotlightContractCanBurnTokens.selector);
     reputation.downvotePost(user1);
 
     // Test downvote from spotlight works
@@ -174,7 +175,7 @@ contract ReputationTest is Test {
     reputation.upvotePost(user1); // 100 tokens
 
     // Test that non-spotlight address cannot downvote
-    vm.expectRevert("Only Spotlight contract can burn tokens");
+    vm.expectRevert(OnlySpotlightContractCanBurnTokens.selector);
     reputation.downvoteComment(user1);
 
     // Test downvote from spotlight works
