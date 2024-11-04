@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "./Loading";
 import Register from "./Register";
@@ -14,6 +14,13 @@ const RegistrationForm = () => {
   console.log("connectedAddress:", connectedAddress);
   console.log("userProfile:", userProfile);
 
+  useEffect(() => {
+    if (userProfile && userProfile.username !== "") {
+      // Already registered
+      router.push("/feed");
+    }
+  }, [userProfile, router]);
+
   if (!connectedAddress) {
     return;
   }
@@ -21,11 +28,6 @@ const RegistrationForm = () => {
   if (userProfile === undefined) {
     // We cannot render anything
     return;
-  }
-
-  if (userProfile.username !== "") {
-    // Already registered
-    router.push("/feed");
   }
 
   return (

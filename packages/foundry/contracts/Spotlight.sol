@@ -272,6 +272,8 @@ contract Spotlight {
     PostLib.Post storage post = postStore[_id];
     if (post.creator != msg.sender) revert OnlyCreatorCanEdit();
 
+    // TODO: Burn RPT associated with the post (or at least burn some amount of RPT...)
+
     // Remove post from user's profile
     bytes[] storage userPosts = profilePostIDs[msg.sender];
     for (uint256 i = 0; i < userPosts.length; i++) {
@@ -299,11 +301,16 @@ contract Spotlight {
 
   function upvote(bytes calldata _id) public onlyRegistered postExists(_id) {
     PostLib.Post storage p = postStore[_id];
-    if (upvotedBy[_id][msg.sender]) revert AlreadyVoted();
+    if (upvotedBy[_id][msg.sender]) {
+      p.upvoteCount--;
+      reputationToken.revertUpvotePost(p.creator);
+      delete upvotedBy[_id][msg.sender];
+      return;
+    }
 
     if (downvotedBy[_id][msg.sender]) {
-      // TODO: undo downvote in reputationToken
       p.downvoteCount--;
+      reputationToken.revertDownvotePost(p.creator);
       delete downvotedBy[_id][msg.sender];
     }
 
@@ -315,11 +322,17 @@ contract Spotlight {
 
   function downvote(bytes calldata _id) public onlyRegistered postExists(_id) {
     PostLib.Post storage p = postStore[_id];
-    if (downvotedBy[_id][msg.sender]) revert AlreadyDownvoted();
+    if (downvotedBy[_id][msg.sender]) {
+      p.downvoteCount--;
+      reputationToken.revertDownvotePost(p.creator);
+      delete downvotedBy[_id][msg.sender];
+      return;
+    }
 
     if (upvotedBy[_id][msg.sender]) {
       // TODO: undo upvote in reputationToken
       p.upvoteCount--;
+      reputationToken.revertUpvotePost(p.creator);
       delete upvotedBy[_id][msg.sender];
     }
 
