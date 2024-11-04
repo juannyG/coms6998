@@ -83,7 +83,7 @@ contract Spotlight {
   /// @notice Modifier to ensure that a username meets the length requirements.
   /// @param _username The username to be validated.
   modifier usernameValid(string memory _username) {
-    if (bytes(_username).length == 0)  revert UsernameCannotBeEmpty();
+    if (bytes(_username).length == 0) revert UsernameCannotBeEmpty();
     if (bytes(_username).length > 32) revert UsernameTooLong();
     _;
   }
@@ -191,12 +191,10 @@ contract Spotlight {
   /// @param _content The content of the post.
   /// @param _nonce The nonce used for signature generation
   /// @param _sig The signature of the post.
-  function createPost(
-    string memory _title,
-    string memory _content,
-    uint256 _nonce,
-    bytes calldata _sig
-  ) public onlyRegistered {
+  function createPost(string memory _title, string memory _content, uint256 _nonce, bytes calldata _sig)
+    public
+    onlyRegistered
+  {
     if (bytes(_content).length == 0) revert ContentCannotBeEmpty();
     if (bytes(_title).length == 0) revert TitleCannotBeEmpty();
     if (!PostLib.isValidPostSignature(msg.sender, _title, _content, _nonce, _sig)) revert InvalidSignature();
