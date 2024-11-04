@@ -77,7 +77,6 @@ contract VotesTest is Test {
     PostLib.Post memory p = spotlight.getPost(postSig);
 
     spotlight.upvote(postSig);
-    
     p = spotlight.getPost(postSig); // refresh data from contract
     assertEq(1, p.upvoteCount);
     assertTrue(spotlight.upvotedBy(postSig, wallet2.addr));
