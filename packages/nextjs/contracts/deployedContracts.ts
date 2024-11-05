@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0x0165878a594ca255338adfa4d48449f69242eb8f",
+      address: "0x5fbdb2315678afecb367f032d93f642f64180aa3",
       abi: [
         {
           type: "constructor",
@@ -601,6 +601,61 @@ const deployedContracts = {
             },
           ],
           anonymous: false,
+        },
+        {
+          type: "error",
+          name: "AddressNotRegistered",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ContentCannotBeEmpty",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "InvalidSignature",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlyCreatorCanEdit",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostNotFound",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ProfileAlreadyExist",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ProfileNotExist",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "TitleCannotBeEmpty",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "UsernameCannotBeEmpty",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "UsernameTaken",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "UsernameTooLong",
+          inputs: [],
         },
       ],
       inheritedFunctions: {},

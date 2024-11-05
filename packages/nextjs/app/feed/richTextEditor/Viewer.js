@@ -3,6 +3,7 @@ import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
 import RestoreFromLocalStoragePlugin from "./plugins/RestoreContentFromData";
 import ExampleTheme from "./themes/ExampleTheme";
+import MaxLengthPlugin from "./plugins/MaxLengthPlugin";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
@@ -50,6 +51,7 @@ export default function Viewer({ data }) {
             contentEditable={<ContentEditable className="editor-input" />}
             ErrorBoundary={LexicalErrorBoundary}
           />
+          {/* <MaxLengthPlugin maxLength={30}/> */}
           <RestoreFromLocalStoragePlugin data={data} />
           <CodeHighlightPlugin />
           <ListPlugin />
