@@ -315,4 +315,30 @@ contract PostManagementTest is Test {
 
     vm.stopPrank();
   }
+
+  function testDeletingProfileDeletesUsersPost() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature);
+    vm.stopPrank();
+
+    address otherUser = vm.addr(2);
+    vm.startPrank(otherUser);
+    spotlight.registerProfile("username2");
+    PostLib.Post[] memory communityPosts = spotlight.getCommunityPosts();
+    assertEq(1, communityPosts.length);
+    vm.stopPrank();
+
+    vm.startPrank(wallet.addr);
+    spotlight.deleteProfile();
+    vm.stopPrank();
+
+    vm.startPrank(otherUser);
+    communityPosts = spotlight.getCommunityPosts();
+    assertEq(0, communityPosts.length);
+    vm.stopPrank();
+  }
 }
