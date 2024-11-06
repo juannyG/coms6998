@@ -9,7 +9,9 @@ const FeedHeaderPage: NextPage = () => {
 
       <div className="grid grid-cols-3 grid-cols-[1fr_50%_1fr] items-center w-full h-20 relative">
         <div className="col-span-1 h-full">
-          <p className="absolute left-60 top-6 text-2xl font-bold text-left text-black">Spotlight</p>
+          <p className="absolute xl:left-60 md:left-36 sm:left-16 top-6 text-2xl font-bold text-left text-black">
+            Spotlight
+          </p>
         </div>
         <div className="col-span-1 w-full h-full flex justify-center items-center">
           <label className="w-[80%] input input-bordered flex justify-center items-center gap-2">
@@ -82,7 +84,9 @@ const FeedHeaderPage: NextPage = () => {
               </svg>
             </div>
           </div>
-          <img alt="" src="/avatar.png" className="w-10 h-10 rounded-[40px] object-cover ml-2" />
+          <a href="/home">
+            <img alt="" src="/avatar.png" className="w-10 h-10 rounded-[40px] object-cover ml-2" />
+          </a>
         </div>
       </div>
     </div>
