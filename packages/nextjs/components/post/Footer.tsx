@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import Image from "next/image";
+import VerificationBadge from "./VerificationBadge";
 import { useAccount } from "wagmi";
 import { UserProfileContext } from "~~/contexts/UserProfile";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
@@ -73,7 +74,9 @@ const PostFooter = ({ post }: { post: TPost }) => {
           <p className="[font-family:'Inter-Medium',Helvetica] font-medium text-gray-500 text-[13px]">
             ({Number(post.upvoteCount)})
           </p>
+
           <p className="[font-family:'Inter-Medium',Helvetica] font-medium text-gray-500 text-[13px]">|</p>
+
           <a onClick={e => onDownvoteClick(e)}>
             <Image
               alt="Downvote"
@@ -86,6 +89,8 @@ const PostFooter = ({ post }: { post: TPost }) => {
           <p className="[font-family:'Inter-Medium',Helvetica] font-medium text-gray-500 text-[13px]">
             ({Number(post.downvoteCount)})
           </p>
+          <p className="[font-family:'Inter-Medium',Helvetica] font-medium text-gray-500 text-[13px]">|</p>
+          <VerificationBadge post={post} />
         </div>
       </div>
     </>
