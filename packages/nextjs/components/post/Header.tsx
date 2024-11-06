@@ -1,42 +1,43 @@
 import { useContext } from "react";
 import Image from "next/image";
+import CreatorDisplay from "./CreatorDisplay";
 import { useAccount } from "wagmi";
-import { PostContext } from "~~/contexts/Post";
+import { PostDeleteContext, PostDisplayContext, PostEditContext } from "~~/contexts/Post";
+import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { TPost, TUserProfile } from "~~/types/spotlight";
 
-const PostHeader = ({ post, creatorProfile }: { post: TPost; creatorProfile: TUserProfile }) => {
+const PostHeader = ({ post }: { post: TPost }) => {
   const { address } = useAccount();
-  const { setPostId, setShowDeleteConfirmation, deleting } = useContext(PostContext);
-  const shortenedCreatorAddr = post.creator.substring(0, 6) + "..." + post.creator.substring(post.creator.length - 4);
-  const creatorRep = Number(creatorProfile.reputation) / 10 ** 18;
+  const { showPostMgmt } = useContext(PostDisplayContext);
+  const { setShowDeleteConfirmation, deleting } = useContext(PostDeleteContext);
+  const { setShowEditModal, editing } = useContext(PostEditContext);
+  const { data: creatorProfile } = useScaffoldReadContract({
+    contractName: "Spotlight",
+    functionName: "getProfile",
+    args: [post.creator],
+  }) as { data: TUserProfile };
+
+  if (creatorProfile === undefined) {
+    return null; // Cannot render until we have their profile
+  }
 
   const onClickDeletePost = (evt: React.MouseEvent<HTMLButtonElement>) => {
     evt.stopPropagation();
     setShowDeleteConfirmation(true);
-    setPostId(post.id);
+  };
+  const onClickEditPost = (evt: React.MouseEvent<HTMLButtonElement>) => {
+    evt.stopPropagation();
+    setShowEditModal(true);
   };
 
   return (
     <>
-      <div className="tooltip tooltip-neutral cursor-pointer" data-tip={`${creatorRep.toFixed(4)} RPT`}>
-        <div className="flex items-center gap-4">
-          <div className="avatar">
-            <div className="w-10 h-10 rounded-full">
-              <img alt="" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-            </div>
-          </div>
-          {/* TODO: This styling is different depending on render context (i.e. list vs singleton) */}
-          <p className="text-sm font-semibold text-left text-black">
-            <a>
-              {creatorProfile.username} @ {shortenedCreatorAddr}
-            </a>
-          </p>
-        </div>
-      </div>
+      <CreatorDisplay post={post} />
+
       <div className="flex gap-2">
-        {address === post.creator && (
+        {address === post.creator && showPostMgmt && (
           <>
-            <button className="btn btn-danger btn-sm">
+            <button className="btn btn-danger btn-sm" onClick={e => onClickEditPost(e)} disabled={editing}>
               <Image alt="Edit Post" className="cursor-pointer" width="20" height="25" src="/pencil.svg" />
             </button>
             <button className="btn btn-danger btn-sm" onClick={e => onClickDeletePost(e)} disabled={deleting}>

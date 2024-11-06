@@ -1,23 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import { useRouter } from "next/navigation";
 import { NextPage } from "next";
 import { Hex } from "viem";
 import { useAccount } from "wagmi";
 import Post from "~~/components/post/Post";
-import { PostContext } from "~~/contexts/Post";
-import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { PostDisplayContext } from "~~/contexts/Post";
+import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { TPost } from "~~/types/spotlight";
 
 const ContentPage: NextPage = function () {
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [showEditPage, setShowEditPage] = useState(false);
-  const [postId, setPostId] = useState<Hex | null>(null);
+  const router = useRouter();
   const { address } = useAccount();
-  const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
-  const { data, refetch } = useScaffoldReadContract({
+
+  // TODO: Just fetch the IDs - not all the posts
+  const { data } = useScaffoldReadContract({
     account: address,
     contractName: "Spotlight",
     functionName: "getCommunityPosts",
@@ -34,52 +32,26 @@ const ContentPage: NextPage = function () {
     return <>No posts yet (To be styled!)</>;
   }
 
-  // Refresh posts after delete
-  const refreshPosts = () => {
-    refetch();
-  };
-
-  const handleDelete = async (postId: Hex) => {
-    try {
-      setDeleting(true);
-      await writeSpotlightContractAsync({
-        functionName: "deletePost",
-        args: [postId],
-      });
-      console.log(`Deleted post with ID: ${postId}`);
-      refreshPosts(); // Refetch or update local state to remove the deleted post
-    } catch (error) {
-      console.error("Error showDeleteConfirmation post:", error);
-    } finally {
-      setShowDeleteConfirmation(false);
-      setDeleting(false);
-      setPostId(null);
-    }
+  const onClickViewPost = (postId: Hex) => {
+    const query = new URLSearchParams({ postSig: String(postId) }).toString();
+    router.push(`/feed/viewPost?${query}`);
   };
 
   return (
     <>
-      <PostContext.Provider value={{ setShowDeleteConfirmation, setShowEditPage, setPostId, deleting, editing }}>
+      <PostDisplayContext.Provider value={{ compactDisplay: true, showPostMgmt: false }}>
         {data.map((post: TPost) => (
-          <Post key={post.id} post={post} />
-        ))}
-      </PostContext.Provider>
-
-      {postId && showDeleteConfirmation && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg text-center">
-            <p>Are you sure you want to delete this post?</p>
-            <div className="mt-4 flex justify-center gap-4">
-              <button className="btn btn-danger" onClick={() => handleDelete(postId)} disabled={deleting}>
-                Confirm
-              </button>
-              <button className="btn btn-secondary" onClick={() => setPostId(null)}>
-                Cancel
-              </button>
-            </div>
+          <div
+            key={post.id}
+            className="flex flex-col w-full p-4 gap-4 justify-start
+                      transition-all duration-300 ease-in-out
+                      hover:bg-gray-200 hover:shadow-lg hover:scale-105 cursor-pointer"
+            onClick={() => onClickViewPost(post.id)}
+          >
+            <Post key={post.id} postId={post.id} />
           </div>
-        </div>
-      )}
+        ))}
+      </PostDisplayContext.Provider>
     </>
   );
 };

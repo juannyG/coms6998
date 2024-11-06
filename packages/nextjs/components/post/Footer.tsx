@@ -9,14 +9,13 @@ const PostFooter = ({ post }: { post: TPost }) => {
   const { address } = useAccount();
   const { refetchProfile } = useContext(UserProfileContext);
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
-
-  // TODO: refetch this INDIVIDUAL post
-
-  // TODO: Refetch the post should be conditional based on where the post is being rendered...
-  //   const { refetch: refetchPosts } = useScaffoldReadContract({
-  //     contractName: "Spotlight",
-  //     functionName: "getCommunityPosts",
-  //   });
+  const { refetch: refetchPost } = useScaffoldReadContract({
+    account: address,
+    contractName: "Spotlight",
+    functionName: "getPost",
+    args: [post.id],
+    watch: true,
+  });
 
   const { data: hasUpvoted, refetch: refetchHasUpvoted } = useScaffoldReadContract({
     contractName: "Spotlight",
@@ -35,7 +34,7 @@ const PostFooter = ({ post }: { post: TPost }) => {
     console.log("upvote clicked for", post.id);
     try {
       await writeSpotlightContractAsync({ functionName: "upvote", args: [post.id] });
-      //   refetchPosts();
+      refetchPost();
       refetchHasUpvoted();
       refetchHasDownvoted();
       refetchProfile();
@@ -49,7 +48,7 @@ const PostFooter = ({ post }: { post: TPost }) => {
     console.log("downvote clicked for", post.id);
     try {
       await writeSpotlightContractAsync({ functionName: "downvote", args: [post.id] });
-      //   refetchPosts();
+      refetchPost();
       refetchHasDownvoted();
       refetchHasUpvoted();
       refetchProfile();

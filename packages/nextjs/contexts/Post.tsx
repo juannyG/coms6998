@@ -1,24 +1,47 @@
 import { createContext } from "react";
-import { Hex } from "viem";
 
-interface IPostContext {
+interface IPostDeleteContext {
   deleting: boolean;
-  editing: boolean;
+  showDeleteConfirmation: boolean;
+  setDeleting: React.Dispatch<React.SetStateAction<boolean>>;
   setShowDeleteConfirmation: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowEditPage: React.Dispatch<React.SetStateAction<boolean>>;
-  setPostId: React.Dispatch<React.SetStateAction<Hex | null>>;
 }
 
-export const PostContext = createContext<IPostContext>({
+export const PostDeleteContext = createContext<IPostDeleteContext>({
   deleting: false,
-  editing: false,
+  showDeleteConfirmation: false,
+  setDeleting: () => {
+    return false;
+  },
   setShowDeleteConfirmation: () => {
     return false;
   },
-  setShowEditPage: () => {
+});
+
+interface IPostEditContext {
+  editing: boolean;
+  showEditModal: boolean;
+  setEditing: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowEditModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export const PostEditContext = createContext<IPostEditContext>({
+  editing: false,
+  showEditModal: false,
+  setEditing: () => {
     return false;
   },
-  setPostId: () => {
-    return null;
+  setShowEditModal: () => {
+    return false;
   },
+});
+
+interface IPostDisplayContext {
+  showPostMgmt: boolean;
+  compactDisplay: boolean;
+}
+
+export const PostDisplayContext = createContext<IPostDisplayContext>({
+  showPostMgmt: false,
+  compactDisplay: false,
 });
