@@ -9,8 +9,16 @@ export type ScaffoldConfig = {
 };
 
 const scaffoldConfig = {
-  // The networks on which your DApp is live
+  /**
+   * The networks on which your DApp is live
+   *
+   * NOTE: This lets you switch networks HOWEVER - when we use a list
+   * of networks that includes sepolia, we lose the burner wallet.
+   *
+   * If you want to use the the sepolia network, swap the un/commented lines below.
+   */
   targetNetworks: [chains.foundry],
+  // targetNetworks: [chains.foundry, chains.sepolia],
 
   // The interval at which your front-end polls the RPC servers for new data
   // it has no effect if you only target the local network (default is 4000)
