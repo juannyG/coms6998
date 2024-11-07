@@ -50,18 +50,20 @@ function RightColumn() {
   };
 
   return (
-    <PostDisplayContext.Provider value={{ compactDisplay: true, showPostMgmt: false, showHeader: false }}>
-      {userPosts?.map((post: TPost) => (
-        <div
-          key={post.id}
-          className="flex flex-col w-full p-4 gap-4 justify-start
-                      transition-all duration-300 ease-in-out
-                      hover:bg-gray-200 hover:shadow-lg hover:scale-105 cursor-pointer"
-          onClick={() => onClickViewPost(post.id)}
-        >
-          <Post key={post.id} postId={post.id} />
-        </div>
-      ))}
+    <PostDisplayContext.Provider value={{ compactDisplay: true, showPostMgmt: false, onProfile: true }}>
+      <div className="flex flex-col items-center gap-4 pt-4 overflow-scroll h-[100%] w-[100%]">
+        {userPosts?.map((post: TPost) => (
+          <div
+            key={post.id}
+            className="flex flex-col w-[95%] p-4 gap-4 justify-start
+                        transition-all duration-300 ease-in-out
+                        hover:bg-gray-200 hover:shadow-lg hover:scale-105 cursor-pointer truncate-text border rounded-lg"
+            onClick={() => onClickViewPost(post.id)}
+          >
+            <Post key={post.id} postId={post.id} />
+          </div>
+        ))}
+      </div>
     </PostDisplayContext.Provider>
   );
 }

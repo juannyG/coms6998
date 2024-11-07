@@ -58,7 +58,7 @@ h1 {
 }
 
 .view-editor-container {
-  margin: 0 auto 10px auto;
+  margin: 0 auto;
   border-radius: 2px;
   width: 100%;
   color: #000;
@@ -82,13 +82,16 @@ h1 {
   /* background: #fff; */
   position: relative;
   border-radius: 10px;
+  margin: 15px 10px;
+}
+
+.truncate-text .view-editor-inner{
   display: -webkit-box;
   overflow: hidden;
   -webkit-line-clamp: 4;
   line-clamp: 4;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis; 
-  margin: 15px 10px;
 }
 
 .editor-input {

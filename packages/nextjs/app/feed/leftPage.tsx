@@ -2,7 +2,7 @@ import { NextPage } from "next";
 
 const LeftPage: NextPage = () => {
   return (
-    <div className="flex flex-col items-end gap-20">
+    <div className="flex flex-col items-end gap-20 hidden sm:block">
       <div className="flex flex-col justify-start items-start w-[70%] border rounded p-5 gap-4">
         <p className="flex-grow-0 flex-shrink-0 w-[100%] text-lg text-left">
           <span className="flex-grow-0 flex-shrink-0 w-[100%] text-lg font-bold text-left text-[#3466f6]">

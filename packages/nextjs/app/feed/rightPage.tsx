@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 
 const RightPage: NextPage = function () {
   return (
-    <div className="flex flex-col justify-start border border-[#e6ebf1] p-4">
+    <div className="flex flex-col justify-start border border-[#e6ebf1] p-4 hidden sm:block">
       <div className="w-[80%] h-5 mb-5">
         <p className="text-sm font-bold text-left text-black">Hot Today</p>
       </div>

@@ -32,7 +32,7 @@ const FeedHeaderPage: NextPage = () => {
         </div>
 
         <div className="col-span-1 h-full relative flex items-center justify-center gap-4">
-          <div className="indicator">
+          <div className="indicator hidden sm:block">
             <span className="indicator-item badge bg-red-500 text-white">1</span>
             <div className="grid h-8 w-8 place-items-center">
               <svg
@@ -58,7 +58,7 @@ const FeedHeaderPage: NextPage = () => {
               </svg>
             </div>
           </div>
-          <div className="indicator">
+          <div className="indicator hidden sm:block">
             <span className="indicator-item badge bg-red-500 text-white">1</span>
             <div className="grid h-8 w-8 place-items-center">
               <svg

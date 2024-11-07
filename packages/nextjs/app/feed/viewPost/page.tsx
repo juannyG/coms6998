@@ -33,7 +33,7 @@ const ViewPostPage: NextPage = () => {
           <div className="w-[50%] mt-6 flex flex-col ">
             <BackButton />
 
-            <PostDisplayContext.Provider value={{ compactDisplay: false, showPostMgmt: true, showHeader: true }}>
+            <PostDisplayContext.Provider value={{ compactDisplay: false, showPostMgmt: true, onProfile: false }}>
               <PostDeleteContext.Provider value={deleteContext}>
                 <PostEditContext.Provider value={editContext}>
                   <Post postId={postSig as Hex} />
