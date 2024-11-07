@@ -16,10 +16,10 @@ To run Spotlight locally, you
 
 ## Prerequisites
 * An address private key with sufficient Sepolia ETH
-* Alchemy API key (API access to Sepolia miner node)
+* [Etherscan](https://etherscan.io/login) API key for verifying contract on Etherscan
+* [Alchemy API key](https://docs.alchemy.com/docs/alchemy-quickstart-guide) (API access to Sepolia miner node)
 * Create a new app in Alchemy
   * Chose Ethereum testnet Sepolia to get the API key
-* Etherscan API key for verifying contract on Etherscan
 
 ## Manual deployment to Sepolia
 * Populate vars in `packages/foundry/.env` - these are the values you prepared in the Prerequisites section
@@ -30,26 +30,17 @@ To run Spotlight locally, you
 * `yarn verify --network sepolia` - [Verify the contract on Sepolia](https://book.getfoundry.sh/forge/deploying?highlight=verify#verifying-a-pre-existing-contract)
 
 ## Configure NextJS to interact with contract on Sepolia testnet
-If you did NOT deploy the changes to Sepolia or you have since done a `yarn deploy` to deploy the
-Spotlight contract to your local foundry network, you will not have the Spotlight contract address
-in `contracts/deployedContracts.ts`.
+Update [scaffold.config.ts](packages/nextjs/scaffold.config.ts) and modify the `targetNetworks` key as described in the comments.
 
-To point the NextJS app at Sepolia, we need to change the chain ID and Spotlight address in `contracts/deployedContracts.ts` to
-* `11155111` - Chain ID for Sepolia
-* `0x...`    - The deployed address of the contract on Sepolia testnet.
-
-Example, the MVP Spotlight contract deployed to Sepolia is located @ `0xe4C755d54319F934B3D1ff420C97017A0DAee652`, so we would
-need to update `contracts/deployedContracts.ts` from
+From:
 ```
-  31337: {
-    Spotlight: {
-      address: "0x0000111122223333444455556666777788889999",
+  targetNetworks: [chains.foundry],
+  // targetNetworks: [chains.foundry, chains.sepolia],
 ```
-to
+To:
 ```
- 11155111: {
-    Spotlight: {
-      address: "0xe4C755d54319F934B3D1ff420C97017A0DAee652",
+  // targetNetworks: [chains.foundry],
+  targetNetworks: [chains.foundry, chains.sepolia],
 ```
 
 ## Import RPT into Metamask wallet

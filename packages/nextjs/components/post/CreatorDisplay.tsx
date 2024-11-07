@@ -18,6 +18,7 @@ const SmallCreatorDisplay = ({ username, address }: { username: string; address:
 };
 
 const FullCreatorDisplay = ({ username, address }: { username: string; address: Address }) => {
+  const shortenedCreatorAddr = address.substring(0, 6) + "..." + address.substring(address.length - 4);
   return (
     <>
       <div className="grid-col-1">
@@ -25,7 +26,8 @@ const FullCreatorDisplay = ({ username, address }: { username: string; address: 
           <p className="text-lg text-left text-black">{username}</p>
         </div>
         <div>
-          <p className="text-sm text-left text-black">{address}</p>
+          <p className="hidden sm:block text-sm text-left text-black">{address}</p>
+          <p className="sm:hidden text-sm text-left text-black">{shortenedCreatorAddr}</p>
         </div>
       </div>
     </>

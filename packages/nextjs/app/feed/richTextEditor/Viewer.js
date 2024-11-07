@@ -1,3 +1,4 @@
+import "../richTextEditor/styles.css";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
@@ -47,7 +48,7 @@ export default function Viewer({ data }) {
       <div className="view-editor-container">
         <div className="view-editor-inner">
           <RichTextPlugin
-            contentEditable={<ContentEditable className="editor-input" />}
+            contentEditable={<ContentEditable className="viewer-input" />}
             ErrorBoundary={LexicalErrorBoundary}
           />
           <RestoreFromLocalStoragePlugin data={data} />
