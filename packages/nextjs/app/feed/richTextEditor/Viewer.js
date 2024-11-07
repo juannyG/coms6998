@@ -3,7 +3,6 @@ import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
 import RestoreFromLocalStoragePlugin from "./plugins/RestoreContentFromData";
 import ExampleTheme from "./themes/ExampleTheme";
-import MaxLengthPlugin from "./plugins/MaxLengthPlugin";
 import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
@@ -17,6 +16,7 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
+import "../richTextEditor/styles.css";
 
 const editorConfig = {
   // The editor theme
@@ -48,7 +48,7 @@ export default function Viewer({ data }) {
       <div className="view-editor-container">
         <div className="view-editor-inner">
           <RichTextPlugin
-            contentEditable={<ContentEditable className="editor-input" />}
+            contentEditable={<ContentEditable className="viewer-input" />}
             ErrorBoundary={LexicalErrorBoundary}
           />
           {/* <MaxLengthPlugin maxLength={30}/> */}

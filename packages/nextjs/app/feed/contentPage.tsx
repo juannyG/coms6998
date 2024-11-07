@@ -39,7 +39,7 @@ const ContentPage: NextPage = function () {
 
   return (
     <>
-      <PostDisplayContext.Provider value={{ compactDisplay: true, showPostMgmt: false }}>
+      <PostDisplayContext.Provider value={{ compactDisplay: true, showPostMgmt: false, showHeader: true }}>
         {data.map((post: TPost) => (
           <div
             key={post.id}

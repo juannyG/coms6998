@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import FeedHeaderPage from "../header";
-import "../richTextEditor/styles.css";
 import BackButton from "./BackButton";
 import Comments from "./comments";
 import type { NextPage } from "next";
@@ -34,7 +33,7 @@ const ViewPostPage: NextPage = () => {
           <div className="w-[50%] mt-6 flex flex-col ">
             <BackButton />
 
-            <PostDisplayContext.Provider value={{ compactDisplay: false, showPostMgmt: true }}>
+            <PostDisplayContext.Provider value={{ compactDisplay: false, showPostMgmt: true, showHeader: true }}>
               <PostDeleteContext.Provider value={deleteContext}>
                 <PostEditContext.Provider value={editContext}>
                   <Post postId={postSig as Hex} />

@@ -1,17 +1,11 @@
 import { useEffect } from "react";
-import Viewer from "../feed/richTextEditor/Viewer";
+import { useRouter } from "next/navigation";
+import { Hex } from "viem";
 import { useAccount } from "wagmi";
+import Post from "~~/components/post/Post";
+import { PostDisplayContext } from "~~/contexts/Post";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { TPost, TUserProfile } from "~~/types/spotlight";
-
-function PostCard({ post }: { post: TPost }) {
-  return (
-    <div className="w-[100%] border rounded-xl p-4">
-      <h1 className="text-lg text-left font-bold">{post.title}</h1>
-      <Viewer data={post.content} />
-    </div>
-  );
-}
 
 function LeftColumn() {
   const { address: connectedAddress } = useAccount();
@@ -40,6 +34,7 @@ function LeftColumn() {
 
 function RightColumn() {
   const { address: connectedAddress } = useAccount();
+  const router = useRouter();
 
   const { data: userPosts } = useScaffoldReadContract({
     account: connectedAddress,
@@ -49,19 +44,25 @@ function RightColumn() {
     watch: true,
   });
 
-  useEffect(() => {
-    console.log("userPosts", userPosts);
-  }, [userPosts]);
+  const onClickViewPost = (postId: Hex) => {
+    const query = new URLSearchParams({ postSig: String(postId) }).toString();
+    router.push(`/feed/viewPost?${query}`);
+  };
 
   return (
-    <div>
-      <h1 className="text-4xl text-left mt-10">My Posts</h1>
-      <div className="flex flex-col w-[100%] gap-4 mt-10">
-        {userPosts?.map(post => (
-          <PostCard key={post.id} post={post} />
-        ))}
-      </div>
-    </div>
+    <PostDisplayContext.Provider value={{ compactDisplay: true, showPostMgmt: false, showHeader: false }}>
+      {userPosts?.map((post: TPost) => (
+        <div
+          key={post.id}
+          className="flex flex-col w-full p-4 gap-4 justify-start
+                      transition-all duration-300 ease-in-out
+                      hover:bg-gray-200 hover:shadow-lg hover:scale-105 cursor-pointer"
+          onClick={() => onClickViewPost(post.id)}
+        >
+          <Post key={post.id} postId={post.id} />
+        </div>
+      ))}
+    </PostDisplayContext.Provider>
   );
 }
 

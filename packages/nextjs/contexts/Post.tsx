@@ -39,9 +39,11 @@ export const PostEditContext = createContext<IPostEditContext>({
 interface IPostDisplayContext {
   showPostMgmt: boolean;
   compactDisplay: boolean;
+  showHeader: boolean;
 }
 
 export const PostDisplayContext = createContext<IPostDisplayContext>({
   showPostMgmt: false,
   compactDisplay: false,
+  showHeader: true,
 });

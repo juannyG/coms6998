@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EditorContext } from "./context";
 import Editor from "./richTextEditor/Editor";
-import "./richTextEditor/styles.css";
 import { NextPage } from "next";
 import { useAccount, useSignMessage } from "wagmi";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";

@@ -71,7 +71,7 @@ h1 {
 }
 
 .editor-inner {
-  background: #fff;
+  /* background: #fff; */
   position: relative;
   border: 1px solid #e6ebf1;
   border-bottom-left-radius: 10px;
@@ -79,10 +79,16 @@ h1 {
 }
 
 .view-editor-inner {
-  background: #fff;
+  /* background: #fff; */
   position: relative;
-  /* border: 1px solid #e6ebf1; */
   border-radius: 10px;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis; 
+  margin: 15px 10px;
 }
 
 .editor-input {
@@ -94,6 +100,17 @@ h1 {
   tab-size: 1;
   outline: 0;
   padding: 15px 10px;
+  caret-color: #444;
+}
+
+.viewer-input {
+  resize: none;
+  font-size: 15px;
+  caret-color: rgb(5, 5, 5);
+  position: relative;
+  tab-size: 1;
+  outline: 0;
+  /* padding: 15px 10px; */
   caret-color: #444;
 }
 
