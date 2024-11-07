@@ -47,8 +47,8 @@ const PostEditModal = ({ post }: { post: TPost }) => {
     <>
       {showEditModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg text-center">
-            <div className="mt-4 flex justify-center gap-4">
+          <div className="w-full mt-4 sm:mt-0 sm:w-[50%] bg-white p-6 rounded shadow-lg text-center">
+            <div className="w-full mt-4 flex justify-center gap-4">
               <EditPostEditorContext.Provider value={value}>
                 <div className="w-full h-[30%] flex flex-col justify-between px-4 border border-[#e6ebf1]">
                   <div className="w-full flex flex-row items-center justify-start gap-4 pt-2">

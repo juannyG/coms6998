@@ -23,7 +23,11 @@ function LeftColumn() {
 
   return (
     <div className="w-[100%]">
-      <img alt="" src="/avatar.png" className="w-80 h-80 rounded-full object-cover ml-2" />
+      <img
+        alt=""
+        src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+        className="w-80 h-80 rounded-full object-cover ml-2"
+      />
       <div className="flex w-[100%] flex-col">
         <h1 className="text-4xl  text-left">{userProfile?.username}</h1>
         <div>Address: {shortenedUserAddress}</div>
