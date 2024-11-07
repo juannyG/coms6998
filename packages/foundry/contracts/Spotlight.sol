@@ -72,7 +72,7 @@ contract Spotlight {
     _;
   }
 
-  modifier postExists(bytes calldata _id) {
+  modifier postExists(bytes memory _id) {
     PostLib.Post memory post = postStore[_id];
     if (bytes(post.content).length == 0) {
       revert PostNotFound();
@@ -148,10 +148,18 @@ contract Spotlight {
   /// @notice Delete the caller's profile.
   /// @dev The profile is removed and its associated username is freed.
   function deleteProfile() public onlyRegistered {
-    // TODO: delete posts in postStore & communityPostIDs
     bytes32 oldHash = _getUsernameHash(profiles[msg.sender].username);
     normalized_username_hashes[oldHash] = false;
 
+    for (uint256 i = 0; i < profilePostIDs[msg.sender].length; ++i) {
+      bytes memory id = profilePostIDs[msg.sender][i];
+      deleteCommunityPost(id);
+      delete postStore[id];
+    }
+
+    // TODO: Burn remaining reputation of user
+
+    delete profilePostIDs[msg.sender];
     delete profiles[msg.sender];
     emit ProfileDeleted(msg.sender);
   }
@@ -267,7 +275,7 @@ contract Spotlight {
     emit PostEdited(msg.sender, _id);
   }
 
-  function deletePost(bytes calldata _id) public onlyRegistered postExists(_id) {
+  function deletePost(bytes memory _id) public onlyRegistered postExists(_id) {
     // Ensure the post exists
     PostLib.Post storage post = postStore[_id];
     if (post.creator != msg.sender) revert OnlyCreatorCanEdit();
@@ -285,6 +293,12 @@ contract Spotlight {
       }
     }
 
+    deleteCommunityPost(_id);
+    delete postStore[_id];
+    emit PostDeleted(msg.sender, _id);
+  }
+
+  function deleteCommunityPost(bytes memory _id) internal postExists(_id) {
     // Remove post from communityPostIDs
     for (uint256 i = 0; i < communityPostIDs.length; i++) {
       // Solidity doesn’t have native string comparison, so keccak256 is often used to compare strings by hashing them
@@ -294,9 +308,6 @@ contract Spotlight {
         break;
       }
     }
-
-    delete postStore[_id];
-    emit PostDeleted(msg.sender, _id);
   }
 
   function upvote(bytes calldata _id) public onlyRegistered postExists(_id) {

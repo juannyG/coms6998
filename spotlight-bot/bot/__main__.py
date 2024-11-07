@@ -100,6 +100,7 @@ class SpotlightBot:
         signed_msg = self.bot_acct.sign_message(msg)
         sig = Web3.to_hex(signed_msg.signature)
         tx_hash = self.spotlight.functions.createPost(title, editor_json, nonce, sig).transact()
+        w3.eth.wait_for_transaction_receipt(tx_hash)
         print(f"sig/postID: {sig}")
         print(f"txID: {Web3.to_hex(tx_hash)}\n")
         self._bot_post_ids.append(sig)
@@ -111,11 +112,13 @@ class SpotlightBot:
         self._community_post_ids.remove(post_sig)
         print(f"Deleting post {post_sig}")
         tx_hash = self.spotlight.functions.deletePost(post_sig).transact()
+        w3.eth.wait_for_transaction_receipt(tx_hash)
         print(f"txID: {Web3.to_hex(tx_hash)}\n")
 
     def delete_profile(self):
         print("Deleting profile")
         tx_hash = self.spotlight.functions.deleteProfile().transact()
+        w3.eth.wait_for_transaction_receipt(tx_hash)
         print(f"txID: {Web3.to_hex(tx_hash)}\n")
 
     def upvote(self):
@@ -124,6 +127,7 @@ class SpotlightBot:
         print(f"Upvoting {post_sig}")
         try:
             tx_hash = self.spotlight.functions.upvote(post_sig).transact()
+            w3.eth.wait_for_transaction_receipt(tx_hash)
             print(f"txID: {Web3.to_hex(tx_hash)}\n")
         except Exception as exc:
             if "Post does not exist" in exc.message:
@@ -138,6 +142,7 @@ class SpotlightBot:
         print(f"Downvoting {post_sig}")
         try:
             tx_hash = self.spotlight.functions.downvote(post_sig).transact()
+            w3.eth.wait_for_transaction_receipt(tx_hash)
             print(f"txID: {Web3.to_hex(tx_hash)}\n")
         except Exception as exc:
             if "Post does not exist" in exc.message:
