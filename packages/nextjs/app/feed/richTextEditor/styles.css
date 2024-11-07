@@ -398,6 +398,13 @@ pre::-webkit-scrollbar-thumb {
   vertical-align: middle;
 }
 
+@media screen and (max-width: 600px) {
+  .toolbar {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+}
+
 .toolbar button.toolbar-item {
   border: 0;
   display: flex;
