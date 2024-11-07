@@ -22,13 +22,13 @@ function LeftColumn() {
     : "";
 
   return (
-    <div className="w-[100%]">
+    <div className="w-[100%] flex flex-col items-center">
       <img
         alt=""
         src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
         className="w-80 h-80 rounded-full object-cover ml-2"
       />
-      <div className="flex w-[100%] flex-col">
+      <div className="flex w-[100%] flex-col pl-4">
         <h1 className="text-4xl  text-left">{userProfile?.username}</h1>
         <div>Address: {shortenedUserAddress}</div>
       </div>
@@ -55,7 +55,7 @@ function RightColumn() {
 
   return (
     <PostDisplayContext.Provider value={{ compactDisplay: true, showPostMgmt: false, onProfile: true }}>
-      <div className="flex flex-col items-center gap-4 pt-4 overflow-scroll h-[100%] w-[100%]">
+      <div className="flex flex-col items-center gap-4 pt-4 overflow-x-hidden overflow-scroll sm:h-[100%] w-[100%]">
         {userPosts?.map((post: TPost) => (
           <div
             key={post.id}
@@ -74,11 +74,11 @@ function RightColumn() {
 
 export default function Profile() {
   return (
-    <div className="flex flex-row w-100% justify-center w-[60%]">
-      <div className="w-[33%] pt-10">
+    <div className="sm:flex sm:flex-row w-full sm:w-[60%] justify-center">
+      <div className="w-full sm:w-[33%] pt-10 ">
         <LeftColumn />
       </div>
-      <div className="w-[66%]">
+      <div className="w-full sm:w-[66%]">
         <RightColumn />
       </div>
     </div>

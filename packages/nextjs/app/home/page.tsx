@@ -108,7 +108,7 @@ const Home: NextPage = () => {
     //     </div>
     //   </div>
     // </div>
-    <div className="w-full h-[842px] flex justify-center">
+    <div className="w-full sm:h-[80dvh] flex justify-center">
       <Profile />
     </div>
   );
