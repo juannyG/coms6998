@@ -51,7 +51,6 @@ export default function Viewer({ data }) {
             contentEditable={<ContentEditable className="viewer-input" />}
             ErrorBoundary={LexicalErrorBoundary}
           />
-          {/* <MaxLengthPlugin maxLength={30}/> */}
           <RestoreFromLocalStoragePlugin data={data} />
           <CodeHighlightPlugin />
           <ListPlugin />
