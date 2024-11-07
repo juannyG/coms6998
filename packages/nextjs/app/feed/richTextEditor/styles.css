@@ -104,6 +104,8 @@ h1 {
   outline: 0;
   padding: 15px 10px;
   caret-color: #444;
+  overflow: auto;
+  max-height: 500px;
 }
 
 .viewer-input {
@@ -396,13 +398,6 @@ pre::-webkit-scrollbar-thumb {
   border: 1px solid #e6ebf1;
   border-bottom: none;
   vertical-align: middle;
-}
-
-@media screen and (max-width: 600px) {
-  .toolbar {
-    flex-wrap: wrap;
-    max-width: 100%;
-  }
 }
 
 .toolbar button.toolbar-item {
@@ -799,4 +794,15 @@ i.right-align {
 
 i.justify-align {
   background-image: url(images/icons/justify.svg);
+}
+
+
+@media screen and (max-width: 600px) {
+  .toolbar {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+  .editor-input {
+    max-height: 300px;
+  }
 }
