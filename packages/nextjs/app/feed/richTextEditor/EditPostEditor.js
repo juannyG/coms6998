@@ -74,7 +74,7 @@ export default function Editor({ data }) {
           <ListMaxIndentLevelPlugin maxDepth={7} />
           <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
         </div>
-        <div className="flex justify-end pt-2">
+        <div className="flex justify-end pt-2 gap-2">
           <button className="btn btn-outline rounded text-[#3466f6] border border-[#3466f6]" onClick={cancel}>
             Cancel
           </button>

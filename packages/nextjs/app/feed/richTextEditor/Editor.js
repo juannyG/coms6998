@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { EditorContext } from "../context";
+import "../richTextEditor/styles.css";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import EditorContentPlugin from "./plugins/EditorContentPlugin";

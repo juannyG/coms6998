@@ -30,16 +30,16 @@ const FeedPage: NextPage = () => {
       <div className="w-full h-full relative bg-white box-border">
         <FeedHeaderPage />
         <div className="w-full flex gap-6 ">
-          <div className="w-[24%] mt-6">
+          <div className="w-[24%] mt-6 hidden sm:block">
             <LeftPage />
           </div>
-          <div className="w-[50%] mt-6">
+          <div className="w-full sm:w-[50%] mt-6">
             <div className="flex flex-col gap-10">
               <CreatePage />
               <ContentPage />
             </div>
           </div>
-          <div className="w-[20%] mt-6">
+          <div className="w-[20%] mt-6 hidden sm:block">
             <RightPage />
           </div>
         </div>

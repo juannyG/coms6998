@@ -11,7 +11,7 @@ import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
 const Post = ({ postId }: { postId: Hex }) => {
   const { address } = useAccount();
-  const { compactDisplay, showPostMgmt } = useContext(PostDisplayContext);
+  const { compactDisplay, showPostMgmt, onProfile } = useContext(PostDisplayContext);
   const { data: post } = useScaffoldReadContract({
     account: address,
     contractName: "Spotlight",
@@ -26,11 +26,18 @@ const Post = ({ postId }: { postId: Hex }) => {
 
   return (
     <>
-      <div className="flex justify-between items-center">
-        <PostHeader post={post} />
-      </div>
+      {!onProfile && (
+        <div className="flex justify-between items-center">
+          <PostHeader post={post} />
+        </div>
+      )}
 
-      {compactDisplay ? (
+      {onProfile ? (
+        <div className="cursor-pointer flex flex-col w-full">
+          <p className="w-[100%] text-lg font-bold text-left text-black">{post.title}</p>
+          <Viewer data={post.content} />
+        </div>
+      ) : compactDisplay ? (
         <div className="cursor-pointer flex flex-col w-full p-4 gap-4">
           <p className="w-[100%] text-lg font-bold text-left text-black">{post.title}</p>
           <Viewer data={post.content} />

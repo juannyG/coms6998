@@ -8,13 +8,13 @@ const FeedHeaderPage: NextPage = () => {
       <div className="w-full h-20 absolute top-[-0.5px] bg-white" style={{ boxShadow: "0px 1px 0px 0 #e8edf3" }} />
 
       <div className="grid grid-cols-3 grid-cols-[1fr_50%_1fr] items-center w-full h-20 relative">
-        <div className="col-span-1 h-full">
-          <p className="absolute xl:left-60 md:left-36 sm:left-16 top-6 text-2xl font-bold text-left text-black">
+        <div className="col-span-1 h-full ">
+          <p className="absolute xl:left-60 md:left-36 sm:left-16 sm:top-6 left-1 top-7 text-base sm:text-2xl font-bold text-left text-black">
             Spotlight
           </p>
         </div>
         <div className="col-span-1 w-full h-full flex justify-center items-center">
-          <label className="w-[80%] input input-bordered flex justify-center items-center gap-2">
+          <label className="sm:w-[80%] input input-bordered flex justify-center items-center gap-2">
             <input type="text" className="grow" placeholder="Search" />
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -32,7 +32,7 @@ const FeedHeaderPage: NextPage = () => {
         </div>
 
         <div className="col-span-1 h-full relative flex items-center justify-center gap-4">
-          <div className="indicator">
+          <div className="indicator hidden sm:block">
             <span className="indicator-item badge bg-red-500 text-white">1</span>
             <div className="grid h-8 w-8 place-items-center">
               <svg
@@ -58,7 +58,7 @@ const FeedHeaderPage: NextPage = () => {
               </svg>
             </div>
           </div>
-          <div className="indicator">
+          <div className="indicator hidden sm:block">
             <span className="indicator-item badge bg-red-500 text-white">1</span>
             <div className="grid h-8 w-8 place-items-center">
               <svg
@@ -85,7 +85,11 @@ const FeedHeaderPage: NextPage = () => {
             </div>
           </div>
           <a href="/home">
-            <img alt="" src="/avatar.png" className="w-10 h-10 rounded-[40px] object-cover ml-2" />
+            <img
+              alt=""
+              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+              className="w-10 h-10 rounded-[40px] object-cover ml-2"
+            />
           </a>
         </div>
       </div>
