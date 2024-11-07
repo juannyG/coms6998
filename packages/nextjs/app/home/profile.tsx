@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { NextPage } from "next";
 import { Hex } from "viem";
 import { useAccount } from "wagmi";
 import Post from "~~/components/post/Post";
@@ -8,7 +7,7 @@ import { PostDisplayContext } from "~~/contexts/Post";
 import { UserProfileContext } from "~~/contexts/UserProfile";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
-import { TPost, TUserProfile } from "~~/types/spotlight";
+import { TPost } from "~~/types/spotlight";
 import { notification } from "~~/utils/scaffold-eth";
 
 function LeftColumn() {

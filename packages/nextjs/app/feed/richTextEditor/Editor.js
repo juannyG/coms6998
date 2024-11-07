@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { EditorContext } from "../context";
+import "../richTextEditor/styles.css";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import EditorContentPlugin from "./plugins/EditorContentPlugin";
@@ -21,7 +22,6 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import "../richTextEditor/styles.css";
 
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;

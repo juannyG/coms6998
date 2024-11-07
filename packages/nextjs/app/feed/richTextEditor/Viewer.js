@@ -1,3 +1,4 @@
+import "../richTextEditor/styles.css";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
@@ -16,7 +17,6 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import "../richTextEditor/styles.css";
 
 const editorConfig = {
   // The editor theme

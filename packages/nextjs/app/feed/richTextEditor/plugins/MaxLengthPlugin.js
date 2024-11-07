@@ -6,7 +6,7 @@ export default function MaxLengthPlugin({ maxLength }) {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    return editor.registerNodeTransform($getRoot(), (rootNode) => {
+    return editor.registerNodeTransform($getRoot(), rootNode => {
       editor.update(() => {
         const selection = $getSelection();
         if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
