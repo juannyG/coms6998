@@ -341,4 +341,28 @@ contract PostManagementTest is Test {
     assertEq(0, communityPosts.length);
     vm.stopPrank();
   }
+
+  function testAddAndGetComments() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature);
+
+    // Add multiple comments
+    spotlight.addComment(signature, "First comment.");
+    spotlight.addComment(signature, "Second comment.");
+    vm.stopPrank();
+
+    // Verify the comments
+    PostLib.Comment[] memory comments = spotlight.getComments(signature);
+    assertEq(comments.length, 2, "Expected 2 comments");
+
+    assertEq(comments[0].commenter, wallet.addr, "First comment: commenter mismatch");
+    assertEq(comments[0].content, "First comment.", "First comment: content mismatch");
+
+    assertEq(comments[1].commenter, wallet.addr, "Second comment: commenter mismatch");
+    assertEq(comments[1].content, "Second comment.", "Second comment: content mismatch");
+  }
 }
