@@ -41,7 +41,7 @@ const ViewPostPage: NextPage = () => {
               </PostDeleteContext.Provider>
             </PostDisplayContext.Provider>
 
-            <Comments />
+            <Comments postId={postSig as Hex} />
           </div>
         </div>
       </div>

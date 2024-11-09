@@ -29,6 +29,7 @@ contract Spotlight {
   // TODO: Move to off-chain storage - sig => off-chain storage location
   /// @dev Mapping from signature of post (post ID) to post content
   mapping(bytes => PostLib.Post) internal postStore;
+  mapping(bytes => PostLib.Comment[]) internal postComments;
 
   // TODO: Support >1 community
   /* TODO:
@@ -351,6 +352,20 @@ contract Spotlight {
     downvotedBy[_id][msg.sender] = true;
     reputationToken.downvotePost(p.creator);
     emit PostDownvoted(msg.sender, _id);
+  }
+
+  function addComment(bytes calldata _id, string calldata _content) public onlyRegistered postExists(_id) {
+    require(bytes(_content).length > 0, "Comment cannot be empty");
+
+    PostLib.Comment memory newComment =
+      PostLib.Comment({ commenter: msg.sender, content: _content, createdAt: block.timestamp });
+
+    postComments[_id].push(newComment);
+    emit CommentAdded(msg.sender, _id, _content, block.timestamp);
+  }
+
+  function getComments(bytes calldata _id) public view postExists(_id) returns (PostLib.Comment[] memory) {
+    return postComments[_id];
   }
 
   // TODO

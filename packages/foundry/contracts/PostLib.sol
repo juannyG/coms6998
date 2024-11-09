@@ -19,6 +19,12 @@ library PostLib {
     uint256 upvoteCount;
     uint256 downvoteCount;
   }
+
+  struct Comment {
+    address commenter;
+    string content;
+    uint256 createdAt;
+  }
   // TODO: Add a community pointer
   // TODO: Add comments
   /* NICE TO HAVE: 

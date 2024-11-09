@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
       abi: [
         {
           type: "constructor",
@@ -18,6 +18,24 @@ const deployedContracts = {
               internalType: "address",
             },
           ],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "addComment",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_content",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
           stateMutability: "nonpayable",
         },
         {
@@ -122,6 +140,42 @@ const deployedContracts = {
           ],
           outputs: [],
           stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "getComments",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "tuple[]",
+              internalType: "struct PostLib.Comment[]",
+              components: [
+                {
+                  name: "commenter",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "content",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "createdAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+              ],
+            },
+          ],
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -455,6 +509,37 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+        },
+        {
+          type: "event",
+          name: "CommentAdded",
+          inputs: [
+            {
+              name: "commenter",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "postId",
+              type: "bytes",
+              indexed: true,
+              internalType: "bytes",
+            },
+            {
+              name: "content",
+              type: "string",
+              indexed: false,
+              internalType: "string",
+            },
+            {
+              name: "createdAt",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
         },
         {
           type: "event",
@@ -678,6 +763,24 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "addComment",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_content",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
           name: "createPost",
           inputs: [
             {
@@ -778,6 +881,42 @@ const deployedContracts = {
           ],
           outputs: [],
           stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "getComments",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "tuple[]",
+              internalType: "struct PostLib.Comment[]",
+              components: [
+                {
+                  name: "commenter",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "content",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "createdAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+              ],
+            },
+          ],
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -1111,6 +1250,37 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+        },
+        {
+          type: "event",
+          name: "CommentAdded",
+          inputs: [
+            {
+              name: "commenter",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "postId",
+              type: "bytes",
+              indexed: true,
+              internalType: "bytes",
+            },
+            {
+              name: "content",
+              type: "string",
+              indexed: false,
+              internalType: "string",
+            },
+            {
+              name: "createdAt",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
         },
         {
           type: "event",

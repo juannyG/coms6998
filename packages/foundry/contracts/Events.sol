@@ -45,3 +45,9 @@ event TokenIssued(address indexed receiver, uint256 amount);
 /// @param account The address that will be burned the tokens
 /// @param amount The number of tokens burned
 event TokenBurned(address indexed account, uint256 amount);
+
+/// @notice Emitted when a comment is added
+/// @param commenter The address of the user who added the comment
+/// @param postId The id of the post
+/// @param content The content of the comment
+event CommentAdded(address indexed commenter, bytes indexed postId, string content, uint256 createdAt);

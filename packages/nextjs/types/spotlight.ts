@@ -13,6 +13,7 @@ export interface TPost {
   lastUpdatedAt: bigint;
   upvoteCount: bigint;
   downvoteCount: bigint;
+  comments?: TComment[]; // Optional field to store comments
 }
 
 export interface TPostSig {
@@ -26,3 +27,9 @@ export type TUserProfile = {
   username: string;
   reputation: bigint;
 };
+
+export interface TComment {
+  commenter: Address;
+  content: string;
+  createdAt: bigint;
+}
