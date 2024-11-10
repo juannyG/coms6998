@@ -1,5 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Client } from "@web3-storage/w3up-client";
 import { Hex } from "viem";
 import { useAccount } from "wagmi";
 import Post from "~~/components/post/Post";
@@ -9,6 +10,7 @@ import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 import { TPost } from "~~/types/spotlight";
 import { notification } from "~~/utils/scaffold-eth";
+import { getW3StorageClient } from "~~/utils/spotlight";
 
 function LeftColumn() {
   const router = useRouter();
@@ -17,6 +19,8 @@ function LeftColumn() {
     ? connectedAddress.slice(0, 6) + "..." + connectedAddress.slice(-4)
     : "";
 
+  // const [fileName, setFileName] = useState("");
+  const [w3client, setW3Client] = useState<Client>();
   const [deleted, setDeleted] = useState(false);
   const [isChangingUsername, setIsChangingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState<string>("");
@@ -24,11 +28,35 @@ function LeftColumn() {
   const { userProfile } = useContext(UserProfileContext);
 
   useEffect(() => {
+    const getClient = async () => {
+      const c = await getW3StorageClient();
+      setW3Client(c);
+    };
+
+    getClient().catch(e => {
+      console.error(e);
+    });
+  }, [setW3Client]);
+
+  useEffect(() => {
     if (userProfile && userProfile.username === "") {
       // They need to go register first...
       router.push("/");
     }
   }, [userProfile, router]);
+
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    if (w3client === undefined) {
+      console.log("No web3.storage client available"); // TODO - better error handling
+      return;
+    }
+    // TODO: Need to block out the screen while uploading w/ loading icon...
+    if (event.target.files && event.target.files.length > 0) {
+      console.log("Uploading file:", event.target.files[0]);
+      const res = await w3client.uploadFile(event.target.files[0]);
+      console.log(res.toString());
+    }
+  };
 
   const handleDeleteProfile = async () => {
     const confirmDelete = window.confirm("Are you sure you want to delete your profile?");
@@ -108,14 +136,20 @@ function LeftColumn() {
                 </div>
               </div>
             ) : (
-              <div className="flex space-x-4 mt-4">
-                <button className="btn btn-secondary" onClick={() => setIsChangingUsername(true)}>
-                  Change Username
-                </button>
-                <button className="btn btn-error" onClick={handleDeleteProfile}>
-                  Delete Profile
-                </button>
-              </div>
+              <>
+                <div>
+                  <input type="file" className="file-input" accept="image/*" onChange={handleFileChange} />
+                </div>
+
+                <div className="flex space-x-4 mt-4">
+                  <button className="btn btn-secondary" onClick={() => setIsChangingUsername(true)}>
+                    Change Username
+                  </button>
+                  <button className="btn btn-error" onClick={handleDeleteProfile}>
+                    Delete Profile
+                  </button>
+                </div>
+              </>
             )}
           </>
         )}

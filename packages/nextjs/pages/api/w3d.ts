@@ -1,3 +1,8 @@
+/**
+ * Delegation of UCAN so the browser can directly up load to Spotlight w3storage
+ *
+ * https://web3.storage/docs/how-to/upload/#delegate-ucan-for-your-user-to-upload-directly
+ */
 import * as DID from "@ipld/dag-ucan/did";
 import * as Signer from "@ucanto/principal/ed25519";
 import * as Client from "@web3-storage/w3up-client";
@@ -37,6 +42,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
   // Serialize the delegation and send it to the client
   const archive = await delegation.archive();
-  console.log(archive.ok);
   res.status(200).send(archive.ok);
 }
