@@ -17,14 +17,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   const principal = Signer.parse(process.env.W3S_KEY);
   const store = new StoreMemory();
   const client = await Client.create({ principal, store });
-  // Add proof that this agent has been delegated capabilities on the space
+  // // Add proof that this agent has been delegated capabilities on the space
   const proof = await Proof.parse(process.env.W3S_PROOF);
   const space = await client.addSpace(proof);
   await client.setCurrentSpace(space.did());
-  // READY to go!
+  // // READY to go!
 
-  const x = client.uploadFile(new File(["testing"], "jgtestupload-1"));
-  console.log(x);
+  // const x = client.uploadFile(new File(["testing"], "jgtestupload-1"));
+  // console.log(x);
 
   res.status(200).json({ message: "Hello from Next.js!" });
 }
