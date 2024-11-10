@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import Profile from "./profile";
 import type { NextPage } from "next";
 
