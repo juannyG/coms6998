@@ -50,11 +50,18 @@ function LeftColumn() {
       console.log("No web3.storage client available"); // TODO - better error handling
       return;
     }
-    // TODO: Need to block out the screen while uploading w/ loading icon...
+    (document.getElementById("loading-modal") as HTMLFormElement).showModal();
+
     if (event.target.files && event.target.files.length > 0) {
       console.log("Uploading file:", event.target.files[0]);
-      const res = await w3client.uploadFile(event.target.files[0]);
-      console.log(res.toString());
+      try {
+        const res = await w3client.uploadFile(event.target.files[0]);
+        console.log(res.toString());
+      } catch (e) {
+        console.error(e);
+      } finally {
+        (document.getElementById("loading-modal") as HTMLFormElement).close();
+      }
     }
   };
 
@@ -137,23 +144,56 @@ function LeftColumn() {
               </div>
             ) : (
               <>
-                <div>
-                  <input type="file" className="file-input" accept="image/*" onChange={handleFileChange} />
-                </div>
-
-                <div className="flex space-x-4 mt-4">
+                <div className="flex space-x-4 mt-4 pb-5">
                   <button className="btn btn-secondary" onClick={() => setIsChangingUsername(true)}>
                     Change Username
                   </button>
-                  <button className="btn btn-error" onClick={handleDeleteProfile}>
-                    Delete Profile
-                  </button>
+                  <div>
+                    <label htmlFor="uploadFile1" className="btn btn-secondary">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-6 mr-2 fill-black inline"
+                        viewBox="0 0 32 32"
+                      >
+                        <path
+                          d="M23.75 11.044a7.99 7.99 0 0 0-15.5-.009A8 8 0 0 0 9 27h3a1 1 0 0 0 0-2H9a6 6 0 0 1-.035-12 1.038 1.038 0 0 0 1.1-.854 5.991 5.991 0 0 1 11.862 0A1.08 1.08 0 0 0 23 13a6 6 0 0 1 0 12h-3a1 1 0 0 0 0 2h3a8 8 0 0 0 .75-15.956z"
+                          data-original="#000000"
+                        />
+                        <path
+                          d="M20.293 19.707a1 1 0 0 0 1.414-1.414l-5-5a1 1 0 0 0-1.414 0l-5 5a1 1 0 0 0 1.414 1.414L15 16.414V29a1 1 0 0 0 2 0V16.414z"
+                          data-original="#000000"
+                        />
+                      </svg>
+                      Change Photo
+                      <input
+                        type="file"
+                        id="uploadFile1"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                      />
+                    </label>
+                  </div>
                 </div>
+                <button className="btn btn-error" onClick={handleDeleteProfile}>
+                  Delete Profile
+                </button>
               </>
             )}
           </>
         )}
       </div>
+      <dialog id="loading-modal" className="modal">
+        <div className="modal-box [&&]:max-w-48">
+          <h3 className="font-bold text-lg"></h3>
+          <div className="flex justify-center">
+            <p className="py-4">Uploading image...</p>
+          </div>
+          <div className="flex justify-center">
+            <span className="loading loading-dots loading-lg"></span>
+          </div>
+        </div>
+      </dialog>
     </div>
   );
 }
