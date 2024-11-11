@@ -16,7 +16,7 @@ const ViewPostPage: NextPage = () => {
   const [editing, setEditing] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const searchParams = useSearchParams();
-  const postSig = searchParams.get("postSig") || "";
+  const postSig = searchParams?.get("postSig") || "";
 
   if (!postSig) {
     return <div>Loading...</div>; // Handle case where postSig is not yet available

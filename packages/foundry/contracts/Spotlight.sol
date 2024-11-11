@@ -47,7 +47,8 @@ contract Spotlight {
   /// @notice Structure to store profile information.
   struct Profile {
     // TODO: avatar, bio, etc.
-    string username; // The username of the profile
+    string username;
+    string avatarCID; // IPFS CID
     uint256 reputation;
   }
 
@@ -368,7 +369,8 @@ contract Spotlight {
     return postComments[_id];
   }
 
-  // TODO
-  // function clearVote(bytes calldata _sig) public onlyRegistered() postExists(_sig) {
-  // }
+  function updateAvatarCID(string calldata _cid) public onlyRegistered {
+    if (bytes(_cid).length == 0) revert AvatarCIDCannotBeEmpty();
+    profiles[msg.sender].avatarCID = _cid;
+  }
 }

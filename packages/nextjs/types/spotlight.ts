@@ -26,6 +26,7 @@ export interface TPostSig {
 export type TUserProfile = {
   username: string;
   reputation: bigint;
+  avatarCID: string;
 };
 
 export interface TComment {
