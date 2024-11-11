@@ -10,7 +10,7 @@ import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth/useScaffoldWriteContract";
 import { TPost } from "~~/types/spotlight";
 import { notification } from "~~/utils/scaffold-eth";
-import { getW3StorageClient } from "~~/utils/spotlight";
+import { getAvatarURL, getW3StorageClient } from "~~/utils/spotlight";
 
 function LeftColumn() {
   const router = useRouter();
@@ -25,7 +25,7 @@ function LeftColumn() {
   const [isChangingUsername, setIsChangingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState<string>("");
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
-  const { userProfile } = useContext(UserProfileContext);
+  const { userProfile, refetchProfile } = useContext(UserProfileContext);
 
   useEffect(() => {
     const getClient = async () => {
@@ -55,8 +55,15 @@ function LeftColumn() {
     if (event.target.files && event.target.files.length > 0) {
       console.log("Uploading file:", event.target.files[0]);
       try {
+        // TODO: useEstimateGas to check if the user can upload the file before actually uploading!
         const res = await w3client.uploadFile(event.target.files[0]);
-        console.log(res.toString());
+        const cid = res.toString();
+        await writeSpotlightContractAsync({
+          functionName: "updateAvatarCID",
+          args: [cid],
+        });
+        refetchProfile();
+        notification.success("Avatar updated successfully!");
       } catch (e) {
         console.error(e);
       } finally {
@@ -106,13 +113,9 @@ function LeftColumn() {
 
   return (
     <div className="w-[100%] flex flex-col items-center">
-      <img
-        alt=""
-        src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-        className="w-80 h-80 rounded-full object-cover ml-2"
-      />
+      <img alt="" src={getAvatarURL(userProfile.avatarCID)} className="w-80 h-80 rounded-full object-cover ml-2" />
       <div className="flex w-[100%] flex-col pl-4">
-        <h1 className="text-left text-2xl font-bold text-gray-800">{userProfile?.username}</h1>
+        <h1 className="text-left text-2xl font-bold text-gray-800">{userProfile.username}</h1>
         <div>Address: {shortenedUserAddress}</div>
         <div>Reputation: {Number(userProfile.reputation)} RPT</div>
       </div>

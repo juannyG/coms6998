@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+      address: "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
       abi: [
         {
           type: "constructor",
@@ -406,6 +406,11 @@ const deployedContracts = {
                   internalType: "string",
                 },
                 {
+                  name: "avatarCID",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
                   name: "reputation",
                   type: "uint256",
                   internalType: "uint256",
@@ -453,6 +458,19 @@ const deployedContracts = {
           inputs: [
             {
               name: "_username",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "updateAvatarCID",
+          inputs: [
+            {
+              name: "_cid",
               type: "string",
               internalType: "string",
             },
@@ -690,6 +708,11 @@ const deployedContracts = {
         {
           type: "error",
           name: "AddressNotRegistered",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "AvatarCIDCannotBeEmpty",
           inputs: [],
         },
         {
@@ -1147,6 +1170,11 @@ const deployedContracts = {
                   internalType: "string",
                 },
                 {
+                  name: "avatarCID",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
                   name: "reputation",
                   type: "uint256",
                   internalType: "uint256",
@@ -1194,6 +1222,19 @@ const deployedContracts = {
           inputs: [
             {
               name: "_username",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "updateAvatarCID",
+          inputs: [
+            {
+              name: "_cid",
               type: "string",
               internalType: "string",
             },
@@ -1431,6 +1472,11 @@ const deployedContracts = {
         {
           type: "error",
           name: "AddressNotRegistered",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "AvatarCIDCannotBeEmpty",
           inputs: [],
         },
         {

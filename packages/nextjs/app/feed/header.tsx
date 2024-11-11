@@ -1,8 +1,13 @@
 "use client";
 
+import { useContext } from "react";
 import { NextPage } from "next";
+import { UserProfileContext } from "~~/contexts/UserProfile";
+import { getAvatarURL } from "~~/utils/spotlight";
 
 const FeedHeaderPage: NextPage = () => {
+  const { userProfile } = useContext(UserProfileContext);
+
   return (
     <div className="w-full h-20 relative">
       <div className="w-full h-20 absolute top-[-0.5px] bg-white" style={{ boxShadow: "0px 1px 0px 0 #e8edf3" }} />
@@ -87,7 +92,7 @@ const FeedHeaderPage: NextPage = () => {
           <a href="/home">
             <img
               alt=""
-              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+              src={getAvatarURL(userProfile?.avatarCID)}
               className="w-10 h-10 rounded-[40px] object-cover ml-2"
             />
           </a>

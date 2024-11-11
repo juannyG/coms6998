@@ -44,7 +44,7 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
       setUserProfile(readUserProfile);
       console.log(readUserProfile);
     } else {
-      setUserProfile({ username: "", reputation: BigInt(0) });
+      setUserProfile({ username: "", reputation: BigInt(0), avatarCID: "" });
     }
   }, [isRegistered, readUserProfile, setUserProfile]);
 

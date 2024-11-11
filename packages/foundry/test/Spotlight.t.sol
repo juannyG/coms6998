@@ -166,4 +166,26 @@ contract SpotlightTest is Test {
     vm.prank(user);
     spotlight.deleteProfile();
   }
+
+  function testAvatarCIDCannotBeEmpty() public {
+    address user = vm.addr(1);
+
+    vm.startPrank(user);
+    spotlight.registerProfile("Username");
+    vm.expectRevert(AvatarCIDCannotBeEmpty.selector);
+    spotlight.updateAvatarCID("");
+  }
+
+  function testUpdatingAvatarCID() public {
+    address user = vm.addr(1);
+
+    vm.startPrank(user);
+    spotlight.registerProfile("Username");
+    Spotlight.Profile memory profile = spotlight.getProfile(user);
+    assertEq("", profile.avatarCID);
+
+    spotlight.updateAvatarCID("abcd.ipfs.w3s.link");
+    profile = spotlight.getProfile(user);
+    assertEq("abcd.ipfs.w3s.link", profile.avatarCID);
+  }
 }

@@ -32,3 +32,9 @@ export const getW3StorageClient = async () => {
   console.log("space set - ready for upload");
   return client;
 };
+
+export const getAvatarURL = (cid: string | undefined) => {
+  return cid
+    ? `https://${cid}.ipfs.w3s.link`
+    : "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp";
+};

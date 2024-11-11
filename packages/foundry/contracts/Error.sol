@@ -35,3 +35,5 @@ error CannotIssueToZeroAddress();
 error OnlySpotlightContractCanIssueTokens();
 
 error OnlySpotlightContractCanBurnTokens();
+
+error AvatarCIDCannotBeEmpty();

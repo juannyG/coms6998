@@ -3,6 +3,7 @@ import { Address } from "viem";
 import { PostDisplayContext } from "~~/contexts/Post";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { TPost, TUserProfile } from "~~/types/spotlight";
+import { getAvatarURL } from "~~/utils/spotlight";
 
 const SmallCreatorDisplay = ({ username, address }: { username: string; address: Address }) => {
   const shortenedCreatorAddr = address.substring(0, 6) + "..." + address.substring(address.length - 4);
@@ -54,7 +55,7 @@ const CreatorDisplay = ({ post }: { post: TPost }) => {
         <div className="flex items-center justify-between gap-4">
           <div className="avatar">
             <div className="w-10 h-10 rounded-full">
-              <img alt="" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+              <img alt="" src={getAvatarURL(creatorProfile?.avatarCID)} />
             </div>
           </div>
           {compactDisplay ? (
