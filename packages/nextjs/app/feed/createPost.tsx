@@ -44,6 +44,21 @@ const CreatePage: NextPage = () => {
 
         console.log("Signature of post:", postSig);
 
+        /**
+         * TODO: prep Blob -> File to upload to IPFS
+         * Result = postCID
+         * Update createPost payload to only be postSig + postCID
+         *
+         * https://web3.storage/docs/how-to/upload/#preparing-files-and-uploading
+         */
+        const postStruct = {
+          title,
+          content,
+          nonce,
+          postSig,
+        };
+        console.log("will upload to IPFS:", postStruct);
+
         await writeSpotlightContractAsync({ functionName: "createPost", args: [title, content, nonce, postSig] });
       } catch (e: any) {
         console.log(e);

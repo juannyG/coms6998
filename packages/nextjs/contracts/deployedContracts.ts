@@ -771,7 +771,7 @@ const deployedContracts = {
   },
   11155111: {
     Spotlight: {
-      address: "0x4f6cd2d37666d685e635b8c09a81144954429f87",
+      address: "0x0d6f929956430fe73eb0cfd5cf934a696d6b015d",
       abi: [
         {
           type: "constructor",

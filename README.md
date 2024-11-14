@@ -20,7 +20,7 @@ To run Spotlight locally, you
 * [Etherscan](https://etherscan.io/login) API key for verifying contract on Etherscan
 * [Alchemy API key](https://docs.alchemy.com/docs/alchemy-quickstart-guide) (API access to Sepolia miner node)
 * Create a new app in Alchemy
-  * Chose Ethereum testnet Sepolia to get the API key
+  * Choose Ethereum testnet Sepolia to get the API key
 
 ## Manual deployment to Sepolia
 * Populate vars in `packages/foundry/.env` - these are the values you prepared in the Prerequisites section
