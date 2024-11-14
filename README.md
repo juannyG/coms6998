@@ -8,9 +8,10 @@ yarn install
 ```
 
 To run Spotlight locally, you
-1. `yarn chain` - Bring up the local testnet. This accepts arguments for [forge's anvil](https://book.getfoundry.sh/reference/anvil/)
-2. `yarn start` - Bring up the local NextJS development server
-3. `yarn deploy` - Deploy the contract to the local testnet
+1. `cp packages/foundry/.env.example packages/foundry/.env`
+2. `yarn chain` - Bring up the local testnet. This accepts arguments for [forge's anvil](https://book.getfoundry.sh/reference/anvil/)
+3. `yarn start` - Bring up the local NextJS development server
+4. `yarn deploy` - Deploy the contract to the local testnet
 
 # Deploying to Sepolia
 
@@ -46,6 +47,14 @@ To:
 ## Import RPT into Metamask wallet
 * Click "Import tokens"
 * Drop in RPT token address on Sepolia (currently here: https://sepolia.etherscan.io/token/0xd5af0c2c5db2249dfc4a912c536fdfe1ef8ab52a?a=0x1292D9741379cFb7E26F918761E88EF7930b8468)
+
+# IPFS and web3.storage
+
+We have a primary key/proof in the NextJS app we use to delegate permissions out to the client's browser.
+
+The commands for how to generate a key/proof pair can be found here: https://web3.storage/docs/how-to/upload/#bring-your-own-delegations
+
+The docs refer to `KEY` and `PROOF` vars - we prepend `W3S_` to them in `packages/nextjs/.env` for better namespacing.
 
 # VSCode
 
