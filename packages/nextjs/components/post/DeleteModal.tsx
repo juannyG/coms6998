@@ -2,9 +2,9 @@ import { useContext } from "react";
 import { useRouter } from "next/navigation";
 import { PostDeleteContext } from "~~/contexts/Post";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { TPost } from "~~/types/spotlight";
+import { TPost, TW3Post } from "~~/types/spotlight";
 
-const PostDeleteModal = ({ post }: { post: TPost }) => {
+const PostDeleteModal = ({ post, contractPost }: { post: TW3Post; contractPost: TPost }) => {
   const router = useRouter();
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
   const { showDeleteConfirmation, setShowDeleteConfirmation, deleting, setDeleting } = useContext(PostDeleteContext);
@@ -12,11 +12,15 @@ const PostDeleteModal = ({ post }: { post: TPost }) => {
   const handleDelete = async () => {
     try {
       setDeleting(true);
+
+      // TODO: Delete from web3.storage
+      console.log("TODO: delete from web3.storage", post.signature);
+
       await writeSpotlightContractAsync({
         functionName: "deletePost",
-        args: [post.id],
+        args: [contractPost.id],
       });
-      console.log(`Deleted post with ID: ${post.id}`);
+      console.log(`Deleted post with ID: ${contractPost.id}`);
       router.push("/feed");
     } catch (error) {
       console.error("Error showDeleteConfirmation post:", error);

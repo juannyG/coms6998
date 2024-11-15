@@ -1,18 +1,21 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import PostDeleteModal from "./DeleteModal";
 import PostEditModal from "./EditModal";
 import PostFooter from "./Footer";
 import PostHeader from "./Header";
-import { Hex } from "viem";
+import { Hex, fromHex } from "viem";
 import { useAccount } from "wagmi";
 import Viewer from "~~/app/feed/richTextEditor/Viewer";
 import { PostDisplayContext } from "~~/contexts/Post";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { TW3Post } from "~~/types/spotlight";
+import { bigintDeserializer } from "~~/utils/spotlight";
 
 const Post = ({ postId }: { postId: Hex }) => {
+  const [post, setPost] = useState<TW3Post>();
   const { address } = useAccount();
   const { compactDisplay, showPostMgmt, onProfile } = useContext(PostDisplayContext);
-  const { data: post } = useScaffoldReadContract({
+  const { data: contractPost } = useScaffoldReadContract({
     account: address,
     contractName: "Spotlight",
     functionName: "getPost",
@@ -20,7 +23,32 @@ const Post = ({ postId }: { postId: Hex }) => {
     watch: true,
   });
 
-  if (address === undefined || post === undefined) {
+  useEffect(() => {
+    const getPostContent = async (cid: string) => {
+      const res = await fetch(`https://${cid}.ipfs.w3s.link`);
+      if (!res.ok) {
+        // TODO: Better error handling!
+        console.log(res.status, res.statusText);
+        return;
+      }
+      const text = await res.text();
+      const w3Post = JSON.parse(text, bigintDeserializer);
+      // console.log(text);
+      // console.log(w3Post);
+      setPost(w3Post);
+    };
+
+    if (contractPost) {
+      const w3cid = fromHex(contractPost.w3cid, "string");
+      console.log("post.w3cid", w3cid);
+      getPostContent(w3cid).catch(e => {
+        // TODO: Better error handling!
+        console.log(e);
+      });
+    }
+  }, [contractPost]);
+
+  if (address === undefined || contractPost === undefined || post === undefined) {
     return;
   }
 
@@ -28,7 +56,7 @@ const Post = ({ postId }: { postId: Hex }) => {
     <>
       {!onProfile && (
         <div className="flex justify-between items-center">
-          <PostHeader post={post} />
+          <PostHeader post={post} contractPost={contractPost} />
         </div>
       )}
 
@@ -52,13 +80,13 @@ const Post = ({ postId }: { postId: Hex }) => {
       )}
 
       <div>
-        <PostFooter post={post} />
+        <PostFooter post={post} contractPost={contractPost} />
       </div>
 
       {showPostMgmt && (
         <>
-          <PostDeleteModal post={post} />
-          <PostEditModal post={post} />
+          <PostDeleteModal post={post} contractPost={contractPost} />
+          <PostEditModal post={post} contractPost={contractPost} />
         </>
       )}
     </>

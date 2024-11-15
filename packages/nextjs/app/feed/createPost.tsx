@@ -4,12 +4,16 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EditorContext } from "./context";
 import Editor from "./richTextEditor/Editor";
+import { Client } from "@web3-storage/w3up-client";
 import { NextPage } from "next";
+import { toHex } from "viem";
 import { useAccount, useSignMessage } from "wagmi";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { createPostSignature } from "~~/utils/spotlight";
+import { TW3Post } from "~~/types/spotlight";
+import { bigintSerializer, createPostSignature, getW3StorageClient } from "~~/utils/spotlight";
 
 const CreatePage: NextPage = () => {
+  const [w3client, setW3Client] = useState<Client>();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [clickPost, setClickPost] = useState(false);
@@ -22,6 +26,17 @@ const CreatePage: NextPage = () => {
   function handleTitleChange(e: any) {
     setTitle(e.target.value);
   }
+
+  useEffect(() => {
+    const getClient = async () => {
+      const c = await getW3StorageClient();
+      setW3Client(c);
+    };
+
+    getClient().catch(e => {
+      console.error(e);
+    });
+  }, [setW3Client]);
 
   useEffect(() => {
     if (clickPost && postSig) {
@@ -37,6 +52,10 @@ const CreatePage: NextPage = () => {
       if (!address) {
         return;
       }
+      if (w3client === undefined) {
+        console.log("No web3.storage client available"); // TODO - better error handling
+        return;
+      }
       try {
         const nonce = BigInt(Math.ceil(Math.random() * 10 ** 17));
         const postSig = await createPostSignature({ signMessageAsync, title, content, nonce });
@@ -44,22 +63,24 @@ const CreatePage: NextPage = () => {
 
         console.log("Signature of post:", postSig);
 
-        /**
-         * TODO: prep Blob -> File to upload to IPFS
-         * Result = postCID
-         * Update createPost payload to only be postSig + postCID
-         *
-         * https://web3.storage/docs/how-to/upload/#preparing-files-and-uploading
-         */
         const postStruct = {
           title,
           content,
           nonce,
-          postSig,
-        };
-        console.log("will upload to IPFS:", postStruct);
+          signature: postSig,
+        } as TW3Post;
+        const json = JSON.stringify(postStruct, bigintSerializer);
+        const blob = new Blob([json], { type: "application/json" });
 
-        await writeSpotlightContractAsync({ functionName: "createPost", args: [title, content, nonce, postSig] });
+        // TODO: Need an overlay - this is slow...
+        const res = await w3client.uploadFile(new File([blob], `${postSig}.json`));
+        const cid = res.toString();
+        console.log("Post w3 CID:", toHex(cid));
+
+        await writeSpotlightContractAsync({
+          functionName: "createPost",
+          args: [title, content, nonce, postSig, toHex(cid)],
+        });
       } catch (e: any) {
         console.log(e);
       }

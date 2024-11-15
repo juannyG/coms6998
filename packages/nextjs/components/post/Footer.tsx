@@ -4,9 +4,9 @@ import VerificationBadge from "./VerificationBadge";
 import { useAccount } from "wagmi";
 import { UserProfileContext } from "~~/contexts/UserProfile";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { TPost } from "~~/types/spotlight";
+import { TPost, TW3Post } from "~~/types/spotlight";
 
-const PostFooter = ({ post }: { post: TPost }) => {
+const PostFooter = ({ post, contractPost }: { post: TW3Post; contractPost: TPost }) => {
   const { address } = useAccount();
   const { refetchProfile } = useContext(UserProfileContext);
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
@@ -14,7 +14,7 @@ const PostFooter = ({ post }: { post: TPost }) => {
     account: address,
     contractName: "Spotlight",
     functionName: "getPost",
-    args: [post.id],
+    args: [contractPost.id],
     watch: true,
   });
 
@@ -32,9 +32,9 @@ const PostFooter = ({ post }: { post: TPost }) => {
 
   const onUpvoteClick = async (evt: React.MouseEvent<HTMLAnchorElement>) => {
     evt.stopPropagation();
-    console.log("upvote clicked for", post.id);
+    console.log("upvote clicked for", contractPost.id);
     try {
-      await writeSpotlightContractAsync({ functionName: "upvote", args: [post.id] });
+      await writeSpotlightContractAsync({ functionName: "upvote", args: [contractPost.id] });
       refetchPost();
       refetchHasUpvoted();
       refetchHasDownvoted();
@@ -46,9 +46,9 @@ const PostFooter = ({ post }: { post: TPost }) => {
 
   const onDownvoteClick = async (evt: React.MouseEvent<HTMLAnchorElement>) => {
     evt.stopPropagation();
-    console.log("downvote clicked for", post.id);
+    console.log("downvote clicked for", contractPost.id);
     try {
-      await writeSpotlightContractAsync({ functionName: "downvote", args: [post.id] });
+      await writeSpotlightContractAsync({ functionName: "downvote", args: [contractPost.id] });
       refetchPost();
       refetchHasDownvoted();
       refetchHasUpvoted();
@@ -72,7 +72,7 @@ const PostFooter = ({ post }: { post: TPost }) => {
             />
           </a>
           <p className="[font-family:'Inter-Medium',Helvetica] font-medium text-gray-500 text-[13px]">
-            ({Number(post.upvoteCount)})
+            ({Number(contractPost.upvoteCount)})
           </p>
 
           <p className="[font-family:'Inter-Medium',Helvetica] font-medium text-gray-500 text-[13px]">|</p>
@@ -87,10 +87,10 @@ const PostFooter = ({ post }: { post: TPost }) => {
             />
           </a>
           <p className="[font-family:'Inter-Medium',Helvetica] font-medium text-gray-500 text-[13px]">
-            ({Number(post.downvoteCount)})
+            ({Number(contractPost.downvoteCount)})
           </p>
           <p className="[font-family:'Inter-Medium',Helvetica] font-medium text-gray-500 text-[13px]">|</p>
-          <VerificationBadge post={post} />
+          <VerificationBadge post={post} contractPost={contractPost} />
         </div>
       </div>
     </>

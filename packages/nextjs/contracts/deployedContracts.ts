@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+      address: "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
       abi: [
         {
           type: "constructor",
@@ -59,6 +59,11 @@ const deployedContracts = {
             },
             {
               name: "_sig",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_w3cid",
               type: "bytes",
               internalType: "bytes",
             },
@@ -137,6 +142,11 @@ const deployedContracts = {
               type: "string",
               internalType: "string",
             },
+            {
+              name: "_w3cid",
+              type: "bytes",
+              internalType: "bytes",
+            },
           ],
           outputs: [],
           stateMutability: "nonpayable",
@@ -213,6 +223,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "w3cid",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -284,6 +299,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "w3cid",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -351,6 +371,11 @@ const deployedContracts = {
                 },
                 {
                   name: "signature",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "w3cid",
                   type: "bytes",
                   internalType: "bytes",
                 },
@@ -826,6 +851,11 @@ const deployedContracts = {
               type: "bytes",
               internalType: "bytes",
             },
+            {
+              name: "_w3cid",
+              type: "bytes",
+              internalType: "bytes",
+            },
           ],
           outputs: [],
           stateMutability: "nonpayable",
@@ -900,6 +930,11 @@ const deployedContracts = {
               name: "newContent",
               type: "string",
               internalType: "string",
+            },
+            {
+              name: "_w3cid",
+              type: "bytes",
+              internalType: "bytes",
             },
           ],
           outputs: [],
@@ -977,6 +1012,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "w3cid",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -1048,6 +1088,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "w3cid",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -1115,6 +1160,11 @@ const deployedContracts = {
                 },
                 {
                   name: "signature",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "w3cid",
                   type: "bytes",
                   internalType: "bytes",
                 },

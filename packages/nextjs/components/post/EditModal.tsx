@@ -1,12 +1,16 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Client } from "@web3-storage/w3up-client";
+import { toHex } from "viem";
 import { useAccount } from "wagmi";
 import Editor from "~~/app/feed/richTextEditor/EditPostEditor";
 import { EditPostEditorContext } from "~~/app/feed/viewPost/editPostContext";
 import { PostEditContext } from "~~/contexts/Post";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { TPost } from "~~/types/spotlight";
+import { TPost, TW3Post } from "~~/types/spotlight";
+import { bigintSerializer, getW3StorageClient } from "~~/utils/spotlight";
 
-const PostEditModal = ({ post }: { post: TPost }) => {
+const PostEditModal = ({ post, contractPost }: { post: TW3Post; contractPost: TPost }) => {
+  const [w3client, setW3Client] = useState<Client>();
   const { setEditing, setShowEditModal, showEditModal } = useContext(PostEditContext);
   const [content, setContent] = useState(post.content);
   const { address } = useAccount();
@@ -15,9 +19,20 @@ const PostEditModal = ({ post }: { post: TPost }) => {
     account: address,
     contractName: "Spotlight",
     functionName: "getPost",
-    args: [post.id],
+    args: [contractPost.id],
     watch: true,
   });
+
+  useEffect(() => {
+    const getClient = async () => {
+      const c = await getW3StorageClient();
+      setW3Client(c);
+    };
+
+    getClient().catch(e => {
+      console.error(e);
+    });
+  }, [setW3Client]);
 
   const value = {
     setContent,
@@ -28,11 +43,30 @@ const PostEditModal = ({ post }: { post: TPost }) => {
       if (!address) {
         return;
       }
+      if (w3client === undefined) {
+        console.log("No web3.storage client available"); // TODO - better error handling
+        return;
+      }
       setEditing(true);
       try {
+        // TODO: Delete web3.storage reference of contractPost.w3cid
+        // TODO: Create new signature for updated title/content with a fresh nonce
         const postId = post.signature; // use old signature as post id
         console.log("Edited Post Id", postId);
-        await writeSpotlightContractAsync({ functionName: "editPost", args: [postId, content] });
+        const postStruct = {
+          title: post.title,
+          content,
+          nonce: post.nonce,
+          signature: post.signature,
+        } as TW3Post;
+        const json = JSON.stringify(postStruct, bigintSerializer);
+        const blob = new Blob([json], { type: "application/json" });
+
+        // TODO: Need an overlay - this is slow...
+        const res = await w3client.uploadFile(new File([blob], `${postId}.json`));
+        const cid = res.toString();
+        console.log("Post w3 CID:", toHex(cid));
+        await writeSpotlightContractAsync({ functionName: "editPost", args: [postId, content, toHex(cid)] });
         refetchPost();
       } catch (e: any) {
         console.log(e);

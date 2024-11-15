@@ -1,17 +1,19 @@
 import { useVerifyMessage } from "wagmi";
-import { TPost } from "~~/types/spotlight";
+import { TPost, TW3Post } from "~~/types/spotlight";
 import { encodePostDataForSignature } from "~~/utils/spotlight";
 
-const VerificationBadge = ({ post }: { post: TPost }) => {
+const VerificationBadge = ({ post, contractPost }: { post: TW3Post; contractPost: TPost }) => {
   const { data: isValid } = useVerifyMessage({
-    address: post.creator,
-    signature: post.signature,
+    address: contractPost.creator,
+    signature: contractPost.signature,
     message: { raw: encodePostDataForSignature(post.title, post.content, post.nonce) },
   });
 
   if (isValid === undefined) {
     return;
   }
+
+  // TODO: Triple check post.signature === contractPost.signature
 
   return (
     <>

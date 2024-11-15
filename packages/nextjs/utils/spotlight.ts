@@ -38,3 +38,24 @@ export const getAvatarURL = (cid: string | undefined) => {
     ? `https://${cid}.ipfs.w3s.link`
     : "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp";
 };
+
+/**
+ * JSON.stringify cannot handle bigint - so...here's one way to
+ * be able to de/serialize it to and from web3.storage
+ */
+export const bigintSerializer = (k: string, v: any) => {
+  if (typeof v === "bigint") {
+    return JSON.stringify({ t: "bigint", [k]: v.toString() });
+  }
+  return v;
+};
+
+export const bigintDeserializer = (k: string, v: any) => {
+  try {
+    const j = JSON.parse(v);
+    if (j.t === "bigint") {
+      return BigInt(j[k]);
+    }
+  } catch (err) {}
+  return v;
+};

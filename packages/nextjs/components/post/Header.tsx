@@ -4,9 +4,9 @@ import CreatorDisplay from "./CreatorDisplay";
 import { useAccount } from "wagmi";
 import { PostDeleteContext, PostDisplayContext, PostEditContext } from "~~/contexts/Post";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
-import { TPost, TUserProfile } from "~~/types/spotlight";
+import { TPost, TUserProfile, TW3Post } from "~~/types/spotlight";
 
-const PostHeader = ({ post }: { post: TPost }) => {
+const PostHeader = ({ post, contractPost }: { post: TW3Post; contractPost: TPost }) => {
   const { address } = useAccount();
   const { showPostMgmt } = useContext(PostDisplayContext);
   const { setShowDeleteConfirmation, deleting } = useContext(PostDeleteContext);
@@ -14,7 +14,7 @@ const PostHeader = ({ post }: { post: TPost }) => {
   const { data: creatorProfile } = useScaffoldReadContract({
     contractName: "Spotlight",
     functionName: "getProfile",
-    args: [post.creator],
+    args: [contractPost.creator],
   }) as { data: TUserProfile };
 
   if (creatorProfile === undefined) {
@@ -32,10 +32,10 @@ const PostHeader = ({ post }: { post: TPost }) => {
 
   return (
     <>
-      <CreatorDisplay post={post} />
+      <CreatorDisplay post={post} contractPost={contractPost} />
 
       <div className="flex gap-2">
-        {address === post.creator && showPostMgmt && (
+        {address === contractPost.creator && showPostMgmt && (
           <>
             <button className="btn btn-danger btn-sm" onClick={e => onClickEditPost(e)} disabled={editing}>
               <Image alt="Edit Post" className="cursor-pointer" width="20" height="25" src="/pencil.svg" />

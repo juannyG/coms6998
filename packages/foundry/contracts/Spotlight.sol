@@ -201,17 +201,21 @@ contract Spotlight {
   /// @param _content The content of the post.
   /// @param _nonce The nonce used for signature generation
   /// @param _sig The signature of the post.
-  function createPost(string memory _title, string memory _content, uint256 _nonce, bytes calldata _sig)
-    public
-    onlyRegistered
-  {
+  function createPost(
+    string memory _title,
+    string memory _content,
+    uint256 _nonce,
+    bytes calldata _sig,
+    bytes calldata _w3cid
+  ) public onlyRegistered {
     if (bytes(_content).length == 0) revert ContentCannotBeEmpty();
     if (bytes(_title).length == 0) revert TitleCannotBeEmpty();
     if (!PostLib.isValidPostSignature(msg.sender, _title, _content, _nonce, _sig)) revert InvalidSignature();
 
     // TODO: Check that the signature doesn't already exist in the postStore!
-
+    // TODO: Check for empty _w3cid
     PostLib.Post memory p = PostLib.Post({
+      w3cid: _w3cid,
       creator: msg.sender,
       title: _title,
       content: _content,
@@ -263,7 +267,12 @@ contract Spotlight {
     return p;
   }
 
-  function editPost(bytes calldata _id, string calldata newContent) public onlyRegistered postExists(_id) {
+  function editPost(bytes calldata _id, string calldata newContent, bytes calldata _w3cid)
+    public
+    onlyRegistered
+    postExists(_id)
+  {
+    // TODO: Check for empty _w3cid
     // Ensure post exists
     PostLib.Post storage post = postStore[_id];
     if (post.creator != msg.sender) revert OnlyCreatorCanEdit();
@@ -272,6 +281,7 @@ contract Spotlight {
     // TODO: Accept newSig arg and verify it against newContent
 
     post.content = newContent;
+    post.w3cid = _w3cid;
     post.lastUpdatedAt = block.timestamp;
 
     emit PostEdited(msg.sender, _id);

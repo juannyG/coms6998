@@ -30,7 +30,7 @@ contract VotesTest is Test {
 
     vm.startPrank(wallet1.addr);
     spotlight.registerProfile("username");
-    spotlight.createPost(post.title, post.content, post.nonce, postSig);
+    spotlight.createPost(post.title, post.content, post.nonce, postSig, "");
     vm.stopPrank();
   }
 
