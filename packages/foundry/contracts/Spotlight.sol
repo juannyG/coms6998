@@ -76,7 +76,7 @@ contract Spotlight {
 
   modifier postExists(bytes memory _id) {
     PostLib.Post memory post = postStore[_id];
-    if (bytes(post.content).length == 0) {
+    if (bytes(post.id).length == 0) {
       revert PostNotFound();
     }
     _;
@@ -208,20 +208,17 @@ contract Spotlight {
     bytes calldata _sig,
     bytes calldata _w3cid
   ) public onlyRegistered {
+    if (_w3cid.length == 0) revert PostCIDCannotBeEmpty();
     if (bytes(_content).length == 0) revert ContentCannotBeEmpty();
     if (bytes(_title).length == 0) revert TitleCannotBeEmpty();
     if (!PostLib.isValidPostSignature(msg.sender, _title, _content, _nonce, _sig)) revert InvalidSignature();
 
     // TODO: Check that the signature doesn't already exist in the postStore!
-    // TODO: Check for empty _w3cid
     PostLib.Post memory p = PostLib.Post({
-      w3cid: _w3cid,
-      creator: msg.sender,
-      title: _title,
-      content: _content,
       id: _sig,
+      creator: msg.sender,
       signature: _sig,
-      nonce: _nonce,
+      w3cid: _w3cid,
       createdAt: block.timestamp,
       lastUpdatedAt: block.timestamp,
       upvoteCount: 0,
@@ -272,15 +269,14 @@ contract Spotlight {
     onlyRegistered
     postExists(_id)
   {
-    // TODO: Check for empty _w3cid
     // Ensure post exists
     PostLib.Post storage post = postStore[_id];
+    if (_w3cid.length == 0) revert PostCIDCannotBeEmpty();
     if (post.creator != msg.sender) revert OnlyCreatorCanEdit();
     if (bytes(newContent).length == 0) revert ContentCannotBeEmpty();
 
-    // TODO: Accept newSig arg and verify it against newContent
+    // TODO: Accept newSig arg and verify it against newTitle/newContent/newNonce
 
-    post.content = newContent;
     post.w3cid = _w3cid;
     post.lastUpdatedAt = block.timestamp;
 

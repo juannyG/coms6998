@@ -5,16 +5,12 @@ import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 library PostLib {
-  // TODO: Decouple the Post structure from it's signature primitives by creating a SignedPost struct
   /// @notice Structure to store the reference to a post
   struct Post {
-    address creator;
-    string title;
-    string content;
     bytes id;
+    address creator;
     bytes signature;
     bytes w3cid;
-    uint256 nonce;
     uint256 createdAt;
     uint256 lastUpdatedAt;
     uint256 upvoteCount;
@@ -27,7 +23,6 @@ library PostLib {
     uint256 createdAt;
   }
   // TODO: Add a community pointer
-  // TODO: Add comments
   /* NICE TO HAVE: 
       If we want to get fancy, we can ensure uniqueness by requiring post creation to include a nonce that is equal to 
       exactly 1 + userProfile.postNonce

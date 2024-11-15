@@ -2,7 +2,7 @@ import { Address } from "viem";
 import { Hex } from "viem";
 import { SignMessageMutateAsync } from "wagmi/query";
 
-export interface TW3Post {
+export interface TIPFSPost {
   signature: Hex;
   title: string;
   content: string;
@@ -14,9 +14,6 @@ export interface TPost {
   id: Hex;
   signature: Hex;
   creator: Address;
-  title: string;
-  content: string;
-  nonce: bigint;
   createdAt: bigint;
   lastUpdatedAt: bigint;
   upvoteCount: bigint;

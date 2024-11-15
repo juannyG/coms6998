@@ -6,10 +6,10 @@ import Editor from "~~/app/feed/richTextEditor/EditPostEditor";
 import { EditPostEditorContext } from "~~/app/feed/viewPost/editPostContext";
 import { PostEditContext } from "~~/contexts/Post";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { TPost, TW3Post } from "~~/types/spotlight";
+import { TIPFSPost, TPost } from "~~/types/spotlight";
 import { bigintSerializer, getW3StorageClient } from "~~/utils/spotlight";
 
-const PostEditModal = ({ post, contractPost }: { post: TW3Post; contractPost: TPost }) => {
+const PostEditModal = ({ post, contractPost }: { post: TIPFSPost; contractPost: TPost }) => {
   const [w3client, setW3Client] = useState<Client>();
   const { setEditing, setShowEditModal, showEditModal } = useContext(PostEditContext);
   const [content, setContent] = useState(post.content);
@@ -51,6 +51,7 @@ const PostEditModal = ({ post, contractPost }: { post: TW3Post; contractPost: TP
       try {
         // TODO: Delete web3.storage reference of contractPost.w3cid
         // TODO: Create new signature for updated title/content with a fresh nonce
+        (document.getElementById("loading-modal") as HTMLFormElement).showModal();
         const postId = post.signature; // use old signature as post id
         console.log("Edited Post Id", postId);
         const postStruct = {
@@ -58,7 +59,7 @@ const PostEditModal = ({ post, contractPost }: { post: TW3Post; contractPost: TP
           content,
           nonce: post.nonce,
           signature: post.signature,
-        } as TW3Post;
+        } as TIPFSPost;
         const json = JSON.stringify(postStruct, bigintSerializer);
         const blob = new Blob([json], { type: "application/json" });
 
@@ -71,6 +72,7 @@ const PostEditModal = ({ post, contractPost }: { post: TW3Post; contractPost: TP
       } catch (e: any) {
         console.log(e);
       } finally {
+        (document.getElementById("loading-modal") as HTMLFormElement).close();
         setShowEditModal(false);
         setEditing(false);
       }
@@ -80,31 +82,44 @@ const PostEditModal = ({ post, contractPost }: { post: TW3Post; contractPost: TP
   return (
     <>
       {showEditModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-full mt-4 sm:mt-0 sm:w-[50%] bg-white p-6 rounded shadow-lg text-center">
-            <div className="w-full mt-4 flex justify-center gap-4">
-              <EditPostEditorContext.Provider value={value}>
-                <div className="w-full h-[30%] flex flex-col justify-between px-4 border border-[#e6ebf1]">
-                  <div className="w-full flex flex-row items-center justify-start gap-4 pt-2">
-                    <p className="text-lg font-semibold text-left text-black">Title</p>
-                    {/* TODO: Should this be an input if it's readonly? */}
-                    <input
-                      type="text"
-                      className="input input-bordered rounded-lg w-full max-w-xs"
-                      value={post.title}
-                      readOnly
-                    />
+        <>
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="w-full mt-4 sm:mt-0 sm:w-[50%] bg-white p-6 rounded shadow-lg text-center">
+              <div className="w-full mt-4 flex justify-center gap-4">
+                <EditPostEditorContext.Provider value={value}>
+                  <div className="w-full h-[30%] flex flex-col justify-between px-4 border border-[#e6ebf1]">
+                    <div className="w-full flex flex-row items-center justify-start gap-4 pt-2">
+                      <p className="text-lg font-semibold text-left text-black">Title</p>
+                      {/* TODO: Should this be an input if it's readonly? */}
+                      <input
+                        type="text"
+                        className="input input-bordered rounded-lg w-full max-w-xs"
+                        value={post.title}
+                        readOnly
+                      />
+                    </div>
+                    <div className="divider"></div>
+                    <div className="w-full flex flex-col">
+                      <p className="text-lg font-semibold text-left text-black ">Description</p>
+                      <Editor data={post.content} />
+                    </div>
                   </div>
-                  <div className="divider"></div>
-                  <div className="w-full flex flex-col">
-                    <p className="text-lg font-semibold text-left text-black ">Description</p>
-                    <Editor data={post.content} />
-                  </div>
-                </div>
-              </EditPostEditorContext.Provider>
+                </EditPostEditorContext.Provider>
+              </div>
             </div>
           </div>
-        </div>
+          <dialog id="loading-modal" className="modal">
+            <div className="modal-box [&&]:max-w-48">
+              <h3 className="font-bold text-lg"></h3>
+              <div className="flex justify-center">
+                <p className="py-4">Finalizing update...</p>
+              </div>
+              <div className="flex justify-center">
+                <span className="loading loading-dots loading-lg"></span>
+              </div>
+            </div>
+          </dialog>
+        </>
       )}
     </>
   );

@@ -4,9 +4,9 @@ import VerificationBadge from "./VerificationBadge";
 import { useAccount } from "wagmi";
 import { UserProfileContext } from "~~/contexts/UserProfile";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { TPost, TW3Post } from "~~/types/spotlight";
+import { TIPFSPost, TPost } from "~~/types/spotlight";
 
-const PostFooter = ({ post, contractPost }: { post: TW3Post; contractPost: TPost }) => {
+const PostFooter = ({ post, contractPost }: { post: TIPFSPost; contractPost: TPost }) => {
   const { address } = useAccount();
   const { refetchProfile } = useContext(UserProfileContext);
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");

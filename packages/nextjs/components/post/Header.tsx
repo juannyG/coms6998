@@ -4,9 +4,9 @@ import CreatorDisplay from "./CreatorDisplay";
 import { useAccount } from "wagmi";
 import { PostDeleteContext, PostDisplayContext, PostEditContext } from "~~/contexts/Post";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
-import { TPost, TUserProfile, TW3Post } from "~~/types/spotlight";
+import { TIPFSPost, TPost, TUserProfile } from "~~/types/spotlight";
 
-const PostHeader = ({ post, contractPost }: { post: TW3Post; contractPost: TPost }) => {
+const PostHeader = ({ post, contractPost }: { post: TIPFSPost; contractPost: TPost }) => {
   const { address } = useAccount();
   const { showPostMgmt } = useContext(PostDisplayContext);
   const { setShowDeleteConfirmation, deleting } = useContext(PostDeleteContext);

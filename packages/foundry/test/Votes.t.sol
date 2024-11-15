@@ -8,6 +8,12 @@ import "../contracts/PostLib.sol";
 import "../contracts/Error.sol";
 
 contract VotesTest is Test {
+  struct TestPost {
+    string title;
+    string content;
+    uint256 nonce;
+  }
+
   Spotlight public spotlight;
   Vm.Wallet public wallet1;
   Vm.Wallet public wallet2;
@@ -18,7 +24,7 @@ contract VotesTest is Test {
     wallet1 = vm.createWallet(1);
     wallet2 = vm.createWallet(2);
 
-    PostLib.Post memory post;
+    TestPost memory post;
     post.content = "Hello, world!";
     post.title = "Title";
     post.nonce = 123;
@@ -30,7 +36,7 @@ contract VotesTest is Test {
 
     vm.startPrank(wallet1.addr);
     spotlight.registerProfile("username");
-    spotlight.createPost(post.title, post.content, post.nonce, postSig, "");
+    spotlight.createPost(post.title, post.content, post.nonce, postSig, "cid");
     vm.stopPrank();
   }
 

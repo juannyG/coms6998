@@ -1,8 +1,8 @@
 import { useVerifyMessage } from "wagmi";
-import { TPost, TW3Post } from "~~/types/spotlight";
+import { TIPFSPost, TPost } from "~~/types/spotlight";
 import { encodePostDataForSignature } from "~~/utils/spotlight";
 
-const VerificationBadge = ({ post, contractPost }: { post: TW3Post; contractPost: TPost }) => {
+const VerificationBadge = ({ post, contractPost }: { post: TIPFSPost; contractPost: TPost }) => {
   const { data: isValid } = useVerifyMessage({
     address: contractPost.creator,
     signature: contractPost.signature,

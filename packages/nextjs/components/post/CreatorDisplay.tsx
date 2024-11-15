@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { Address } from "viem";
 import { PostDisplayContext } from "~~/contexts/Post";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
-import { TPost, TUserProfile, TW3Post } from "~~/types/spotlight";
+import { TIPFSPost, TPost, TUserProfile } from "~~/types/spotlight";
 import { getAvatarURL } from "~~/utils/spotlight";
 
 const SmallCreatorDisplay = ({ username, address }: { username: string; address: Address }) => {
@@ -35,7 +35,7 @@ const FullCreatorDisplay = ({ username, address }: { username: string; address: 
   );
 };
 
-const CreatorDisplay = ({ post, contractPost }: { post: TW3Post; contractPost: TPost }) => {
+const CreatorDisplay = ({ post, contractPost }: { post: TIPFSPost; contractPost: TPost }) => {
   console.log("do we still need this:", post);
   const { compactDisplay } = useContext(PostDisplayContext);
   const { data: creatorProfile } = useScaffoldReadContract({

@@ -9,7 +9,7 @@ import { NextPage } from "next";
 import { toHex } from "viem";
 import { useAccount, useSignMessage } from "wagmi";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { TW3Post } from "~~/types/spotlight";
+import { TIPFSPost } from "~~/types/spotlight";
 import { bigintSerializer, createPostSignature, getW3StorageClient } from "~~/utils/spotlight";
 
 const CreatePage: NextPage = () => {
@@ -57,6 +57,7 @@ const CreatePage: NextPage = () => {
         return;
       }
       try {
+        (document.getElementById("loading-modal") as HTMLFormElement).showModal();
         const nonce = BigInt(Math.ceil(Math.random() * 10 ** 17));
         const postSig = await createPostSignature({ signMessageAsync, title, content, nonce });
         setPostSig(postSig);
@@ -68,7 +69,7 @@ const CreatePage: NextPage = () => {
           content,
           nonce,
           signature: postSig,
-        } as TW3Post;
+        } as TIPFSPost;
         const json = JSON.stringify(postStruct, bigintSerializer);
         const blob = new Blob([json], { type: "application/json" });
 
@@ -83,6 +84,8 @@ const CreatePage: NextPage = () => {
         });
       } catch (e: any) {
         console.log(e);
+      } finally {
+        (document.getElementById("loading-modal") as HTMLFormElement).close();
       }
 
       setClickPost(true);
@@ -90,25 +93,38 @@ const CreatePage: NextPage = () => {
   };
 
   return (
-    <EditorContext.Provider value={value}>
-      <div className="w-full h-[30%] flex flex-col justify-between px-4 border border-[#e6ebf1]">
-        <div className="w-full flex flex-row items-center justify-start gap-4 pt-2">
-          <p className="text-lg font-semibold text-left text-black">Title</p>
-          <input
-            type="text"
-            placeholder="Enter your title"
-            className="input input-bordered rounded-lg w-full max-w-xs"
-            value={title}
-            onChange={handleTitleChange}
-          />
+    <>
+      <EditorContext.Provider value={value}>
+        <div className="w-full h-[30%] flex flex-col justify-between px-4 border border-[#e6ebf1]">
+          <div className="w-full flex flex-row items-center justify-start gap-4 pt-2">
+            <p className="text-lg font-semibold text-left text-black">Title</p>
+            <input
+              type="text"
+              placeholder="Enter your title"
+              className="input input-bordered rounded-lg w-full max-w-xs"
+              value={title}
+              onChange={handleTitleChange}
+            />
+          </div>
+          <div className="divider"></div>
+          <div className="w-full flex flex-col">
+            <p className="text-lg font-semibold text-left text-black ">Description</p>
+            <Editor />
+          </div>
         </div>
-        <div className="divider"></div>
-        <div className="w-full flex flex-col">
-          <p className="text-lg font-semibold text-left text-black ">Description</p>
-          <Editor />
+      </EditorContext.Provider>
+      <dialog id="loading-modal" className="modal">
+        <div className="modal-box [&&]:max-w-48">
+          <h3 className="font-bold text-lg"></h3>
+          <div className="flex justify-center">
+            <p className="py-4">Finalizing post...</p>
+          </div>
+          <div className="flex justify-center">
+            <span className="loading loading-dots loading-lg"></span>
+          </div>
         </div>
-      </div>
-    </EditorContext.Provider>
+      </dialog>
+    </>
   );
 };
 

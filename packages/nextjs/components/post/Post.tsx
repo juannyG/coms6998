@@ -8,11 +8,11 @@ import { useAccount } from "wagmi";
 import Viewer from "~~/app/feed/richTextEditor/Viewer";
 import { PostDisplayContext } from "~~/contexts/Post";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
-import { TW3Post } from "~~/types/spotlight";
+import { TIPFSPost } from "~~/types/spotlight";
 import { bigintDeserializer } from "~~/utils/spotlight";
 
 const Post = ({ postId }: { postId: Hex }) => {
-  const [post, setPost] = useState<TW3Post>();
+  const [post, setPost] = useState<TIPFSPost>();
   const { address } = useAccount();
   const { compactDisplay, showPostMgmt, onProfile } = useContext(PostDisplayContext);
   const { data: contractPost } = useScaffoldReadContract({

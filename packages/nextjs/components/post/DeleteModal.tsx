@@ -2,9 +2,9 @@ import { useContext } from "react";
 import { useRouter } from "next/navigation";
 import { PostDeleteContext } from "~~/contexts/Post";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-import { TPost, TW3Post } from "~~/types/spotlight";
+import { TIPFSPost, TPost } from "~~/types/spotlight";
 
-const PostDeleteModal = ({ post, contractPost }: { post: TW3Post; contractPost: TPost }) => {
+const PostDeleteModal = ({ post, contractPost }: { post: TIPFSPost; contractPost: TPost }) => {
   const router = useRouter();
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
   const { showDeleteConfirmation, setShowDeleteConfirmation, deleting, setDeleting } = useContext(PostDeleteContext);
