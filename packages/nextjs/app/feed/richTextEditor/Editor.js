@@ -52,21 +52,27 @@ const editorConfig = {
 };
 
 export default function Editor() {
-  const { confirmPost, setPaywalled } = useContext(EditorContext);
+  const { confirmPost, confirmPaywallPost } = useContext(EditorContext);
   const [showPaywallOption, setShowPaywallOption] = useState(false);
   const { address } = useAccount();
 
   useEffect(() => {
     const checkIfEncryptionSupported = async () => {
-      const ethAccounts = await window.ethereum.request({
-        "method": "eth_accounts",
-        "params": [],
-      });
+      try {
+        const ethAccounts = await window.ethereum.request({
+          "method": "eth_accounts",
+          "params": [],
+        });
 
-      // We need to normalize the account addresses to make sure we can compare them
-      if (ethAccounts?.length > 0 && ethAccounts[0].toLowerCase() == address?.toLowerCase()) {
-        setShowPaywallOption(true);
-      } else {
+        // This checks if the metamask account is ACTUALLY the account being used in Spotlight
+        // (i.e. you can have MetaMask installed, but you're using a burner wallet/ledger/etc)
+        // We need to normalize the account addresses to make sure we can compare them
+        if (ethAccounts?.length > 0 && ethAccounts[0].toLowerCase() == address?.toLowerCase()) {
+          setShowPaywallOption(true);
+        } else {
+          setShowPaywallOption(false);
+        }
+      } catch {
         setShowPaywallOption(false);
       }
     };
@@ -99,11 +105,7 @@ export default function Editor() {
             Post
           </button>
           {showPaywallOption && 
-            <button className="btn btn-outline rounded text-[#3466f6] border border-[#3466f6]" onClick={async () => {
-              console.log("Editor.setPaywalled(true)");
-              setPaywalled(true);
-              confirmPost();
-            }}>
+            <button className="btn btn-outline rounded text-[#3466f6] border border-[#3466f6]" onClick={confirmPaywallPost}>
               Paywall Post
             </button>
           }
