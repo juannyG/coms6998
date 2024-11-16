@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { EditorContext } from "../context";
 import "../richTextEditor/styles.css";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
@@ -22,6 +22,7 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
+import { useAccount } from "wagmi";
 
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
@@ -51,7 +52,27 @@ const editorConfig = {
 };
 
 export default function Editor() {
-  const { confirmPost } = useContext(EditorContext);
+  const { confirmPost, setPaywalled } = useContext(EditorContext);
+  const [showPaywallOption, setShowPaywallOption] = useState(false);
+  const { address } = useAccount();
+
+  useEffect(() => {
+    const checkIfEncryptionSupported = async () => {
+      const ethAccounts = await window.ethereum.request({
+        "method": "eth_accounts",
+        "params": [],
+      });
+
+      // We need to normalize the account addresses to make sure we can compare them
+      if (ethAccounts?.length > 0 && ethAccounts[0].toLowerCase() == address?.toLowerCase()) {
+        setShowPaywallOption(true);
+      } else {
+        setShowPaywallOption(false);
+      }
+    };
+
+    checkIfEncryptionSupported().catch((err) => console.log(err));
+  }, [address, window.ethereum, setShowPaywallOption])
 
   return (
     <LexicalComposer initialConfig={editorConfig}>
@@ -77,6 +98,15 @@ export default function Editor() {
           <button className="btn btn-outline rounded text-[#3466f6] border border-[#3466f6]" onClick={confirmPost}>
             Post
           </button>
+          {showPaywallOption && 
+            <button className="btn btn-outline rounded text-[#3466f6] border border-[#3466f6]" onClick={async () => {
+              console.log("Editor.setPaywalled(true)");
+              setPaywalled(true);
+              confirmPost();
+            }}>
+              Paywall Post
+            </button>
+          }
         </div>
       </div>
     </LexicalComposer>

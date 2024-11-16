@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EditorContext } from "./context";
 import Editor from "./richTextEditor/Editor";
+import { encrypt } from "@metamask/eth-sig-util";
 import { NextPage } from "next";
 import { useAccount, useSignMessage } from "wagmi";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
@@ -13,6 +14,7 @@ const CreatePage: NextPage = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [clickPost, setClickPost] = useState(false);
+  const [paywalled, setPaywalled] = useState(false);
   const [postSig, setPostSig] = useState("");
   const router = useRouter();
   const { address } = useAccount();
@@ -33,9 +35,22 @@ const CreatePage: NextPage = () => {
 
   const value = {
     setContent,
+    setPaywalled,
     confirmPost: async () => {
       if (!address) {
         return;
+      }
+      // when confirmPost is called - this still appears to be "false"
+      console.log("confirmPost.paywalled", paywalled);
+      if (paywalled) {
+        // TODO: The check for paywalling is buried in the editor right now. Make that a more global context
+        const publicKey = await window.ethereum.request({
+          method: "eth_getEncryptionPublicKey",
+          params: [address.toLowerCase()],
+        });
+        console.log("pubKey for encryption:", publicKey);
+        const encryptedPost = encrypt({ publicKey, data: content, version: "x25519-xsalsa20-poly1305" });
+        console.log(encryptedPost);
       }
       try {
         const nonce = BigInt(Math.ceil(Math.random() * 10 ** 17));
@@ -45,11 +60,10 @@ const CreatePage: NextPage = () => {
         console.log("Signature of post:", postSig);
 
         await writeSpotlightContractAsync({ functionName: "createPost", args: [title, content, nonce, postSig] });
+        setClickPost(true);
       } catch (e: any) {
         console.log(e);
       }
-
-      setClickPost(true);
     },
   };
 
