@@ -30,7 +30,7 @@ const ViewPostPage: NextPage = () => {
       <div className="w-full h-full relative bg-white box-border">
         <FeedHeaderPage />
         <div className="w-full flex gap-6 justify-center">
-          <div className="w-full sm:w-[50%] p-4 sm:p-0 mt-6 flex flex-col ">
+          <div className="w-full sm:w-[70%] lg:w-[50%] p-4 sm:p-0 mt-6 flex flex-col ">
             <BackButton />
 
             <PostDisplayContext.Provider value={{ compactDisplay: false, showPostMgmt: true, onProfile: false }}>

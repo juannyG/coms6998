@@ -10,6 +10,9 @@ function Comments({ postId }: { postId: Hex }) {
   const [comments, setComments] = useState<TComment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const commentsPerPage = 5;
+
   const { writeContractAsync: writeCommentContractAsync } = useScaffoldWriteContract("Spotlight");
 
   const { data: fetchedCommments, refetch: refreshComments } = useScaffoldReadContract({
@@ -49,6 +52,44 @@ function Comments({ postId }: { postId: Hex }) {
     return new Date(Number(timestamp) * 1000).toLocaleString();
   };
 
+  const totalPages = comments ? Math.ceil(comments.length / commentsPerPage) : 0;
+  const currentComments = comments
+    ? comments.slice((currentPage - 1) * commentsPerPage, currentPage * commentsPerPage)
+    : [];
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPageButtons = 5;
+    if (totalPages <= maxPageButtons) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1); // Always show first page
+
+      if (currentPage - 2 >= 3) pages.push("...");
+
+      const start = Math.max(2, currentPage - 2);
+      const end = Math.min(totalPages - 1, currentPage + 2);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (currentPage + 2 < totalPages - 2) pages.push("...");
+
+      pages.push(totalPages); // Always show last page
+    }
+
+    return pages;
+  };
+
   return (
     <div className="flex flex-col h-dvh bg-[url(/rectangle-6.svg)] bg-[100%_100%]">
       {/* Comments Header */}
@@ -77,7 +118,7 @@ function Comments({ postId }: { postId: Hex }) {
 
       {/* Render Comments */}
       <div className="flex flex-col px-10 mt-5 space-y-4">
-        {comments?.map((comment, index) => (
+        {currentComments?.map((comment, index) => (
           <div key={index} className="flex gap-5">
             {/* User Avatar */}
             <img alt="User avatar" src="/avatar.png" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
@@ -99,6 +140,21 @@ function Comments({ postId }: { postId: Hex }) {
           </div>
         ))}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="join justify-center mt-4">
+          {getPageNumbers().map((page, index) => (
+            <button
+              key={index}
+              className={`join-item btn ${currentPage === page ? "btn-active" : ""}`}
+              onClick={() => typeof page === "number" && handlePageChange(page)}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
