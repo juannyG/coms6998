@@ -24,6 +24,9 @@ const Post = ({ postId }: { postId: Hex }) => {
     return;
   }
 
+  const trimId = post.id.substring(0, 6) + "..." + post.id.substring(post.id.length - 4);
+  const TEMP_PAYWALL_MSG = `${trimId} is paywalled - support coming soon`;
+
   return (
     <>
       {!onProfile && (
@@ -35,19 +38,19 @@ const Post = ({ postId }: { postId: Hex }) => {
       {onProfile ? (
         <div className="cursor-pointer flex flex-col w-full">
           <p className="w-[100%] text-lg font-bold text-left text-black">{post.title}</p>
-          <Viewer data={post.content} />
+          {post.paywalled ? TEMP_PAYWALL_MSG : <Viewer data={post.content} />}
         </div>
       ) : compactDisplay ? (
         <div className="cursor-pointer flex flex-col w-full p-4 gap-4">
           <p className="w-[100%] text-lg font-bold text-left text-black">{post.title}</p>
-          <Viewer data={post.content} />
+          {post.paywalled ? TEMP_PAYWALL_MSG : <Viewer data={post.content} />}
         </div>
       ) : (
         <>
           <div className="p-[10px]">
             <p className="text-2xl font-bold">{post.title}</p>
           </div>
-          <Viewer data={post.content} />
+          {post.paywalled ? TEMP_PAYWALL_MSG : <Viewer data={post.content} />}
         </>
       )}
 

@@ -43,7 +43,7 @@ contract PostManagementTest is Test {
   function testCannotCreatePostIfAddressNotRegistered() public {
     vm.expectRevert(ProfileNotExist.selector);
     PostLib.Post memory p = createTestPost();
-    spotlight.createPost(p.title, p.content, p.nonce, "not a sig");
+    spotlight.createPost(p.title, p.content, p.nonce, "not a sig", false);
   }
 
   function testRegisteredAddressCanCreatePostAndEmitsAPostCreatedEvent() public {
@@ -55,7 +55,7 @@ contract PostManagementTest is Test {
 
     vm.expectEmit();
     emit PostCreated(wallet.addr, signature);
-    spotlight.createPost(post.title, post.content, post.nonce, signature);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, false);
   }
 
   function testSignatureThatCannotBeVerifiedResultsInRevertingPostCreation() public {
@@ -64,7 +64,7 @@ contract PostManagementTest is Test {
 
     vm.expectRevert(InvalidSignature.selector);
     PostLib.Post memory p = createTestPost();
-    spotlight.createPost(p.title, p.content, p.nonce, "Fake signature");
+    spotlight.createPost(p.title, p.content, p.nonce, "Fake signature", false);
   }
 
   function testCreatePostWithEmptyContentIsRejected() public {
@@ -74,7 +74,7 @@ contract PostManagementTest is Test {
     PostLib.Post memory p = createTestPost();
     p.content = "";
     vm.expectRevert(ContentCannotBeEmpty.selector);
-    spotlight.createPost(p.title, p.content, p.nonce, "Sig won't be checked here");
+    spotlight.createPost(p.title, p.content, p.nonce, "Sig won't be checked here", false);
   }
 
   function testCreatePostWithEmptyTitleIsRejected() public {
@@ -84,7 +84,7 @@ contract PostManagementTest is Test {
     PostLib.Post memory p = createTestPost();
     p.title = "";
     vm.expectRevert(TitleCannotBeEmpty.selector);
-    spotlight.createPost(p.title, p.content, p.nonce, "Sig won't be checked here");
+    spotlight.createPost(p.title, p.content, p.nonce, "Sig won't be checked here", false);
   }
 
   function testPostCanBeRetrievedBySignature() public {
@@ -93,14 +93,15 @@ contract PostManagementTest is Test {
     PostLib.Post memory p2 = createTestPost("2");
     PostLib.Post memory p3 = createTestPost("3");
     spotlight.registerProfile("username");
-    spotlight.createPost(p1.title, p1.content, p1.nonce, signContentViaWallet(wallet, p1));
-    spotlight.createPost(p2.title, p2.content, p2.nonce, signContentViaWallet(wallet, p2));
-    spotlight.createPost(p3.title, p3.content, p3.nonce, signContentViaWallet(wallet, p3));
+    spotlight.createPost(p1.title, p1.content, p1.nonce, signContentViaWallet(wallet, p1), false);
+    spotlight.createPost(p2.title, p2.content, p2.nonce, signContentViaWallet(wallet, p2), false);
+    spotlight.createPost(p3.title, p3.content, p3.nonce, signContentViaWallet(wallet, p3), false);
 
     PostLib.Post memory retreivedP2 = spotlight.getPost(signContentViaWallet(wallet, p2));
     assertEq("2", string(retreivedP2.content));
     assertEq(wallet.addr, retreivedP2.creator);
     assertEq(signContentViaWallet(wallet, p2), retreivedP2.id);
+    assertFalse(retreivedP2.paywalled);
   }
 
   function testGettingNonexistentPostReverts() public {
@@ -116,7 +117,7 @@ contract PostManagementTest is Test {
     PostLib.Post memory _wPost = createTestPost("_w");
     vm.startPrank(_w.addr);
     spotlight.registerProfile("_w");
-    spotlight.createPost(_wPost.title, _wPost.content, _wPost.nonce, signContentViaWallet(_w, _wPost));
+    spotlight.createPost(_wPost.title, _wPost.content, _wPost.nonce, signContentViaWallet(_w, _wPost), false);
     vm.stopPrank();
 
     PostLib.Post memory p0 = createTestPost("0");
@@ -124,9 +125,9 @@ contract PostManagementTest is Test {
     PostLib.Post memory p2 = createTestPost("2");
     vm.startPrank(wallet.addr);
     spotlight.registerProfile("username");
-    spotlight.createPost(p0.title, p0.content, p0.nonce, signContentViaWallet(wallet, p0));
-    spotlight.createPost(p1.title, p1.content, p1.nonce, signContentViaWallet(wallet, p1));
-    spotlight.createPost(p2.title, p2.content, p2.nonce, signContentViaWallet(wallet, p2));
+    spotlight.createPost(p0.title, p0.content, p0.nonce, signContentViaWallet(wallet, p0), false);
+    spotlight.createPost(p1.title, p1.content, p1.nonce, signContentViaWallet(wallet, p1), false);
+    spotlight.createPost(p2.title, p2.content, p2.nonce, signContentViaWallet(wallet, p2), false);
 
     PostLib.Post[] memory posts = spotlight.getPostsOfAddress(wallet.addr);
     assertEq(3, posts.length);
@@ -163,21 +164,21 @@ contract PostManagementTest is Test {
     wallets[0] = vm.createWallet(10);
     vm.startPrank(wallets[0].addr);
     spotlight.registerProfile("0");
-    spotlight.createPost(p0.title, p0.content, p0.nonce, signContentViaWallet(wallets[0], p0));
+    spotlight.createPost(p0.title, p0.content, p0.nonce, signContentViaWallet(wallets[0], p0), false);
     vm.stopPrank();
 
     PostLib.Post memory p1 = createTestPost("1");
     wallets[1] = vm.createWallet(11);
     vm.startPrank(wallets[1].addr);
     spotlight.registerProfile("1");
-    spotlight.createPost(p1.title, p1.content, p1.nonce, signContentViaWallet(wallets[1], p1));
+    spotlight.createPost(p1.title, p1.content, p1.nonce, signContentViaWallet(wallets[1], p1), false);
     vm.stopPrank();
 
     PostLib.Post memory p2 = createTestPost("2");
     wallets[2] = vm.createWallet(12);
     vm.startPrank(wallets[2].addr);
     spotlight.registerProfile("2");
-    spotlight.createPost(p2.title, p2.content, p2.nonce, signContentViaWallet(wallets[2], p2));
+    spotlight.createPost(p2.title, p2.content, p2.nonce, signContentViaWallet(wallets[2], p2), false);
     vm.stopPrank();
 
     // We're expecting 3 posts to be returned
@@ -211,7 +212,7 @@ contract PostManagementTest is Test {
     PostLib.Post memory p = createTestPost();
     vm.startPrank(wallet.addr);
     spotlight.registerProfile("username");
-    spotlight.createPost(p.title, p.content, p.nonce, signContentViaWallet(wallet, p));
+    spotlight.createPost(p.title, p.content, p.nonce, signContentViaWallet(wallet, p), false);
     vm.stopPrank();
 
     address _addr = vm.addr(2);
@@ -224,7 +225,7 @@ contract PostManagementTest is Test {
     PostLib.Post memory p = createTestPost();
     vm.startPrank(wallet.addr);
     spotlight.registerProfile("username");
-    spotlight.createPost(p.title, p.content, p.nonce, signContentViaWallet(wallet, p));
+    spotlight.createPost(p.title, p.content, p.nonce, signContentViaWallet(wallet, p), false);
     vm.stopPrank();
 
     address _addr = vm.addr(2);
@@ -239,7 +240,7 @@ contract PostManagementTest is Test {
 
     PostLib.Post memory post = createTestPost();
     bytes memory signature = signContentViaWallet(wallet, post);
-    spotlight.createPost(post.title, post.content, post.nonce, signature);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, false);
 
     vm.expectEmit();
     emit PostEdited(wallet.addr, signature);
@@ -257,7 +258,7 @@ contract PostManagementTest is Test {
 
     PostLib.Post memory post = createTestPost();
     bytes memory signature = signContentViaWallet(wallet, post);
-    spotlight.createPost(post.title, post.content, post.nonce, signature);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, false);
     vm.stopPrank();
 
     address otherUser = vm.addr(2);
@@ -274,7 +275,7 @@ contract PostManagementTest is Test {
 
     PostLib.Post memory post = createTestPost();
     bytes memory signature = signContentViaWallet(wallet, post);
-    spotlight.createPost(post.title, post.content, post.nonce, signature);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, false);
 
     vm.expectRevert(ContentCannotBeEmpty.selector);
     spotlight.editPost(signature, "");
@@ -287,7 +288,7 @@ contract PostManagementTest is Test {
 
     PostLib.Post memory post = createTestPost();
     bytes memory signature = signContentViaWallet(wallet, post);
-    spotlight.createPost(post.title, post.content, post.nonce, signature);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, false);
 
     vm.expectEmit();
     emit PostDeleted(wallet.addr, signature);
@@ -304,7 +305,7 @@ contract PostManagementTest is Test {
 
     PostLib.Post memory post = createTestPost();
     bytes memory signature = signContentViaWallet(wallet, post);
-    spotlight.createPost(post.title, post.content, post.nonce, signature);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, false);
     vm.stopPrank();
 
     address otherUser = vm.addr(2);
@@ -322,7 +323,7 @@ contract PostManagementTest is Test {
 
     PostLib.Post memory post = createTestPost();
     bytes memory signature = signContentViaWallet(wallet, post);
-    spotlight.createPost(post.title, post.content, post.nonce, signature);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, false);
     vm.stopPrank();
 
     address otherUser = vm.addr(2);
@@ -348,7 +349,7 @@ contract PostManagementTest is Test {
 
     PostLib.Post memory post = createTestPost();
     bytes memory signature = signContentViaWallet(wallet, post);
-    spotlight.createPost(post.title, post.content, post.nonce, signature);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, false);
 
     // Add multiple comments
     spotlight.addComment(signature, "First comment.");
