@@ -38,7 +38,7 @@ const Post = ({ postId }: { postId: Hex }) => {
       {onProfile ? (
         <div className="cursor-pointer flex flex-col w-full">
           <p className="w-[100%] text-lg font-bold text-left text-black">{post.title}</p>
-          {post.paywalled ? TEMP_PAYWALL_MSG : <Viewer data={post.content} />}{" "}
+          {post.paywalled ? TEMP_PAYWALL_MSG : <Viewer data={post.content} />}
         </div>
       ) : compactDisplay ? (
         <div className="cursor-pointer flex flex-col w-full p-4 gap-4">
@@ -50,7 +50,7 @@ const Post = ({ postId }: { postId: Hex }) => {
           <div className="p-[10px]">
             <p className="text-2xl font-bold">{post.title}</p>
           </div>
-          {post.paywalled ? TEMP_PAYWALL_MSG : <Viewer data={post.content} />}{" "}
+          {post.paywalled ? TEMP_PAYWALL_MSG : <Viewer data={post.content} />}
         </>
       )}
 
