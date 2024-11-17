@@ -82,7 +82,7 @@ export default function Editor() {
           >
             Post
           </button>
-          {paywallSupported &&
+          {paywallSupported && (
             <div className="pl-2">
               <button
                 className="btn btn-outline rounded text-[#3466f6] border border-[#3466f6]"
@@ -91,7 +91,7 @@ export default function Editor() {
                 Paywall Post
               </button>
             </div>
-          }
+          )}
         </div>
       </div>
     </LexicalComposer>
