@@ -201,10 +201,13 @@ contract Spotlight {
   /// @param _content The content of the post.
   /// @param _nonce The nonce used for signature generation
   /// @param _sig The signature of the post.
-  function createPost(string memory _title, string memory _content, uint256 _nonce, bytes calldata _sig)
-    public
-    onlyRegistered
-  {
+  function createPost(
+    string memory _title,
+    string memory _content,
+    uint256 _nonce,
+    bytes calldata _sig,
+    bool _paywalled
+  ) public onlyRegistered {
     if (bytes(_content).length == 0) revert ContentCannotBeEmpty();
     if (bytes(_title).length == 0) revert TitleCannotBeEmpty();
     if (!PostLib.isValidPostSignature(msg.sender, _title, _content, _nonce, _sig)) revert InvalidSignature();
@@ -218,6 +221,7 @@ contract Spotlight {
       id: _sig,
       signature: _sig,
       nonce: _nonce,
+      paywalled: _paywalled,
       createdAt: block.timestamp,
       lastUpdatedAt: block.timestamp,
       upvoteCount: 0,

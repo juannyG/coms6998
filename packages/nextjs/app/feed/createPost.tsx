@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EditorContext } from "./context";
 import Editor from "./richTextEditor/Editor";
-import { decrypt, encrypt } from "@metamask/eth-sig-util";
+import { encrypt } from "@metamask/eth-sig-util";
 import { NextPage } from "next";
-import { toHex } from "viem";
 import { useAccount, useSignMessage } from "wagmi";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { createPostSignature } from "~~/utils/spotlight";
@@ -33,36 +32,58 @@ const CreatePage: NextPage = () => {
     }
   }, [clickPost, router, postSig]);
 
-  const confirmPost = async (paywalled = false) => {
+  const confirmPost = async (evt: React.MouseEventHandler<HTMLButtonElement>, paywalled = false) => {
     if (!address) {
       return;
     }
-    console.log("confirmPost.paywalled", paywalled);
-    if (paywalled) {
-      // TODO: The check for paywalling is buried in the editor right now. Make that a more global context
-      const publicKey = await window.ethereum.request({
-        method: "eth_getEncryptionPublicKey",
-        params: [address.toLowerCase()],
-      });
-      console.log("pubKey for encryption:", publicKey);
-      const encryptedPost = encrypt({ publicKey, data: content, version: "x25519-xsalsa20-poly1305" });
-      console.log(encryptedPost);
-      console.log(toHex(encryptedPost.ciphertext));
 
-      // sleep for 500ms - metamask gets unhappy if you hammer it with back-2-back reqs
-      await new Promise(f => setTimeout(f, 500));
-      const x = await window.ethereum.request({
-        method: "eth_decrypt",
-        params: [`0x${Buffer.from(JSON.stringify(encryptedPost), "utf8").toString("hex")}`, address],
-      });
-      console.log(x);
-    }
     try {
-      // const nonce = BigInt(Math.ceil(Math.random() * 10 ** 17));
-      // const postSig = await createPostSignature({ signMessageAsync, title, content, nonce });
-      // setPostSig(postSig);
-      // console.log("Signature of post:", postSig);
-      // await writeSpotlightContractAsync({ functionName: "createPost", args: [title, content, nonce, postSig] });
+      const nonce = BigInt(Math.ceil(Math.random() * 10 ** 17));
+
+      console.log("confirmPost.paywalled", paywalled);
+      if (paywalled) {
+        const publicKey = await window.ethereum.request({
+          method: "eth_getEncryptionPublicKey",
+          params: [address.toLowerCase()],
+        });
+        // console.log("pubKey for encryption:", publicKey);
+
+        // For more info on this encryption algo see: https://crypto.stackexchange.com/a/77074
+        const encryptedPost = encrypt({ publicKey, data: content, version: "x25519-xsalsa20-poly1305" });
+        const strEncryptedPost = JSON.stringify(encryptedPost);
+        console.log("encrypted post content", strEncryptedPost);
+
+        // sleep for 500ms - metamask gets unhappy if you spam it with back-2-back reqs after en/decrypt methods
+        await new Promise(f => setTimeout(f, 500));
+        const postSig = await createPostSignature({ signMessageAsync, title, content: strEncryptedPost, nonce });
+        setPostSig(postSig);
+        console.log("Signature of post:", postSig);
+
+        await writeSpotlightContractAsync({
+          functionName: "createPost",
+          args: [title, strEncryptedPost, nonce, postSig, paywalled],
+        });
+
+        // EXAMPLE DECRYPTION
+        // import { decrypt } from "@metamask/eth-sig-util";
+        // sleep for 500ms - metamask gets unhappy if you spam it with back-2-back reqs
+        // await new Promise(f => setTimeout(f, 500));
+        // const x = await window.ethereum.request({
+        //   method: "eth_decrypt",
+        //   params: [`0x${Buffer.from(JSON.stringify(encryptedPost), "utf8").toString("hex")}`, address],
+        // });
+        // console.log(x);
+      } else {
+        // TODO: work on this duplication... bleh
+        const postSig = await createPostSignature({ signMessageAsync, title, content, nonce });
+        setPostSig(postSig);
+        console.log("Signature of post:", postSig);
+
+        await writeSpotlightContractAsync({
+          functionName: "createPost",
+          args: [title, content, nonce, postSig, paywalled],
+        });
+      }
       // setClickPost(true);
     } catch (e: any) {
       console.log(e);
@@ -71,9 +92,6 @@ const CreatePage: NextPage = () => {
 
   const value = {
     setContent,
-    confirmPaywallPost: async () => {
-      confirmPost(true);
-    },
     confirmPost,
   };
 

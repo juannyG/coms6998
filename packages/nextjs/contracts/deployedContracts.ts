@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+      address: "0xa513e6e4b8f2a923d98304ec87f64353c4d5c853",
       abi: [
         {
           type: "constructor",
@@ -61,6 +61,11 @@ const deployedContracts = {
               name: "_sig",
               type: "bytes",
               internalType: "bytes",
+            },
+            {
+              name: "_paywalled",
+              type: "bool",
+              internalType: "bool",
             },
           ],
           outputs: [],
@@ -213,6 +218,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -284,6 +294,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -353,6 +368,11 @@ const deployedContracts = {
                   name: "signature",
                   type: "bytes",
                   internalType: "bytes",
+                },
+                {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
                 },
                 {
                   name: "nonce",
@@ -826,6 +846,11 @@ const deployedContracts = {
               type: "bytes",
               internalType: "bytes",
             },
+            {
+              name: "_paywalled",
+              type: "bool",
+              internalType: "bool",
+            },
           ],
           outputs: [],
           stateMutability: "nonpayable",
@@ -977,6 +1002,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -1048,6 +1078,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -1117,6 +1152,11 @@ const deployedContracts = {
                   name: "signature",
                   type: "bytes",
                   internalType: "bytes",
+                },
+                {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
                 },
                 {
                   name: "nonce",

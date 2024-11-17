@@ -37,9 +37,12 @@ const PostHeader = ({ post }: { post: TPost }) => {
       <div className="flex gap-2">
         {address === post.creator && showPostMgmt && (
           <>
-            <button className="btn btn-danger btn-sm" onClick={e => onClickEditPost(e)} disabled={editing}>
-              <Image alt="Edit Post" className="cursor-pointer" width="20" height="25" src="/pencil.svg" />
-            </button>
+            {/* TODO: Think about support for editing paywalled post... */}
+            {!post.paywalled && (
+              <button className="btn btn-danger btn-sm" onClick={e => onClickEditPost(e)} disabled={editing}>
+                <Image alt="Edit Post" className="cursor-pointer" width="20" height="25" src="/pencil.svg" />
+              </button>
+            )}
             <button className="btn btn-danger btn-sm" onClick={e => onClickDeletePost(e)} disabled={deleting}>
               <Image alt="Delete Post" className="cursor-pointer" width="20" height="25" src="/trash.svg" />
             </button>
