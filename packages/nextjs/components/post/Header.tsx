@@ -2,15 +2,25 @@ import { useContext } from "react";
 import Image from "next/image";
 import CreatorDisplay from "./CreatorDisplay";
 import { useAccount } from "wagmi";
+import { PaywallSupportContext } from "~~/contexts/PaywallSupport";
 import { PostDeleteContext, PostDisplayContext, PostEditContext } from "~~/contexts/Post";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { TPost, TUserProfile } from "~~/types/spotlight";
 
-const PostHeader = ({ post }: { post: TPost }) => {
+const PostHeader = ({
+  post,
+  onClickUnlockPost,
+  decrypted,
+}: {
+  post: TPost;
+  onClickUnlockPost: (evt: React.MouseEvent<HTMLButtonElement>) => void;
+  decrypted: boolean;
+}) => {
   const { address } = useAccount();
   const { showPostMgmt } = useContext(PostDisplayContext);
   const { setShowDeleteConfirmation, deleting } = useContext(PostDeleteContext);
   const { setShowEditModal, editing } = useContext(PostEditContext);
+  const { paywallSupported } = useContext(PaywallSupportContext);
   const { data: creatorProfile } = useScaffoldReadContract({
     contractName: "Spotlight",
     functionName: "getProfile",
@@ -38,6 +48,11 @@ const PostHeader = ({ post }: { post: TPost }) => {
         {address === post.creator && showPostMgmt && (
           <>
             {/* TODO: Think about support for editing paywalled post... */}
+            {post.paywalled && paywallSupported && !decrypted && (
+              <button className="btn btn-danger btn-sm" onClick={e => onClickUnlockPost(e)}>
+                <Image alt="Unlock Post" className="cursor-pointer" width="20" height="25" src="/lock-open.svg" />
+              </button>
+            )}
             {!post.paywalled && (
               <button className="btn btn-danger btn-sm" onClick={e => onClickEditPost(e)} disabled={editing}>
                 <Image alt="Edit Post" className="cursor-pointer" width="20" height="25" src="/pencil.svg" />

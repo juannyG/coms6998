@@ -84,7 +84,7 @@ const CreatePage: NextPage = () => {
           args: [title, content, nonce, postSig, paywalled],
         });
       }
-      // setClickPost(true);
+      setClickPost(true);
     } catch (e: any) {
       console.log(e);
     }
