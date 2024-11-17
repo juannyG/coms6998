@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { EditorContext } from "../context";
 import "../richTextEditor/styles.css";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
@@ -52,7 +52,7 @@ const editorConfig = {
 };
 
 export default function Editor() {
-  const { confirmPost, confirmPaywallPost } = useContext(EditorContext);
+  const { confirmPost } = useContext(EditorContext);
   const { paywallSupported } = useContext(PaywallSupportContext);
 
   return (
@@ -76,14 +76,14 @@ export default function Editor() {
           <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
         </div>
         <div className="flex justify-end pt-2">
-          <button className="btn btn-outline rounded text-[#3466f6] border border-[#3466f6]" onClick={async(e) => confirmPost(e, false) }>
+          <button className="btn btn-outline rounded text-[#3466f6] border border-[#3466f6]" onClick={async e => confirmPost(e, false) }>
             Post
           </button>
-          {paywallSupported && 
-          <div className="pl-2">
-            <button className="btn btn-outline rounded text-[#3466f6] border border-[#3466f6]" onClick={async(e) => confirmPost(e, true)}>
-              Paywall Post
-            </button>
+          {paywallSupported &&
+            <div className="pl-2">
+              <button className="btn btn-outline rounded text-[#3466f6] border border-[#3466f6]" onClick={async e => confirmPost(e, true)}>
+                Paywall Post
+              </button>
             </div>
           }
         </div>
