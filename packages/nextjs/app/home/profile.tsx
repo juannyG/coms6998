@@ -113,7 +113,11 @@ function LeftColumn() {
 
   return (
     <div className="w-[100%] flex flex-col items-center">
-      <img alt="" src={getAvatarURL(userProfile.avatarCID)} className="w-80 h-80 rounded-full object-cover ml-2" />
+      <img
+        alt=""
+        src={getAvatarURL(userProfile.avatarCID)}
+        className="w-[80%] h-[80%] lg:w-80 lg:h-80 rounded-full object-cover ml-2"
+      />
       <div className="flex w-[100%] flex-col pl-4">
         <h1 className="text-left text-2xl font-bold text-gray-800">{userProfile.username}</h1>
         <div>Address: {shortenedUserAddress}</div>
@@ -213,16 +217,55 @@ function RightColumn() {
     watch: true,
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 5;
+
+  const totalPages = userPosts ? Math.ceil(userPosts.length / postsPerPage) : 0;
+  const currentPosts = userPosts ? userPosts.slice((currentPage - 1) * postsPerPage, currentPage * postsPerPage) : [];
+
   const onClickViewPost = (postId: Hex) => {
     const query = new URLSearchParams({ postSig: String(postId) }).toString();
     router.push(`/feed/viewPost?${query}`);
   };
 
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPageButtons = 5;
+    if (totalPages <= maxPageButtons) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1); // Always show first page
+
+      if (currentPage - 2 >= 3) pages.push("...");
+
+      const start = Math.max(2, currentPage - 2);
+      const end = Math.min(totalPages - 1, currentPage + 2);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (currentPage + 2 < totalPages - 2) pages.push("...");
+
+      pages.push(totalPages); // Always show last page
+    }
+
+    return pages;
+  };
+
   return (
     <PostDisplayContext.Provider value={{ compactDisplay: true, showPostMgmt: false, onProfile: true }}>
-      <div className="flex flex-col items-center gap-4 pt-4 overflow-x-hidden overflow-scroll sm:h-[100%] w-[100%]">
-        {userPosts && userPosts.length > 0 ? (
-          userPosts.map((post: TPost) => (
+      <div className="flex flex-col items-center gap-4 py-4 overflow-x-hidden overflow-scroll sm:h-[100%] w-[100%]">
+        {currentPosts && currentPosts.length > 0 ? (
+          currentPosts.map((post: TPost) => (
             <div
               key={post.id}
               className="flex flex-col w-full p-4 gap-4 justify-start
@@ -236,6 +279,21 @@ function RightColumn() {
         ) : (
           <div className="text-center text-gray-500 mt-8">No posts yet. Start sharing your thoughts!</div>
         )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="join justify-center mt-4 ">
+            {getPageNumbers().map((page, index) => (
+              <button
+                key={index}
+                className={`join-item btn ${currentPage === page ? "btn-active" : ""}`}
+                onClick={() => typeof page === "number" && handlePageChange(page)}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </PostDisplayContext.Provider>
   );
@@ -243,11 +301,11 @@ function RightColumn() {
 
 export default function Profile() {
   return (
-    <div className="sm:flex sm:flex-row w-full sm:w-[60%] justify-center">
-      <div className="w-full sm:w-[33%] pt-10 ">
+    <div className="sm:flex sm:flex-row w-full sm:w-[100%] lg:w-[60%] justify-center">
+      <div className="w-full sm:w-[40%] lg:w-[33%] pt-10 ">
         <LeftColumn />
       </div>
-      <div className="w-full sm:w-[66%]">
+      <div className="w-full sm:w-[60%] lg:w-[66%]">
         <RightColumn />
       </div>
     </div>
