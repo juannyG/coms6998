@@ -3,7 +3,7 @@ import PostDeleteModal from "./DeleteModal";
 import PostEditModal from "./EditModal";
 import PostFooter from "./Footer";
 import PostHeader from "./Header";
-import { Hex } from "viem";
+import { Hex, toHex } from "viem";
 import { useAccount } from "wagmi";
 import Viewer from "~~/app/feed/richTextEditor/Viewer";
 import { PostDisplayContext } from "~~/contexts/Post";
@@ -37,12 +37,11 @@ const Post = ({ postId }: { postId: Hex }) => {
   const onClickUnlockPost = async (evt: React.MouseEvent<HTMLButtonElement>) => {
     evt.stopPropagation();
     if (address == post.creator) {
-      // sleep for 500ms - metamask gets unhappy if you spam it with back-2-back reqs
-      // await new Promise(f => setTimeout(f, 500));
       try {
+        // TODO: use a util for this
         const decryptedContent = await window.ethereum.request({
           method: "eth_decrypt",
-          params: [`0x${Buffer.from(post.content, "utf8").toString("hex")}`, address],
+          params: [toHex(Buffer.from(post.content, "utf8")), address],
         });
         setContent(decryptedContent);
         setDecrypted(true);
@@ -50,7 +49,24 @@ const Post = ({ postId }: { postId: Hex }) => {
         console.log(e);
       }
     } else {
-      alert("Purchasing paywalled content coming soon...");
+      try {
+        // TODO: !!!Check if user has already payed for post!!!
+
+        // TODO: util for this
+        const publicKey = await window.ethereum.request({
+          method: "eth_getEncryptionPublicKey",
+          params: [address.toLowerCase()],
+        });
+
+        console.log("pubKey for encryption:", publicKey);
+        console.log("i want to pay for", post.id);
+
+        // sleep for 500ms - metamask gets unhappy if you spam it with back-2-back reqs
+        // await new Promise(f => setTimeout(f, 500));
+        console.log("calling Spotlight.purchasePost");
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 

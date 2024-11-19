@@ -16,6 +16,8 @@ import "./Error.sol";
 /// @notice You can use this contract to manage user profiles and create posts.
 /// @dev This contract is intended to be deployed on Ethereum-compatible networks.
 contract Spotlight {
+  uint256 public constant PAYWALL_COST = 0.1 ether;
+
   /// @notice The owner of the contract.
   address public owner;
 
@@ -30,6 +32,9 @@ contract Spotlight {
   /// @dev Mapping from signature of post (post ID) to post content
   mapping(bytes => PostLib.Post) internal postStore;
   mapping(bytes => PostLib.Comment[]) internal postComments;
+
+  // @dev post ID => wallet addr => pubKey for encryption
+  mapping(bytes => mapping(address => string)) internal postsPendingPurchase;
 
   // TODO: Support >1 community
   /* TODO:
@@ -376,5 +381,12 @@ contract Spotlight {
   function updateAvatarCID(string calldata _cid) public onlyRegistered {
     if (bytes(_cid).length == 0) revert AvatarCIDCannotBeEmpty();
     profiles[msg.sender].avatarCID = _cid;
+  }
+
+  function purchasePost(bytes calldata _id, string calldata _pubkey) public payable onlyRegistered postExists(_id) {
+    if (msg.value < PAYWALL_COST) revert InsufficentPostFunds();
+    if (bytes(postsPendingPurchase[_id][msg.sender]).length > 0) revert PostAlreadyPurchased();
+    postsPendingPurchase[_id][msg.sender] = _pubkey;
+    // TODO: emit PostPurchased(msg.sender, _id)
   }
 }
