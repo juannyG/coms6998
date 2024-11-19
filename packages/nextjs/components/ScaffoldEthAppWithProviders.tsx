@@ -10,6 +10,7 @@ import { Footer } from "~~/components/Footer";
 import { Header } from "~~/components/Header";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { ProgressBar } from "~~/components/scaffold-eth/ProgressBar";
+import { PaywallSupportContext } from "~~/contexts/PaywallSupport";
 import { UserProfileContext } from "~~/contexts/UserProfile";
 import { useInitializeNativeCurrencyPrice } from "~~/hooks/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth/useScaffoldReadContract";
@@ -20,6 +21,7 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   useInitializeNativeCurrencyPrice();
   const { address: connectedAddress } = useAccount();
   const [userProfile, setUserProfile] = useState<TUserProfile>();
+  const [paywallSupported, setPaywallSupported] = useState(false);
 
   const { data: isRegistered } = useScaffoldReadContract({
     contractName: "Spotlight",
@@ -34,6 +36,34 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
     args: [connectedAddress],
     watch: true,
   });
+
+  useEffect(() => {
+    if (typeof window !== "object") {
+      return;
+    }
+
+    const checkIfEncryptionSupported = async () => {
+      try {
+        const ethAccounts = await window.ethereum?.request({
+          method: "eth_accounts",
+          params: [],
+        });
+
+        // This checks if the metamask account is ACTUALLY the account being used in Spotlight
+        // (i.e. you can have MetaMask installed, but you're using a burner wallet/ledger/etc)
+        // We need to normalize the account addresses to make sure we can compare them
+        if (ethAccounts?.length > 0 && ethAccounts[0].toLowerCase() == connectedAddress?.toLowerCase()) {
+          setPaywallSupported(true);
+        } else {
+          setPaywallSupported(false);
+        }
+      } catch {
+        setPaywallSupported(false);
+      }
+    };
+
+    checkIfEncryptionSupported().catch(err => console.log(err));
+  }, [connectedAddress, setPaywallSupported]);
 
   useEffect(() => {
     if (isRegistered === undefined) {
@@ -51,12 +81,14 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <UserProfileContext.Provider value={{ userProfile, setUserProfile, refetchProfile }}>
-        <div className="flex flex-col min-h-screen">
-          <Header />
-          <main className="relative flex flex-col flex-1">{children}</main>
-          <Footer />
-        </div>
-        <Toaster />
+        <PaywallSupportContext.Provider value={{ paywallSupported, setPaywallSupported }}>
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="relative flex flex-col flex-1">{children}</main>
+            <Footer />
+          </div>
+          <Toaster />
+        </PaywallSupportContext.Provider>
       </UserProfileContext.Provider>
     </>
   );

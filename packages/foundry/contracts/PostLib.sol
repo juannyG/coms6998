@@ -13,6 +13,7 @@ library PostLib {
     string content;
     bytes id;
     bytes signature;
+    bool paywalled;
     uint256 nonce;
     uint256 createdAt;
     uint256 lastUpdatedAt;

@@ -62,6 +62,11 @@ const deployedContracts = {
               type: "bytes",
               internalType: "bytes",
             },
+            {
+              name: "_paywalled",
+              type: "bool",
+              internalType: "bool",
+            },
           ],
           outputs: [],
           stateMutability: "nonpayable",
@@ -213,6 +218,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -284,6 +294,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -353,6 +368,11 @@ const deployedContracts = {
                   name: "signature",
                   type: "bytes",
                   internalType: "bytes",
+                },
+                {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
                 },
                 {
                   name: "nonce",
@@ -826,6 +846,11 @@ const deployedContracts = {
               type: "bytes",
               internalType: "bytes",
             },
+            {
+              name: "_paywalled",
+              type: "bool",
+              internalType: "bool",
+            },
           ],
           outputs: [],
           stateMutability: "nonpayable",
@@ -977,6 +1002,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -1048,6 +1078,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -1117,6 +1152,11 @@ const deployedContracts = {
                   name: "signature",
                   type: "bytes",
                   internalType: "bytes",
+                },
+                {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
                 },
                 {
                   name: "nonce",

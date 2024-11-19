@@ -121,7 +121,7 @@ function LeftColumn() {
       <div className="flex w-[100%] flex-col pl-4">
         <h1 className="text-left text-2xl font-bold text-gray-800">{userProfile.username}</h1>
         <div>Address: {shortenedUserAddress}</div>
-        <div>Reputation: {Number(userProfile.reputation)} RPT</div>
+        <div>Reputation: {Number(userProfile.reputation) / 10 ** 18} RPT</div>
       </div>
       <div className="flex flex-col justify-start items-center flex-grow-0 flex-shrink-0 sm:mt-4 mb-4">
         {deleted ? (
@@ -151,7 +151,7 @@ function LeftColumn() {
               </div>
             ) : (
               <>
-                <div className="flex space-x-4 mt-4 pb-5">
+                <div className="flex space-x-4 mt-4 pb-5 z-20">
                   <button className="btn btn-secondary" onClick={() => setIsChangingUsername(true)}>
                     Change Username
                   </button>

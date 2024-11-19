@@ -19,6 +19,11 @@ const PostEditModal = ({ post }: { post: TPost }) => {
     watch: true,
   });
 
+  if (post.paywalled) {
+    // TODO: Think about support for editing paywalled post...
+    return <></>;
+  }
+
   const value = {
     setContent,
     cancel: () => {

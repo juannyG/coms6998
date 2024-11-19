@@ -9,6 +9,7 @@ export interface TPost {
   title: string;
   content: string;
   nonce: bigint;
+  paywalled: boolean;
   createdAt: bigint;
   lastUpdatedAt: bigint;
   upvoteCount: bigint;
