@@ -116,7 +116,7 @@ function LeftColumn() {
       <img
         alt=""
         src={getAvatarURL(userProfile.avatarCID)}
-        className="w-40 h-40 lg:w-80 lg:h-80 rounded-full object-cover ml-2"
+        className="w-[80%] h-[80%] lg:w-80 lg:h-80 rounded-full object-cover ml-2"
       />
       <div className="flex w-[100%] flex-col pl-4">
         <h1 className="text-left text-2xl font-bold text-gray-800">{userProfile.username}</h1>
