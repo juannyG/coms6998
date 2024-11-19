@@ -796,7 +796,7 @@ i.justify-align {
   background-image: url(images/icons/justify.svg);
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 1000px) {
   .toolbar {
     flex-wrap: wrap;
     max-width: 100%;
