@@ -366,4 +366,89 @@ contract PostManagementTest is Test {
     assertEq(comments[1].commenter, wallet.addr, "Second comment: commenter mismatch");
     assertEq(comments[1].content, "Second comment.", "Second comment: content mismatch");
   }
+
+  function testCannotPurchasePostIfPostDoesNotExist() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    vm.expectRevert(PostNotFound.selector);
+    spotlight.purchasePost("does-not-exist", "pubkey");
+  }
+
+  function testCannotPurchasePostIfNotRegistered() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, true);
+    vm.stopPrank();
+
+    vm.startPrank(vm.addr(2));
+    vm.expectRevert(ProfileNotExist.selector);
+    spotlight.purchasePost(signature, "pubkey");
+  }
+
+  function testCannotPurchasePostIfPostIsNotPaywalled() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, false);
+    vm.stopPrank();
+
+    address otherUser = vm.addr(2);
+    vm.startPrank(otherUser);
+    spotlight.registerProfile("username2");
+    vm.expectRevert(PostNotPaywalled.selector);
+    spotlight.purchasePost(signature, "pubkey");
+  }
+
+  function testCreatorCannotPayForTheirOwnContent() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, true);
+    vm.expectRevert(CreatorCannotPayForOwnContent.selector);
+    spotlight.purchasePost(signature, "pubkey");
+  }
+
+  function testUserCannotPurchasePostWithoutProperFunds() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, true);
+
+    address otherUser = vm.addr(2);
+    vm.startPrank(otherUser);
+    spotlight.registerProfile("username2");
+    vm.expectRevert(InsufficentPostFunds.selector);
+    spotlight.purchasePost(signature, "pubkey");
+  }
+
+  function testUserCannotDoublePurchaseAPost() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, true);
+
+    address otherUser = vm.addr(2);
+    startHoax(otherUser); // prank, but w/ a balance
+    spotlight.registerProfile("username2");
+
+    vm.expectEmit();
+    emit PostPurchased(otherUser, signature);
+    spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
+    assertTrue(spotlight.hasPurchasedPost(signature));
+
+    vm.expectRevert(PostAlreadyPurchased.selector);
+    spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
+  }
 }

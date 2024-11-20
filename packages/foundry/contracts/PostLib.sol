@@ -20,18 +20,17 @@ library PostLib {
     uint256 upvoteCount;
     uint256 downvoteCount;
   }
+  // TODO: Add a community pointer
+  /* NICE TO HAVE:
+      If we want to get fancy, we can ensure uniqueness by requiring post creation to include a nonce that is equal to 
+      exactly 1 + userProfile.postNonce
+  */
 
   struct Comment {
     address commenter;
     string content;
     uint256 createdAt;
   }
-  // TODO: Add a community pointer
-  // TODO: Add comments
-  /* NICE TO HAVE: 
-      If we want to get fancy, we can ensure uniqueness by requiring post creation to include a nonce that is equal to 
-      exactly 1 + userProfile.postNonce
-  */
 
   function abiEncodePost(string memory _title, string memory _content, uint256 _nonce)
     internal

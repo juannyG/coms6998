@@ -38,6 +38,7 @@ export const WriteOnlyFunctionForm = ({
   const writeTxn = useTransactor();
   const { targetNetwork } = useTargetNetwork();
   const writeDisabled = !chain || chain?.id !== targetNetwork.id;
+  const { address: userAddress } = useAccount();
 
   const { data: result, isPending, writeContractAsync } = useWriteContract();
 
@@ -46,6 +47,7 @@ export const WriteOnlyFunctionForm = ({
       try {
         const makeWriteWithParams = () =>
           writeContractAsync({
+            account: userAddress,
             address: contractAddress,
             functionName: abiFunction.name,
             abi: abi,

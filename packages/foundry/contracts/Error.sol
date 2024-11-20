@@ -37,3 +37,11 @@ error OnlySpotlightContractCanIssueTokens();
 error OnlySpotlightContractCanBurnTokens();
 
 error AvatarCIDCannotBeEmpty();
+
+error InsufficentPostFunds();
+
+error PostAlreadyPurchased();
+
+error PostNotPaywalled();
+
+error CreatorCannotPayForOwnContent();

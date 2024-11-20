@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { InheritanceTooltip } from "./InheritanceTooltip";
 import { Abi, AbiFunction } from "abitype";
 import { Address } from "viem";
-import { useReadContract } from "wagmi";
+import { useAccount, useReadContract } from "wagmi";
 import {
   ContractInput,
   displayTxResult,
@@ -32,8 +32,10 @@ export const ReadOnlyFunctionForm = ({
   const [form, setForm] = useState<Record<string, any>>(() => getInitialFormState(abiFunction));
   const [result, setResult] = useState<unknown>();
   const { targetNetwork } = useTargetNetwork();
+  const { address: userAddress } = useAccount();
 
   const { isFetching, refetch, error } = useReadContract({
+    account: userAddress,
     address: contractAddress,
     functionName: abiFunction.name,
     abi: abi,

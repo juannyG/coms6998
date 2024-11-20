@@ -5,6 +5,7 @@ pragma solidity >=0.8.0 <0.9.0;
 import "forge-std/console.sol";
 import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 import "./PostLib.sol";
 import "./Events.sol";
@@ -15,7 +16,9 @@ import "./Error.sol";
 /// @author Team
 /// @notice You can use this contract to manage user profiles and create posts.
 /// @dev This contract is intended to be deployed on Ethereum-compatible networks.
-contract Spotlight {
+contract Spotlight is ReentrancyGuard {
+  uint256 public constant PAYWALL_COST = 0.1 ether;
+
   /// @notice The owner of the contract.
   address public owner;
 
@@ -30,6 +33,18 @@ contract Spotlight {
   /// @dev Mapping from signature of post (post ID) to post content
   mapping(bytes => PostLib.Post) internal postStore;
   mapping(bytes => PostLib.Comment[]) internal postComments;
+
+  /// @dev post ID => wallet addr => pubKey for encryption
+  mapping(bytes => mapping(address => string)) internal purchaserPublicKeys;
+
+  /// @dev Pointer struct for traversal of purchaserPublicKeys
+  struct PendingPurchase {
+    address purchaser;
+    bytes postId;
+  }
+
+  // Map of creator address => list of (users + posts) have they paid for?
+  mapping(address => PendingPurchase[]) internal pendingPurchases;
 
   // TODO: Support >1 community
   /* TODO:
@@ -376,5 +391,33 @@ contract Spotlight {
   function updateAvatarCID(string calldata _cid) public onlyRegistered {
     if (bytes(_cid).length == 0) revert AvatarCIDCannotBeEmpty();
     profiles[msg.sender].avatarCID = _cid;
+  }
+
+  function hasPurchasedPost(bytes calldata _id) public view onlyRegistered postExists(_id) returns (bool) {
+    /**
+     * TODO: This needs to be modified, i.e. if the creator accepts your payment - it wouldn't be "PENDING"
+     * anymore - it would be in the user's mapping storing their copy of the post, which they can decrypt.
+     * That data structure doesn't exist yet...
+     */
+    return bytes(purchaserPublicKeys[_id][msg.sender]).length > 0;
+  }
+
+  function purchasePost(bytes calldata _id, string calldata _pubkey)
+    public
+    payable
+    onlyRegistered
+    postExists(_id)
+    nonReentrant
+  {
+    if (!postStore[_id].paywalled) revert PostNotPaywalled();
+    if (msg.sender == postStore[_id].creator) revert CreatorCannotPayForOwnContent();
+    if (msg.value < PAYWALL_COST) revert InsufficentPostFunds();
+
+    // TODO: This will need to be modified - same reason(s) stated in `hasPurchasedPost` above
+    if (bytes(purchaserPublicKeys[_id][msg.sender]).length > 0) revert PostAlreadyPurchased();
+
+    purchaserPublicKeys[_id][msg.sender] = _pubkey;
+    pendingPurchases[postStore[_id].creator].push(PendingPurchase(msg.sender, _id));
+    emit PostPurchased(msg.sender, _id);
   }
 }

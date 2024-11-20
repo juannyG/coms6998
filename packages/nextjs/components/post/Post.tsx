@@ -3,17 +3,27 @@ import PostDeleteModal from "./DeleteModal";
 import PostEditModal from "./EditModal";
 import PostFooter from "./Footer";
 import PostHeader from "./Header";
-import { Hex } from "viem";
+import { Hex, parseEther, toHex } from "viem";
 import { useAccount } from "wagmi";
 import Viewer from "~~/app/feed/richTextEditor/Viewer";
 import { PostDisplayContext } from "~~/contexts/Post";
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { notification } from "~~/utils/scaffold-eth";
 
 const Post = ({ postId }: { postId: Hex }) => {
   const { address } = useAccount();
   const { compactDisplay, showPostMgmt, onProfile } = useContext(PostDisplayContext);
   const [content, setContent] = useState("");
   const [decrypted, setDecrypted] = useState(false);
+  const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
+  const { data: hasPurchasedPost } = useScaffoldReadContract({
+    account: address,
+    contractName: "Spotlight",
+    functionName: "hasPurchasedPost",
+    args: [postId],
+    watch: true,
+  });
+
   const { data: post } = useScaffoldReadContract({
     account: address,
     contractName: "Spotlight",
@@ -37,12 +47,11 @@ const Post = ({ postId }: { postId: Hex }) => {
   const onClickUnlockPost = async (evt: React.MouseEvent<HTMLButtonElement>) => {
     evt.stopPropagation();
     if (address == post.creator) {
-      // sleep for 500ms - metamask gets unhappy if you spam it with back-2-back reqs
-      // await new Promise(f => setTimeout(f, 500));
       try {
+        // TODO: use a util for this
         const decryptedContent = await window.ethereum.request({
           method: "eth_decrypt",
-          params: [`0x${Buffer.from(post.content, "utf8").toString("hex")}`, address],
+          params: [toHex(Buffer.from(post.content, "utf8")), address],
         });
         setContent(decryptedContent);
         setDecrypted(true);
@@ -50,7 +59,35 @@ const Post = ({ postId }: { postId: Hex }) => {
         console.log(e);
       }
     } else {
-      alert("Purchasing paywalled content coming soon...");
+      try {
+        // TODO: !!!Check if user has already payed for post!!!
+        if (hasPurchasedPost) {
+          notification.info(
+            "You have already purchased this post. Please wait for the creator to grant or decline your request.",
+          );
+          return;
+        }
+
+        // TODO: util for this
+        const publicKey = await window.ethereum.request({
+          method: "eth_getEncryptionPublicKey",
+          params: [address.toLowerCase()],
+        });
+
+        // console.log("pubKey for encryption:", publicKey);
+        // console.log("i want to pay for", post.id);
+
+        // sleep for 500ms - metamask gets unhappy if you spam it with back-2-back reqs
+        // console.log("calling Spotlight.purchasePost");
+        await new Promise(f => setTimeout(f, 500));
+        await writeSpotlightContractAsync({
+          functionName: "purchasePost",
+          args: [post.id, publicKey],
+          value: parseEther("0.1"),
+        });
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 

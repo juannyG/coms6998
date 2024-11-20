@@ -45,14 +45,16 @@ const PostHeader = ({
       <CreatorDisplay post={post} />
 
       <div className="flex gap-2">
+        <>
+          {post.paywalled && paywallSupported && !decrypted && (
+            <button className="btn btn-danger btn-sm" onClick={e => onClickUnlockPost(e)}>
+              <Image alt="Unlock Post" className="cursor-pointer" width="20" height="25" src="/lock-open.svg" />
+            </button>
+          )}
+        </>
         {address === post.creator && showPostMgmt && (
           <>
             {/* TODO: Think about support for editing paywalled post... */}
-            {post.paywalled && paywallSupported && !decrypted && (
-              <button className="btn btn-danger btn-sm" onClick={e => onClickUnlockPost(e)}>
-                <Image alt="Unlock Post" className="cursor-pointer" width="20" height="25" src="/lock-open.svg" />
-              </button>
-            )}
             {!post.paywalled && (
               <button className="btn btn-danger btn-sm" onClick={e => onClickEditPost(e)} disabled={editing}>
                 <Image alt="Edit Post" className="cursor-pointer" width="20" height="25" src="/pencil.svg" />
