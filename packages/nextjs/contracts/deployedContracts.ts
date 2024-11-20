@@ -22,6 +22,19 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "PAYWALL_COST",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "addComment",
           inputs: [
             {
@@ -442,6 +455,25 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "hasPurchasedPost",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "isRegistered",
           inputs: [
             {
@@ -471,6 +503,24 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "purchasePost",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_pubkey",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
+          stateMutability: "payable",
         },
         {
           type: "function",
@@ -657,6 +707,25 @@ const deployedContracts = {
         },
         {
           type: "event",
+          name: "PostPurchased",
+          inputs: [
+            {
+              name: "purchaser",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "postId",
+              type: "bytes",
+              indexed: true,
+              internalType: "bytes",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
           name: "PostUpvoted",
           inputs: [
             {
@@ -742,6 +811,16 @@ const deployedContracts = {
         },
         {
           type: "error",
+          name: "CreatorCannotPayForOwnContent",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "InsufficentPostFunds",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "InvalidSignature",
           inputs: [],
         },
@@ -752,7 +831,17 @@ const deployedContracts = {
         },
         {
           type: "error",
+          name: "PostAlreadyPurchased",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "PostNotFound",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostNotPaywalled",
           inputs: [],
         },
         {
@@ -763,6 +852,11 @@ const deployedContracts = {
         {
           type: "error",
           name: "ProfileNotExist",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ReentrancyGuardReentrantCall",
           inputs: [],
         },
         {
@@ -806,6 +900,19 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "PAYWALL_COST",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "addComment",
           inputs: [
             {
@@ -1226,6 +1333,25 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "hasPurchasedPost",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "isRegistered",
           inputs: [
             {
@@ -1255,6 +1381,24 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "purchasePost",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_pubkey",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
+          stateMutability: "payable",
         },
         {
           type: "function",
@@ -1441,6 +1585,25 @@ const deployedContracts = {
         },
         {
           type: "event",
+          name: "PostPurchased",
+          inputs: [
+            {
+              name: "purchaser",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "postId",
+              type: "bytes",
+              indexed: true,
+              internalType: "bytes",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
           name: "PostUpvoted",
           inputs: [
             {
@@ -1526,6 +1689,16 @@ const deployedContracts = {
         },
         {
           type: "error",
+          name: "CreatorCannotPayForOwnContent",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "InsufficentPostFunds",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "InvalidSignature",
           inputs: [],
         },
@@ -1536,7 +1709,17 @@ const deployedContracts = {
         },
         {
           type: "error",
+          name: "PostAlreadyPurchased",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "PostNotFound",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostNotPaywalled",
           inputs: [],
         },
         {
@@ -1547,6 +1730,11 @@ const deployedContracts = {
         {
           type: "error",
           name: "ProfileNotExist",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ReentrancyGuardReentrantCall",
           inputs: [],
         },
         {

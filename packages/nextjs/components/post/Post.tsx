@@ -3,17 +3,27 @@ import PostDeleteModal from "./DeleteModal";
 import PostEditModal from "./EditModal";
 import PostFooter from "./Footer";
 import PostHeader from "./Header";
-import { Hex, toHex } from "viem";
+import { Hex, parseEther, toHex } from "viem";
 import { useAccount } from "wagmi";
 import Viewer from "~~/app/feed/richTextEditor/Viewer";
 import { PostDisplayContext } from "~~/contexts/Post";
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { notification } from "~~/utils/scaffold-eth";
 
 const Post = ({ postId }: { postId: Hex }) => {
   const { address } = useAccount();
   const { compactDisplay, showPostMgmt, onProfile } = useContext(PostDisplayContext);
   const [content, setContent] = useState("");
   const [decrypted, setDecrypted] = useState(false);
+  const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
+  const { data: hasPurchasedPost } = useScaffoldReadContract({
+    account: address,
+    contractName: "Spotlight",
+    functionName: "hasPurchasedPost",
+    args: [postId],
+    watch: true,
+  });
+
   const { data: post } = useScaffoldReadContract({
     account: address,
     contractName: "Spotlight",
@@ -51,6 +61,12 @@ const Post = ({ postId }: { postId: Hex }) => {
     } else {
       try {
         // TODO: !!!Check if user has already payed for post!!!
+        if (hasPurchasedPost) {
+          notification.info(
+            "You have already purchased this post. Please wait for the creator to grant or decline your request.",
+          );
+          return;
+        }
 
         // TODO: util for this
         const publicKey = await window.ethereum.request({
@@ -58,12 +74,17 @@ const Post = ({ postId }: { postId: Hex }) => {
           params: [address.toLowerCase()],
         });
 
-        console.log("pubKey for encryption:", publicKey);
-        console.log("i want to pay for", post.id);
+        // console.log("pubKey for encryption:", publicKey);
+        // console.log("i want to pay for", post.id);
 
         // sleep for 500ms - metamask gets unhappy if you spam it with back-2-back reqs
-        // await new Promise(f => setTimeout(f, 500));
-        console.log("calling Spotlight.purchasePost");
+        // console.log("calling Spotlight.purchasePost");
+        await new Promise(f => setTimeout(f, 500));
+        await writeSpotlightContractAsync({
+          functionName: "purchasePost",
+          args: [post.id, publicKey],
+          value: parseEther("0.1"),
+        });
       } catch (e) {
         console.log(e);
       }
