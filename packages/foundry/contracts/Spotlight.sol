@@ -34,8 +34,17 @@ contract Spotlight is ReentrancyGuard {
   mapping(bytes => PostLib.Post) internal postStore;
   mapping(bytes => PostLib.Comment[]) internal postComments;
 
-  // @dev post ID => wallet addr => pubKey for encryption
-  mapping(bytes => mapping(address => string)) internal postsPendingPurchase;
+  /// @dev post ID => wallet addr => pubKey for encryption
+  mapping(bytes => mapping(address => string)) internal purchaserPublicKeys;
+
+  /// @dev Pointer struct for traversal of purchaserPublicKeys
+  struct PendingPurchase {
+    address purchaser;
+    bytes postId;
+  }
+
+  // Map of creator address => list of (users + posts) have they paid for?
+  mapping(address => PendingPurchase[]) internal pendingPurchases;
 
   // TODO: Support >1 community
   /* TODO:
@@ -390,7 +399,7 @@ contract Spotlight is ReentrancyGuard {
      * anymore - it would be in the user's mapping storing their copy of the post, which they can decrypt.
      * That data structure doesn't exist yet...
      */
-    return bytes(postsPendingPurchase[_id][msg.sender]).length > 0;
+    return bytes(purchaserPublicKeys[_id][msg.sender]).length > 0;
   }
 
   function purchasePost(bytes calldata _id, string calldata _pubkey)
@@ -403,8 +412,12 @@ contract Spotlight is ReentrancyGuard {
     if (!postStore[_id].paywalled) revert PostNotPaywalled();
     if (msg.sender == postStore[_id].creator) revert CreatorCannotPayForOwnContent();
     if (msg.value < PAYWALL_COST) revert InsufficentPostFunds();
-    if (bytes(postsPendingPurchase[_id][msg.sender]).length > 0) revert PostAlreadyPurchased();
-    postsPendingPurchase[_id][msg.sender] = _pubkey;
+
+    // TODO: This will need to be modified - same reason(s) stated in `hasPurchasedPost` above
+    if (bytes(purchaserPublicKeys[_id][msg.sender]).length > 0) revert PostAlreadyPurchased();
+
+    purchaserPublicKeys[_id][msg.sender] = _pubkey;
+    pendingPurchases[postStore[_id].creator].push(PendingPurchase(msg.sender, _id));
     emit PostPurchased(msg.sender, _id);
   }
 }
