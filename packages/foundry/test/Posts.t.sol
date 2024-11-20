@@ -446,7 +446,7 @@ contract PostManagementTest is Test {
     vm.expectEmit();
     emit PostPurchased(otherUser, signature);
     spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
-    assertTrue(spotlight.hasPurchasedPost(signature));
+    assertTrue(spotlight.isPurchasePending(signature));
 
     vm.expectRevert(PostAlreadyPurchased.selector);
     spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
