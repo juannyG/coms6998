@@ -425,4 +425,24 @@ contract Spotlight is ReentrancyGuard {
   function getPendingPurchases() public view onlyRegistered returns (PendingPurchase[] memory) {
     return pendingPurchases[msg.sender];
   }
+
+  // function declinePurchase(bytes calldata _id, address payable purchaser)
+  //   public
+  //   onlyRegistered
+  //   postExists(_id)
+  //   nonReentrant
+  // {
+  //   // TODO: Only the owner of the post can decline a purchase
+  //   // TODO: Make sure the contract has the funds to handle the refund of the decline
+  //   purchaser.transfer(0.1 ether);
+
+  //   for (uint256 i = 0; i < pendingPurchases[msg.sender].length; i++) {
+  //     if (keccak256(pendingPurchases[msg.sender][i].postId) == keccak256(_id)) {
+  //       pendingPurchases[msg.sender][i] = pendingPurchases[msg.sender][pendingPurchases[msg.sender].length - 1];
+  //       pendingPurchases[msg.sender].pop();
+  //       break;
+  //     }
+  //   }
+  //   delete purchaserPublicKeys[_id][purchaser];
+  // }
 }

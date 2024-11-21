@@ -1,9 +1,10 @@
 import { encrypt } from "@metamask/eth-sig-util";
 import { toHex } from "viem";
+// import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { TPendingPurchase, TPost } from "~~/types/spotlight";
 
 const PendingPurchase = ({ post, pendingPurchase }: { post: TPost; pendingPurchase: TPendingPurchase }) => {
-  console.log("Pending purchaser:", pendingPurchase);
+  // const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
 
   const acceptPurchase = async () => {
     const decryptedContent = await window.ethereum.request({
@@ -22,6 +23,10 @@ const PendingPurchase = ({ post, pendingPurchase }: { post: TPost; pendingPurcha
 
   const decline = async () => {
     console.log("call declinePurchase contract method");
+    // await writeSpotlightContractAsync({
+    //   functionName: "declinePurchase",
+    //   args: [post.id, pendingPurchase.purchaser],
+    // });
   };
 
   const shortendAddr =
