@@ -267,6 +267,36 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "getPendingPurchases",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "tuple[]",
+              internalType: "struct Spotlight.PendingPurchase[]",
+              components: [
+                {
+                  name: "purchaser",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "postId",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "pubkey",
+                  type: "string",
+                  internalType: "string",
+                },
+              ],
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "getPost",
           inputs: [
             {
@@ -455,7 +485,7 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "hasPurchasedPost",
+          name: "isPurchasePending",
           inputs: [
             {
               name: "_id",
@@ -1145,6 +1175,36 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "getPendingPurchases",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "tuple[]",
+              internalType: "struct Spotlight.PendingPurchase[]",
+              components: [
+                {
+                  name: "purchaser",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "postId",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "pubkey",
+                  type: "string",
+                  internalType: "string",
+                },
+              ],
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "getPost",
           inputs: [
             {
@@ -1333,7 +1393,7 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "hasPurchasedPost",
+          name: "isPurchasePending",
           inputs: [
             {
               name: "_id",

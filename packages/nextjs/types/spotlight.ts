@@ -35,3 +35,9 @@ export interface TComment {
   content: string;
   createdAt: bigint;
 }
+
+export interface TPendingPurchase {
+  postId: Hex;
+  pubkey: string;
+  purchaser: Address;
+}

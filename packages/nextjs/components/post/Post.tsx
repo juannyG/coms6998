@@ -3,9 +3,12 @@ import PostDeleteModal from "./DeleteModal";
 import PostEditModal from "./EditModal";
 import PostFooter from "./Footer";
 import PostHeader from "./Header";
+import ManagePendingPurchases from "./ManagePendingPurchases";
+import PaywallMessage from "./PaywallMessage";
 import { Hex, parseEther, toHex } from "viem";
 import { useAccount } from "wagmi";
 import Viewer from "~~/app/feed/richTextEditor/Viewer";
+import { PaywallSupportContext } from "~~/contexts/PaywallSupport";
 import { PostDisplayContext } from "~~/contexts/Post";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
@@ -13,13 +16,14 @@ import { notification } from "~~/utils/scaffold-eth";
 const Post = ({ postId }: { postId: Hex }) => {
   const { address } = useAccount();
   const { compactDisplay, showPostMgmt, onProfile } = useContext(PostDisplayContext);
+  const { paywallSupported } = useContext(PaywallSupportContext);
   const [content, setContent] = useState("");
   const [decrypted, setDecrypted] = useState(false);
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
-  const { data: hasPurchasedPost } = useScaffoldReadContract({
+  const { data: purchasePending } = useScaffoldReadContract({
     account: address,
     contractName: "Spotlight",
-    functionName: "hasPurchasedPost",
+    functionName: "isPurchasePending",
     args: [postId],
     watch: true,
   });
@@ -61,10 +65,8 @@ const Post = ({ postId }: { postId: Hex }) => {
     } else {
       try {
         // TODO: !!!Check if user has already payed for post!!!
-        if (hasPurchasedPost) {
-          notification.info(
-            "You have already purchased this post. Please wait for the creator to grant or decline your request.",
-          );
+        if (purchasePending) {
+          notification.info("You have already purchased this post. Please wait for the creator handle your request.");
           return;
         }
 
@@ -91,9 +93,6 @@ const Post = ({ postId }: { postId: Hex }) => {
     }
   };
 
-  const trimId = post.id.substring(0, 6) + "..." + post.id.substring(post.id.length - 4);
-  const TEMP_PAYWALL_MSG = `${trimId} is paywalled - support coming soon`;
-
   return (
     <>
       {!onProfile && (
@@ -106,19 +105,31 @@ const Post = ({ postId }: { postId: Hex }) => {
       {onProfile ? (
         <div className="cursor-pointer flex flex-col w-full">
           <p className="w-[100%] text-lg font-bold text-left text-black">{post.title}</p>
-          {post.paywalled && !decrypted ? TEMP_PAYWALL_MSG : <Viewer data={content} />}
+          {post.paywalled && !decrypted ? (
+            <PaywallMessage post={post} paywallSupported={paywallSupported} purchasePending={purchasePending} />
+          ) : (
+            <Viewer data={content} />
+          )}
         </div>
       ) : compactDisplay ? (
         <div className="cursor-pointer flex flex-col w-full p-4 gap-4">
           <p className="w-[100%] text-lg font-bold text-left text-black">{post.title}</p>
-          {post.paywalled && !decrypted ? TEMP_PAYWALL_MSG : <Viewer data={content} />}
+          {post.paywalled && !decrypted ? (
+            <PaywallMessage post={post} paywallSupported={paywallSupported} purchasePending={purchasePending} />
+          ) : (
+            <Viewer data={content} />
+          )}
         </div>
       ) : (
         <>
           <div className="p-[10px]">
             <p className="text-2xl font-bold">{post.title}</p>
           </div>
-          {post.paywalled && !decrypted ? TEMP_PAYWALL_MSG : <Viewer data={content} />}
+          {post.paywalled && !decrypted ? (
+            <PaywallMessage post={post} paywallSupported={paywallSupported} purchasePending={purchasePending} />
+          ) : (
+            <Viewer data={content} />
+          )}
         </>
       )}
 
@@ -130,6 +141,8 @@ const Post = ({ postId }: { postId: Hex }) => {
         <>
           <PostDeleteModal post={post} />
           <PostEditModal post={post} />
+
+          {post.paywalled && post.creator == address && <ManagePendingPurchases post={post} />}
         </>
       )}
     </>

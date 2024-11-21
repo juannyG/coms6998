@@ -41,6 +41,7 @@ contract Spotlight is ReentrancyGuard {
   struct PendingPurchase {
     address purchaser;
     bytes postId;
+    string pubkey;
   }
 
   // Map of creator address => list of (users + posts) have they paid for?
@@ -393,7 +394,7 @@ contract Spotlight is ReentrancyGuard {
     profiles[msg.sender].avatarCID = _cid;
   }
 
-  function hasPurchasedPost(bytes calldata _id) public view onlyRegistered postExists(_id) returns (bool) {
+  function isPurchasePending(bytes calldata _id) public view onlyRegistered postExists(_id) returns (bool) {
     /**
      * TODO: This needs to be modified, i.e. if the creator accepts your payment - it wouldn't be "PENDING"
      * anymore - it would be in the user's mapping storing their copy of the post, which they can decrypt.
@@ -417,7 +418,31 @@ contract Spotlight is ReentrancyGuard {
     if (bytes(purchaserPublicKeys[_id][msg.sender]).length > 0) revert PostAlreadyPurchased();
 
     purchaserPublicKeys[_id][msg.sender] = _pubkey;
-    pendingPurchases[postStore[_id].creator].push(PendingPurchase(msg.sender, _id));
+    pendingPurchases[postStore[_id].creator].push(PendingPurchase(msg.sender, _id, _pubkey));
     emit PostPurchased(msg.sender, _id);
   }
+
+  function getPendingPurchases() public view onlyRegistered returns (PendingPurchase[] memory) {
+    return pendingPurchases[msg.sender];
+  }
+
+  // function declinePurchase(bytes calldata _id, address payable purchaser)
+  //   public
+  //   onlyRegistered
+  //   postExists(_id)
+  //   nonReentrant
+  // {
+  //   // TODO: Only the owner of the post can decline a purchase
+  //   // TODO: Make sure the contract has the funds to handle the refund of the decline
+  //   purchaser.transfer(0.1 ether);
+
+  //   for (uint256 i = 0; i < pendingPurchases[msg.sender].length; i++) {
+  //     if (keccak256(pendingPurchases[msg.sender][i].postId) == keccak256(_id)) {
+  //       pendingPurchases[msg.sender][i] = pendingPurchases[msg.sender][pendingPurchases[msg.sender].length - 1];
+  //       pendingPurchases[msg.sender].pop();
+  //       break;
+  //     }
+  //   }
+  //   delete purchaserPublicKeys[_id][purchaser];
+  // }
 }
