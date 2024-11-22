@@ -18,6 +18,8 @@ contract Reputation is ERC20 {
   }
 
   function setPostsContract(address _addr) public {
+    // TODO: Better error message
+    // TODO: Unit test
     if (msg.sender != spotlightContract) revert OnlySpotlightContractCanIssueTokens();
     if (_addr == address(0)) revert CannotIssueToZeroAddress();
     postsContract = _addr;

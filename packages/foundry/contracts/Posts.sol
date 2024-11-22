@@ -5,8 +5,6 @@ import "./Error.sol";
 import "./PostLib.sol";
 import "./Reputation.sol";
 
-// TODO: NEEDS ACCESS TO REPUTATION TOKEN!
-
 contract Posts {
   address public immutable spotlightContract;
   /// @notice Reputation token contract
