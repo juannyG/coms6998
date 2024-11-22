@@ -45,3 +45,5 @@ error PostAlreadyPurchased();
 error PostNotPaywalled();
 
 error CreatorCannotPayForOwnContent();
+
+error OnlySpotlightCanManagePosts();
