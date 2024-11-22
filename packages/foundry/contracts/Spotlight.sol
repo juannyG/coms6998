@@ -13,6 +13,10 @@ import "./Events.sol";
 import "./Reputation.sol";
 import "./Error.sol";
 
+////////////////////////////////////////////////////////////
+// TODO: All writes must validate msg.sender != address(0)
+////////////////////////////////////////////////////////////
+
 /// @title Spotlight - A decentralized reddit
 /// @author Team
 /// @notice You can use this contract to manage user profiles and create posts.
@@ -242,17 +246,17 @@ contract Spotlight is ReentrancyGuard {
   }
 
   function isPurchasePending(bytes calldata _id) public view returns (bool) {
-    /**
-     * TODO: This needs to be modified, i.e. if the creator accepts your payment - it wouldn't be "PENDING"
-     * anymore - it would be in the user's mapping storing their copy of the post, which they can decrypt.
-     * That data structure doesn't exist yet...
-     */
     return postsContract.isPurchasePending(msg.sender, _id);
   }
 
   function purchasePost(bytes calldata _id, string calldata _pubkey) public payable onlyRegistered nonReentrant {
     if (msg.value < PAYWALL_COST) revert InsufficentPostFunds();
     postsContract.purchasePost(msg.sender, _id, _pubkey);
+    if (msg.value > PAYWALL_COST) {
+      // Refund any excess ether back to the user
+      uint256 excess = msg.value - PAYWALL_COST;
+      payable(msg.sender).transfer(excess);
+    }
     emit PostPurchased(msg.sender, _id);
   }
 

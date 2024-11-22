@@ -47,3 +47,13 @@ error PostNotPaywalled();
 error CreatorCannotPayForOwnContent();
 
 error OnlySpotlightCanManagePosts();
+
+error ReputationAddressCannotBeZero();
+
+error PostCreatorCannotBeZero();
+
+error CommentCannotBeEmpty();
+
+error OnlyCreatorCanDeclinePurchase();
+
+error NoPendingPurchaseFound();

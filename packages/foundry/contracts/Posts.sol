@@ -50,6 +50,7 @@ contract Posts {
 
   constructor(address _spotlightContract, address _reputationContract) {
     if (_spotlightContract == address(0)) revert SpotlightAddressCannotBeZero();
+    if (_reputationContract == address(0)) revert ReputationAddressCannotBeZero();
     spotlightContract = _spotlightContract;
     reputationToken = Reputation(_reputationContract);
   }
@@ -241,7 +242,7 @@ contract Posts {
   function addComment(address _addr, bytes calldata _id, string calldata _content) public {
     if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
     checkPostExists(_id);
-    require(bytes(_content).length > 0, "Comment cannot be empty");
+    if (bytes(_content).length == 0) revert CommentCannotBeEmpty();
 
     PostLib.Comment memory newComment =
       PostLib.Comment({ commenter: _addr, content: _content, createdAt: block.timestamp });
@@ -284,8 +285,9 @@ contract Posts {
   function declinePurchase(address _addr, bytes calldata _id, address payable purchaser) public {
     if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
     checkPostExists(_id);
-
-    // TODO: Only the owner of the post can decline a purchase
+    if (postStore[_id].creator != _addr) revert OnlyCreatorCanDeclinePurchase();
+    if (!postStore[_id].paywalled) revert PostNotPaywalled();
+    if (!isPurchasePending(purchaser, _id)) revert NoPendingPurchaseFound();
 
     for (uint256 i = 0; i < pendingPurchases[_addr].length; i++) {
       if (keccak256(pendingPurchases[_addr][i].postId) == keccak256(_id)) {
