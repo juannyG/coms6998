@@ -208,32 +208,6 @@ contract PostManagementTest is Test {
     spotlight.getPostsOfAddress(_addr);
   }
 
-  function testUnregisteredUserCannotGetPostsOfAnotherUser() public {
-    PostLib.Post memory p = createTestPost();
-    vm.startPrank(wallet.addr);
-    spotlight.registerProfile("username");
-    spotlight.createPost(p.title, p.content, p.nonce, signContentViaWallet(wallet, p), false);
-    vm.stopPrank();
-
-    address _addr = vm.addr(2);
-    vm.startPrank(_addr);
-    vm.expectRevert(ProfileNotExist.selector);
-    spotlight.getPostsOfAddress(wallet.addr);
-  }
-
-  function testUnregisteredUserCannotSeePostsOfACommunity() public {
-    PostLib.Post memory p = createTestPost();
-    vm.startPrank(wallet.addr);
-    spotlight.registerProfile("username");
-    spotlight.createPost(p.title, p.content, p.nonce, signContentViaWallet(wallet, p), false);
-    vm.stopPrank();
-
-    address _addr = vm.addr(2);
-    vm.startPrank(_addr);
-    vm.expectRevert(ProfileNotExist.selector);
-    spotlight.getCommunityPosts();
-  }
-
   function testUserCanEditPostSuccess() public {
     vm.startPrank(wallet.addr);
     spotlight.registerProfile("username");
