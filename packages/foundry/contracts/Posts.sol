@@ -1,13 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-import "./PostLib.sol";
 import "./Error.sol";
+import "./PostLib.sol";
+import "./Reputation.sol";
 
 // TODO: NEEDS ACCESS TO REPUTATION TOKEN!
 
 contract Posts {
   address public immutable spotlightContract;
+  /// @notice Reputation token contract
+  Reputation private reputationToken;
 
   // TODO: Support >1 community
   /* TODO:
@@ -47,9 +50,10 @@ contract Posts {
   // Map of creator address => list of (users + posts) have they paid for?
   mapping(address => PendingPurchase[]) internal pendingPurchases;
 
-  constructor(address _spotlightContract) {
+  constructor(address _spotlightContract, address _reputationContract) {
     if (_spotlightContract == address(0)) revert SpotlightAddressCannotBeZero();
     spotlightContract = _spotlightContract;
+    reputationToken = Reputation(_reputationContract);
   }
 
   function checkPostExists(bytes memory _id) internal view {
@@ -198,20 +202,20 @@ contract Posts {
     PostLib.Post storage p = postStore[_id];
     if (upvotedBy[_id][_addr]) {
       p.upvoteCount--;
-      //   reputationToken.revertUpvotePost(p.creator);
+      reputationToken.revertUpvotePost(p.creator);
       delete upvotedBy[_id][_addr];
       return;
     }
 
     if (downvotedBy[_id][_addr]) {
       p.downvoteCount--;
-      //   reputationToken.revertDownvotePost(p.creator);
+      reputationToken.revertDownvotePost(p.creator);
       delete downvotedBy[_id][_addr];
     }
 
     p.upvoteCount++;
     upvotedBy[_id][_addr] = true;
-    // reputationToken.upvotePost(p.creator);
+    reputationToken.upvotePost(p.creator);
   }
 
   function downvote(address _addr, bytes calldata _id) public {
@@ -220,21 +224,20 @@ contract Posts {
     PostLib.Post storage p = postStore[_id];
     if (downvotedBy[_id][_addr]) {
       p.downvoteCount--;
-      //   reputationToken.revertDownvotePost(p.creator);
+      reputationToken.revertDownvotePost(p.creator);
       delete downvotedBy[_id][_addr];
       return;
     }
 
     if (upvotedBy[_id][_addr]) {
-      // TODO: undo upvote in reputationToken
       p.upvoteCount--;
-      //   reputationToken.revertUpvotePost(p.creator);
+      reputationToken.revertUpvotePost(p.creator);
       delete upvotedBy[_id][_addr];
     }
 
     p.downvoteCount++;
     downvotedBy[_id][_addr] = true;
-    // reputationToken.downvotePost(p.creator);
+    reputationToken.downvotePost(p.creator);
   }
 
   function addComment(address _addr, bytes calldata _id, string calldata _content) public {
@@ -253,55 +256,46 @@ contract Posts {
     return postComments[_id];
   }
 
-  //   function isPurchasePending(bytes calldata _id) public view onlyRegistered postExists(_id) returns (bool) {
-  //     /**
-  //      * TODO: This needs to be modified, i.e. if the creator accepts your payment - it wouldn't be "PENDING"
-  //      * anymore - it would be in the user's mapping storing their copy of the post, which they can decrypt.
-  //      * That data structure doesn't exist yet...
-  //      */
-  //     return bytes(purchaserPublicKeys[_id][msg.sender]).length > 0;
-  //   }
+  function isPurchasePending(address _addr, bytes calldata _id) public view returns (bool) {
+    /**
+     * TODO: This needs to be modified, i.e. if the creator accepts your payment - it wouldn't be "PENDING"
+     * anymore - it would be in the user's mapping storing their copy of the post, which they can decrypt.
+     * That data structure doesn't exist yet...
+     */
+    checkPostExists(_id);
+    return bytes(purchaserPublicKeys[_id][_addr]).length > 0;
+  }
 
-  //   function purchasePost(bytes calldata _id, string calldata _pubkey)
-  //     public
-  //     payable
-  //     onlyRegistered
-  //     postExists(_id)
-  //     nonReentrant
-  //   {
-  //     if (!postStore[_id].paywalled) revert PostNotPaywalled();
-  //     if (msg.sender == postStore[_id].creator) revert CreatorCannotPayForOwnContent();
-  //     if (msg.value < PAYWALL_COST) revert InsufficentPostFunds();
+  function purchasePost(address _addr, bytes calldata _id, string calldata _pubkey) public {
+    if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
+    checkPostExists(_id);
+    if (!postStore[_id].paywalled) revert PostNotPaywalled();
+    if (_addr == postStore[_id].creator) revert CreatorCannotPayForOwnContent();
 
-  //     // TODO: This will need to be modified - same reason(s) stated in `hasPurchasedPost` above
-  //     if (bytes(purchaserPublicKeys[_id][msg.sender]).length > 0) revert PostAlreadyPurchased();
+    // TODO: This will need to be modified - same reason(s) stated in `hasPurchasedPost` above
+    if (bytes(purchaserPublicKeys[_id][_addr]).length > 0) revert PostAlreadyPurchased();
 
-  //     purchaserPublicKeys[_id][msg.sender] = _pubkey;
-  //     pendingPurchases[postStore[_id].creator].push(PendingPurchase(msg.sender, _id, _pubkey));
-  //     emit PostPurchased(msg.sender, _id);
-  //   }
+    purchaserPublicKeys[_id][_addr] = _pubkey;
+    pendingPurchases[postStore[_id].creator].push(PendingPurchase(_addr, _id, _pubkey));
+  }
 
-  //   function getPendingPurchases() public view onlyRegistered returns (PendingPurchase[] memory) {
-  //     return pendingPurchases[msg.sender];
-  //   }
+  function getPendingPurchases(address _addr) public view returns (PendingPurchase[] memory) {
+    return pendingPurchases[_addr];
+  }
 
-  //   function declinePurchase(bytes calldata _id, address payable purchaser)
-  //     public
-  //     onlyRegistered
-  //     postExists(_id)
-  //     nonReentrant
-  //   {
-  //     // TODO: Only the owner of the post can decline a purchase
-  //     // TODO: Make sure the contract has the funds to handle the refund of the decline
-  //     purchaser.transfer(0.1 ether);
+  function declinePurchase(address _addr, bytes calldata _id, address payable purchaser) public {
+    if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
+    checkPostExists(_id);
 
-  //     for (uint256 i = 0; i < pendingPurchases[msg.sender].length; i++) {
-  //       if (keccak256(pendingPurchases[msg.sender][i].postId) == keccak256(_id)) {
-  //         pendingPurchases[msg.sender][i] = pendingPurchases[msg.sender][pendingPurchases[msg.sender].length - 1];
-  //         pendingPurchases[msg.sender].pop();
-  //         break;
-  //       }
-  //     }
-  //     delete purchaserPublicKeys[_id][purchaser];
-  //   }
+    // TODO: Only the owner of the post can decline a purchase
+
+    for (uint256 i = 0; i < pendingPurchases[_addr].length; i++) {
+      if (keccak256(pendingPurchases[_addr][i].postId) == keccak256(_id)) {
+        pendingPurchases[_addr][i] = pendingPurchases[_addr][pendingPurchases[_addr].length - 1];
+        pendingPurchases[_addr].pop();
+        break;
+      }
+    }
+    delete purchaserPublicKeys[_id][purchaser];
+  }
 }

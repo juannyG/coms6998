@@ -48,7 +48,8 @@ contract Spotlight is ReentrancyGuard {
   constructor(address _owner) {
     owner = _owner;
     reputationToken = new Reputation(address(this));
-    postsContract = new Posts(address(this));
+    postsContract = new Posts(address(this), address(reputationToken));
+    reputationToken.setPostsContract(address(postsContract));
   }
 
   /// @notice Modifier to ensure that only registered users can perform certain actions.
@@ -186,17 +187,18 @@ contract Spotlight is ReentrancyGuard {
 
   /// @notice Get all posts for a given address
   /// @param _addr Wallet address of the registered user whose posts we wish to retrieve
-  function getPostsOfAddress(address _addr) public view onlyRegistered returns (PostLib.Post[] memory) {
+  function getPostsOfAddress(address _addr) public view returns (PostLib.Post[] memory) {
+    if (!isRegistered(_addr)) revert AddressNotRegistered();
     return postsContract.getPostsOfAddress(_addr);
   }
 
-  function getPost(bytes calldata _post_sig) public view onlyRegistered returns (PostLib.Post memory) {
+  function getPost(bytes calldata _post_sig) public view returns (PostLib.Post memory) {
     return postsContract.getPost(_post_sig);
   }
 
   // TODO: add community ID argument - what community are you trying to get posts for?
   /// @notice Get all posts from a community
-  function getCommunityPosts() public view onlyRegistered returns (PostLib.Post[] memory) {
+  function getCommunityPosts() public view returns (PostLib.Post[] memory) {
     // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
     return postsContract.getCommunityPosts();
   }
@@ -216,7 +218,7 @@ contract Spotlight is ReentrancyGuard {
     emit PostUpvoted(msg.sender, _id);
   }
 
-  function upvotedBy(bytes calldata _id, address _addr) public view onlyRegistered returns (bool) {
+  function upvotedBy(bytes calldata _id, address _addr) public view returns (bool) {
     return postsContract.upvotedBy(_id, _addr);
   }
 
@@ -225,7 +227,7 @@ contract Spotlight is ReentrancyGuard {
     emit PostDownvoted(msg.sender, _id);
   }
 
-  function downvotedBy(bytes calldata _id, address _addr) public view onlyRegistered returns (bool) {
+  function downvotedBy(bytes calldata _id, address _addr) public view returns (bool) {
     return postsContract.downvotedBy(_id, _addr);
   }
 
@@ -235,59 +237,32 @@ contract Spotlight is ReentrancyGuard {
   }
 
   /// @notice Get comments for a given post ID
-  function getComments(bytes calldata _id) public view onlyRegistered returns (PostLib.Comment[] memory) {
+  function getComments(bytes calldata _id) public view returns (PostLib.Comment[] memory) {
     return postsContract.getComments(_id);
   }
 
-  // function isPurchasePending(bytes calldata _id) public view onlyRegistered postExists(_id) returns (bool) {
-  //   /**
-  //    * TODO: This needs to be modified, i.e. if the creator accepts your payment - it wouldn't be "PENDING"
-  //    * anymore - it would be in the user's mapping storing their copy of the post, which they can decrypt.
-  //    * That data structure doesn't exist yet...
-  //    */
-  //   return bytes(purchaserPublicKeys[_id][msg.sender]).length > 0;
-  // }
+  function isPurchasePending(bytes calldata _id) public view returns (bool) {
+    /**
+     * TODO: This needs to be modified, i.e. if the creator accepts your payment - it wouldn't be "PENDING"
+     * anymore - it would be in the user's mapping storing their copy of the post, which they can decrypt.
+     * That data structure doesn't exist yet...
+     */
+    return postsContract.isPurchasePending(msg.sender, _id);
+  }
 
-  // function purchasePost(bytes calldata _id, string calldata _pubkey)
-  //   public
-  //   payable
-  //   onlyRegistered
-  //   postExists(_id)
-  //   nonReentrant
-  // {
-  //   if (!postStore[_id].paywalled) revert PostNotPaywalled();
-  //   if (msg.sender == postStore[_id].creator) revert CreatorCannotPayForOwnContent();
-  //   if (msg.value < PAYWALL_COST) revert InsufficentPostFunds();
+  function purchasePost(bytes calldata _id, string calldata _pubkey) public payable onlyRegistered nonReentrant {
+    if (msg.value < PAYWALL_COST) revert InsufficentPostFunds();
+    postsContract.purchasePost(msg.sender, _id, _pubkey);
+    emit PostPurchased(msg.sender, _id);
+  }
 
-  //   // TODO: This will need to be modified - same reason(s) stated in `hasPurchasedPost` above
-  //   if (bytes(purchaserPublicKeys[_id][msg.sender]).length > 0) revert PostAlreadyPurchased();
+  function getPendingPurchases() public view returns (Posts.PendingPurchase[] memory) {
+    return postsContract.getPendingPurchases(msg.sender);
+  }
 
-  //   purchaserPublicKeys[_id][msg.sender] = _pubkey;
-  //   pendingPurchases[postStore[_id].creator].push(PendingPurchase(msg.sender, _id, _pubkey));
-  //   emit PostPurchased(msg.sender, _id);
-  // }
-
-  // function getPendingPurchases() public view onlyRegistered returns (PendingPurchase[] memory) {
-  //   return pendingPurchases[msg.sender];
-  // }
-
-  // function declinePurchase(bytes calldata _id, address payable purchaser)
-  //   public
-  //   onlyRegistered
-  //   postExists(_id)
-  //   nonReentrant
-  // {
-  //   // TODO: Only the owner of the post can decline a purchase
-  //   // TODO: Make sure the contract has the funds to handle the refund of the decline
-  //   purchaser.transfer(0.1 ether);
-
-  //   for (uint256 i = 0; i < pendingPurchases[msg.sender].length; i++) {
-  //     if (keccak256(pendingPurchases[msg.sender][i].postId) == keccak256(_id)) {
-  //       pendingPurchases[msg.sender][i] = pendingPurchases[msg.sender][pendingPurchases[msg.sender].length - 1];
-  //       pendingPurchases[msg.sender].pop();
-  //       break;
-  //     }
-  //   }
-  //   delete purchaserPublicKeys[_id][purchaser];
-  // }
+  function declinePurchase(bytes calldata _id, address payable purchaser) public onlyRegistered nonReentrant {
+    postsContract.declinePurchase(msg.sender, _id, purchaser);
+    // TODO: Make sure the contract has the funds to handle the refund of the decline
+    purchaser.transfer(0.1 ether);
+  }
 }
