@@ -63,16 +63,6 @@ const CreatePage: NextPage = () => {
           functionName: "createPost",
           args: [title, strEncryptedPost, nonce, postSig, paywalled],
         });
-
-        // EXAMPLE DECRYPTION
-        // import { decrypt } from "@metamask/eth-sig-util";
-        // sleep for 500ms - metamask gets unhappy if you spam it with back-2-back reqs
-        // await new Promise(f => setTimeout(f, 500));
-        // const x = await window.ethereum.request({
-        //   method: "eth_decrypt",
-        //   params: [`0x${Buffer.from(JSON.stringify(encryptedPost), "utf8").toString("hex")}`, address],
-        // });
-        // console.log(x);
       } else {
         // TODO: work on this duplication... bleh
         const postSig = await createPostSignature({ signMessageAsync, title, content, nonce });

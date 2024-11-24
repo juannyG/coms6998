@@ -537,8 +537,14 @@ contract PostManagementTest is Test {
     spotlight.createPost(post.title, post.content, post.nonce, signature, true);
     vm.stopPrank();
 
-    vm.startPrank(vm.addr(2));
+    address purchaser = vm.addr(2);
+    startHoax(purchaser); // prank, but w/ a balance
     spotlight.registerProfile("username2");
+    spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
+    vm.stopPrank();
+
+    vm.startPrank(vm.addr(3));
+    spotlight.registerProfile("username3");
     vm.expectRevert(OnlyCreatorCanDeclinePurchase.selector);
     spotlight.declinePurchase(signature, payable(vm.addr(2)));
   }

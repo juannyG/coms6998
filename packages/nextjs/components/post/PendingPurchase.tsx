@@ -1,32 +1,54 @@
 import { encrypt } from "@metamask/eth-sig-util";
 import { toHex } from "viem";
+import { useAccount } from "wagmi";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { TPendingPurchase, TPost } from "~~/types/spotlight";
+import { notification } from "~~/utils/scaffold-eth";
 
 const PendingPurchase = ({ post, pendingPurchase }: { post: TPost; pendingPurchase: TPendingPurchase }) => {
+  const { address } = useAccount();
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
 
-  const acceptPurchase = async () => {
-    const decryptedContent = await window.ethereum.request({
-      method: "eth_decrypt",
-      params: [toHex(Buffer.from(post.content, "utf8")), post.creator], // TODO: don't use post.creator
-    });
+  if (!address) {
+    return;
+  }
 
-    await new Promise(f => setTimeout(f, 500));
-    const encryptedForPurchaser = encrypt({
-      publicKey: pendingPurchase.pubkey,
-      data: decryptedContent,
-      version: "x25519-xsalsa20-poly1305",
-    });
-    console.log(encryptedForPurchaser);
+  const acceptPurchase = async () => {
+    try {
+      const decryptedContent = await window.ethereum.request({
+        method: "eth_decrypt",
+        params: [toHex(Buffer.from(post.content, "utf8")), address],
+      });
+
+      await new Promise(f => setTimeout(f, 500));
+      const encryptedForPurchaser = encrypt({
+        publicKey: pendingPurchase.pubkey,
+        data: decryptedContent,
+        version: "x25519-xsalsa20-poly1305",
+      });
+
+      console.log(encryptedForPurchaser);
+      // await new Promise(f => setTimeout(f, 500));
+      // await writeSpotlightContractAsync({
+      //   functionName: "acceptPurchase",
+      //   args: [post.id, pendingPurchase.purchaser]
+      // });
+    } catch (e: any) {
+      console.log(e);
+      notification.error("Could not accept purchase!");
+    }
   };
 
   const decline = async () => {
-    console.log("call declinePurchase contract method");
-    await writeSpotlightContractAsync({
-      functionName: "declinePurchase",
-      args: [post.id, pendingPurchase.purchaser],
-    });
+    try {
+      await writeSpotlightContractAsync({
+        functionName: "declinePurchase",
+        args: [post.id, pendingPurchase.purchaser],
+      });
+    } catch (e: any) {
+      console.log(e);
+      notification.error("Could not decline purchase!");
+    }
   };
 
   const shortendAddr =
