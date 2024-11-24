@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0x0b306bf915c4d645ff596e518faf3f9669b97016",
+      address: "0x959922be3caee4b8cd9a407cc3ac1c251c2007b1",
       abi: [
         {
           type: "constructor",
@@ -32,6 +32,29 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "acceptPurchase",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_purchaser",
+              type: "address",
+              internalType: "address",
+            },
+            {
+              name: "_content",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
         },
         {
           type: "function",
@@ -94,7 +117,7 @@ const deployedContracts = {
               internalType: "bytes",
             },
             {
-              name: "purchaser",
+              name: "_purchaser",
               type: "address",
               internalType: "address payable",
             },
@@ -493,6 +516,82 @@ const deployedContracts = {
                 },
                 {
                   name: "reputation",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+              ],
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getPurchasedPost",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "tuple",
+              internalType: "struct PostLib.Post",
+              components: [
+                {
+                  name: "creator",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "title",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "content",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "id",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "signature",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
+                  name: "nonce",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "createdAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "lastUpdatedAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "upvoteCount",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "downvoteCount",
                   type: "uint256",
                   internalType: "uint256",
                 },
@@ -921,6 +1020,29 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "acceptPurchase",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_purchaser",
+              type: "address",
+              internalType: "address",
+            },
+            {
+              name: "_content",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
           name: "addComment",
           inputs: [
             {
@@ -980,7 +1102,7 @@ const deployedContracts = {
               internalType: "bytes",
             },
             {
-              name: "purchaser",
+              name: "_purchaser",
               type: "address",
               internalType: "address payable",
             },
@@ -1379,6 +1501,82 @@ const deployedContracts = {
                 },
                 {
                   name: "reputation",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+              ],
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getPurchasedPost",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "tuple",
+              internalType: "struct PostLib.Post",
+              components: [
+                {
+                  name: "creator",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "title",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "content",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "id",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "signature",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
+                  name: "nonce",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "createdAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "lastUpdatedAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "upvoteCount",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "downvoteCount",
                   type: "uint256",
                   internalType: "uint256",
                 },

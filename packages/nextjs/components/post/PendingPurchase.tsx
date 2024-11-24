@@ -28,11 +28,12 @@ const PendingPurchase = ({ post, pendingPurchase }: { post: TPost; pendingPurcha
       });
 
       console.log(encryptedForPurchaser);
-      // await new Promise(f => setTimeout(f, 500));
-      // await writeSpotlightContractAsync({
-      //   functionName: "acceptPurchase",
-      //   args: [post.id, pendingPurchase.purchaser]
-      // });
+      const strEncryptedPost = JSON.stringify(encryptedForPurchaser);
+      await new Promise(f => setTimeout(f, 500));
+      await writeSpotlightContractAsync({
+        functionName: "acceptPurchase",
+        args: [post.id, pendingPurchase.purchaser, strEncryptedPost],
+      });
     } catch (e: any) {
       console.log(e);
       notification.error("Could not accept purchase!");

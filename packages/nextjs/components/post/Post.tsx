@@ -20,6 +20,15 @@ const Post = ({ postId }: { postId: Hex }) => {
   const [content, setContent] = useState("");
   const [decrypted, setDecrypted] = useState(false);
   const { writeContractAsync: writeSpotlightContractAsync } = useScaffoldWriteContract("Spotlight");
+
+  const { data: purchasedPost } = useScaffoldReadContract({
+    account: address,
+    contractName: "Spotlight",
+    functionName: "getPurchasedPost",
+    args: [postId],
+    watch: true,
+  });
+
   const { data: purchasePending } = useScaffoldReadContract({
     account: address,
     contractName: "Spotlight",
@@ -45,17 +54,22 @@ const Post = ({ postId }: { postId: Hex }) => {
     }
   }, [post]);
 
-  if (address === undefined || post === undefined) {
+  // Make sure all relevant states have been loaded up
+  if (address === undefined || post === undefined || purchasedPost === undefined || purchasePending === undefined) {
     return;
   }
+
   const onClickUnlockPost = async (evt: React.MouseEvent<HTMLButtonElement>) => {
     evt.stopPropagation();
-    if (address == post.creator) {
+    const isCreator = address == post.creator;
+    const hasBeenPurchased = purchasedPost.id == post.id;
+    const canUnlock = isCreator || hasBeenPurchased;
+    if (canUnlock) {
       try {
-        // TODO: use a util for this
+        const content = isCreator ? post.content : purchasedPost.content;
         const decryptedContent = await window.ethereum.request({
           method: "eth_decrypt",
-          params: [toHex(Buffer.from(post.content, "utf8")), address],
+          params: [toHex(Buffer.from(content, "utf8")), address],
         });
         setContent(decryptedContent);
         setDecrypted(true);
@@ -93,6 +107,16 @@ const Post = ({ postId }: { postId: Hex }) => {
     }
   };
 
+  const paywallMsgNode = (
+    <PaywallMessage
+      post={post}
+      paywallSupported={paywallSupported}
+      purchasePending={purchasePending}
+      purchasedPost={purchasedPost}
+    />
+  );
+  const viewerNode = <Viewer data={content} />;
+
   return (
     <>
       {!onProfile && (
@@ -105,31 +129,19 @@ const Post = ({ postId }: { postId: Hex }) => {
       {onProfile ? (
         <div className="cursor-pointer flex flex-col w-full">
           <p className="w-[100%] text-lg font-bold text-left text-black">{post.title}</p>
-          {post.paywalled && !decrypted ? (
-            <PaywallMessage post={post} paywallSupported={paywallSupported} purchasePending={purchasePending} />
-          ) : (
-            <Viewer data={content} />
-          )}
+          {post.paywalled && !decrypted ? paywallMsgNode : viewerNode}
         </div>
       ) : compactDisplay ? (
         <div className="cursor-pointer flex flex-col w-full p-4 gap-4">
           <p className="w-[100%] text-lg font-bold text-left text-black">{post.title}</p>
-          {post.paywalled && !decrypted ? (
-            <PaywallMessage post={post} paywallSupported={paywallSupported} purchasePending={purchasePending} />
-          ) : (
-            <Viewer data={content} />
-          )}
+          {post.paywalled && !decrypted ? paywallMsgNode : viewerNode}
         </div>
       ) : (
         <>
           <div className="p-[10px]">
             <p className="text-2xl font-bold">{post.title}</p>
           </div>
-          {post.paywalled && !decrypted ? (
-            <PaywallMessage post={post} paywallSupported={paywallSupported} purchasePending={purchasePending} />
-          ) : (
-            <Viewer data={content} />
-          )}
+          {post.paywalled && !decrypted ? paywallMsgNode : viewerNode}
         </>
       )}
 
