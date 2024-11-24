@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+      address: "0x0b306bf915c4d645ff596e518faf3f9669b97016",
       abi: [
         {
           type: "constructor",
@@ -86,6 +86,24 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "declinePurchase",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "purchaser",
+              type: "address",
+              internalType: "address payable",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
           name: "deletePost",
           inputs: [
             {
@@ -122,12 +140,12 @@ const deployedContracts = {
           name: "downvotedBy",
           inputs: [
             {
-              name: "",
+              name: "_id",
               type: "bytes",
               internalType: "bytes",
             },
             {
-              name: "",
+              name: "_addr",
               type: "address",
               internalType: "address",
             },
@@ -273,7 +291,7 @@ const deployedContracts = {
             {
               name: "",
               type: "tuple[]",
-              internalType: "struct Spotlight.PendingPurchase[]",
+              internalType: "struct Posts.PendingPurchase[]",
               components: [
                 {
                   name: "purchaser",
@@ -609,12 +627,12 @@ const deployedContracts = {
           name: "upvotedBy",
           inputs: [
             {
-              name: "",
+              name: "_id",
               type: "bytes",
               internalType: "bytes",
             },
             {
-              name: "",
+              name: "_addr",
               type: "address",
               internalType: "address",
             },
@@ -836,42 +854,7 @@ const deployedContracts = {
         },
         {
           type: "error",
-          name: "ContentCannotBeEmpty",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "CreatorCannotPayForOwnContent",
-          inputs: [],
-        },
-        {
-          type: "error",
           name: "InsufficentPostFunds",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "InvalidSignature",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "OnlyCreatorCanEdit",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "PostAlreadyPurchased",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "PostNotFound",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "PostNotPaywalled",
           inputs: [],
         },
         {
@@ -887,11 +870,6 @@ const deployedContracts = {
         {
           type: "error",
           name: "ReentrancyGuardReentrantCall",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "TitleCannotBeEmpty",
           inputs: [],
         },
         {
@@ -994,6 +972,24 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "declinePurchase",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "purchaser",
+              type: "address",
+              internalType: "address payable",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
           name: "deletePost",
           inputs: [
             {
@@ -1030,12 +1026,12 @@ const deployedContracts = {
           name: "downvotedBy",
           inputs: [
             {
-              name: "",
+              name: "_id",
               type: "bytes",
               internalType: "bytes",
             },
             {
-              name: "",
+              name: "_addr",
               type: "address",
               internalType: "address",
             },
@@ -1181,7 +1177,7 @@ const deployedContracts = {
             {
               name: "",
               type: "tuple[]",
-              internalType: "struct Spotlight.PendingPurchase[]",
+              internalType: "struct Posts.PendingPurchase[]",
               components: [
                 {
                   name: "purchaser",
@@ -1517,12 +1513,12 @@ const deployedContracts = {
           name: "upvotedBy",
           inputs: [
             {
-              name: "",
+              name: "_id",
               type: "bytes",
               internalType: "bytes",
             },
             {
-              name: "",
+              name: "_addr",
               type: "address",
               internalType: "address",
             },
@@ -1744,42 +1740,7 @@ const deployedContracts = {
         },
         {
           type: "error",
-          name: "ContentCannotBeEmpty",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "CreatorCannotPayForOwnContent",
-          inputs: [],
-        },
-        {
-          type: "error",
           name: "InsufficentPostFunds",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "InvalidSignature",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "OnlyCreatorCanEdit",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "PostAlreadyPurchased",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "PostNotFound",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "PostNotPaywalled",
           inputs: [],
         },
         {
@@ -1795,11 +1756,6 @@ const deployedContracts = {
         {
           type: "error",
           name: "ReentrancyGuardReentrantCall",
-          inputs: [],
-        },
-        {
-          type: "error",
-          name: "TitleCannotBeEmpty",
           inputs: [],
         },
         {

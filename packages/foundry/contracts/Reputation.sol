@@ -7,6 +7,7 @@ import "./Error.sol";
 
 contract Reputation is ERC20 {
   address public immutable spotlightContract;
+  address private postsContract;
   uint256 private constant DECAY_INTERVAL = 15 minutes;
   uint256 private constant DECAY_RATE = 1; // 1% decay every 15 minutes
   mapping(address => uint256) private lastDecayTime;
@@ -14,6 +15,25 @@ contract Reputation is ERC20 {
   constructor(address _spotlightContract) ERC20("Reputation", "RPT") {
     if (_spotlightContract == address(0)) revert SpotlightAddressCannotBeZero();
     spotlightContract = _spotlightContract;
+  }
+
+  function setPostsContract(address _addr) public {
+    // TODO: Better error message
+    // TODO: Unit test
+    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanIssueTokens();
+    if (_addr == address(0)) revert CannotIssueToZeroAddress();
+    postsContract = _addr;
+  }
+
+  function isAllowed(address _addr) private view returns (bool) {
+    if (_addr == spotlightContract) {
+      return true;
+    }
+
+    if (_addr == postsContract) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -54,7 +74,7 @@ contract Reputation is ERC20 {
    * @param receiver The address that will receive the tokens
    */
   function upvotePost(address receiver) external {
-    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanIssueTokens();
+    if (!isAllowed(msg.sender)) revert OnlySpotlightContractCanIssueTokens();
     _applyDecay(receiver); // Apply decay before issuing new tokens
     _issueToken(receiver, 100);
   }
@@ -64,7 +84,7 @@ contract Reputation is ERC20 {
    * @param receiver The address that will lose the tokens
    */
   function revertUpvotePost(address receiver) external {
-    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanIssueTokens();
+    if (!isAllowed(msg.sender)) revert OnlySpotlightContractCanIssueTokens();
     _applyDecay(receiver); // Apply decay before burning new tokens
     _burnToken(receiver, 100);
   }
@@ -74,7 +94,7 @@ contract Reputation is ERC20 {
    * @param receiver The address that will receive the tokens
    */
   function upvoteComment(address receiver) external {
-    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanIssueTokens();
+    if (!isAllowed(msg.sender)) revert OnlySpotlightContractCanIssueTokens();
     _applyDecay(receiver); // Apply decay before issuing new tokens
     _issueToken(receiver, 10);
   }
@@ -84,7 +104,7 @@ contract Reputation is ERC20 {
    * @param account The address from which tokens will be burned
    */
   function revertDownvotePost(address account) external {
-    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanBurnTokens();
+    if (!isAllowed(msg.sender)) revert OnlySpotlightContractCanBurnTokens();
     _applyDecay(account); // Apply decay before issuing tokens
     if (balanceOf(account) >= 5 * 10 ** decimals()) {
       // Otherwise we're giving away 5 RPT
@@ -97,7 +117,7 @@ contract Reputation is ERC20 {
    * @param account The address from which tokens will be burned
    */
   function downvotePost(address account) external {
-    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanBurnTokens();
+    if (!isAllowed(msg.sender)) revert OnlySpotlightContractCanBurnTokens();
     _applyDecay(account); // Apply decay before burning tokens
     _burnToken(account, 5);
   }
@@ -107,7 +127,7 @@ contract Reputation is ERC20 {
    * @param account The address from which tokens will be burned
    */
   function downvoteComment(address account) external {
-    if (msg.sender != spotlightContract) revert OnlySpotlightContractCanBurnTokens();
+    if (!isAllowed(msg.sender)) revert OnlySpotlightContractCanBurnTokens();
     _applyDecay(account); // Apply decay before burning tokens
     _burnToken(account, 1);
   }

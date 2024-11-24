@@ -7,10 +7,15 @@ import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+import "./Posts.sol";
 import "./PostLib.sol";
 import "./Events.sol";
 import "./Reputation.sol";
 import "./Error.sol";
+
+////////////////////////////////////////////////////////////
+// TODO: All writes must validate msg.sender != address(0)
+////////////////////////////////////////////////////////////
 
 /// @title Spotlight - A decentralized reddit
 /// @author Team
@@ -25,40 +30,8 @@ contract Spotlight is ReentrancyGuard {
   /// @notice Reputation token contract
   Reputation private reputationToken;
 
-  // @notice Mappings of post IDs to the addresses that up/downvoted them
-  mapping(bytes => mapping(address => bool)) public upvotedBy;
-  mapping(bytes => mapping(address => bool)) public downvotedBy;
-
-  // TODO: Move to off-chain storage - sig => off-chain storage location
-  /// @dev Mapping from signature of post (post ID) to post content
-  mapping(bytes => PostLib.Post) internal postStore;
-  mapping(bytes => PostLib.Comment[]) internal postComments;
-
-  /// @dev post ID => wallet addr => pubKey for encryption
-  mapping(bytes => mapping(address => string)) internal purchaserPublicKeys;
-
-  /// @dev Pointer struct for traversal of purchaserPublicKeys
-  struct PendingPurchase {
-    address purchaser;
-    bytes postId;
-    string pubkey;
-  }
-
-  // Map of creator address => list of (users + posts) have they paid for?
-  mapping(address => PendingPurchase[]) internal pendingPurchases;
-
-  // TODO: Support >1 community
-  /* TODO:
-       We should probably uses openzeppelin's DoubleEndedQueue here
-       https://docs.openzeppelin.com/contracts/5.x/api/utils#DoubleEndedQueue
-
-       An array adds to the end, so newer items are in the "back", forcing full traversal for
-       "the latest" posts.
-
-       Where as with a DoubleEndedQueue, all ops are O(1) and would work nicely with pagination
-    */
-  /// @dev Array of all post signatures in the community
-  bytes[] internal communityPostIDs;
+  /// @notice Posts contract
+  Posts private postsContract;
 
   /// @notice Structure to store profile information.
   struct Profile {
@@ -67,9 +40,6 @@ contract Spotlight is ReentrancyGuard {
     string avatarCID; // IPFS CID
     uint256 reputation;
   }
-
-  /// @dev Mapping from address to it's post IDs
-  mapping(address => bytes[]) internal profilePostIDs;
 
   /// @dev Mapping from an address to its associated profile.
   mapping(address => Profile) internal profiles;
@@ -82,19 +52,13 @@ contract Spotlight is ReentrancyGuard {
   constructor(address _owner) {
     owner = _owner;
     reputationToken = new Reputation(address(this));
+    postsContract = new Posts(address(this), address(reputationToken));
+    reputationToken.setPostsContract(address(postsContract));
   }
 
   /// @notice Modifier to ensure that only registered users can perform certain actions.
   modifier onlyRegistered() {
     if (!isRegistered(msg.sender)) revert ProfileNotExist();
-    _;
-  }
-
-  modifier postExists(bytes memory _id) {
-    PostLib.Post memory post = postStore[_id];
-    if (bytes(post.content).length == 0) {
-      revert PostNotFound();
-    }
     _;
   }
 
@@ -163,21 +127,18 @@ contract Spotlight is ReentrancyGuard {
     emit ProfileUpdated(msg.sender, _newUsername);
   }
 
+  function updateAvatarCID(string calldata _cid) public onlyRegistered {
+    if (bytes(_cid).length == 0) revert AvatarCIDCannotBeEmpty();
+    profiles[msg.sender].avatarCID = _cid;
+  }
+
   /// @notice Delete the caller's profile.
   /// @dev The profile is removed and its associated username is freed.
   function deleteProfile() public onlyRegistered {
     bytes32 oldHash = _getUsernameHash(profiles[msg.sender].username);
     normalized_username_hashes[oldHash] = false;
 
-    for (uint256 i = 0; i < profilePostIDs[msg.sender].length; ++i) {
-      bytes memory id = profilePostIDs[msg.sender][i];
-      deleteCommunityPost(id);
-      delete postStore[id];
-    }
-
-    // TODO: Burn remaining reputation of user
-
-    delete profilePostIDs[msg.sender];
+    postsContract.deleteProfile(msg.sender);
     delete profiles[msg.sender];
     emit ProfileDeleted(msg.sender);
   }
@@ -224,225 +185,88 @@ contract Spotlight is ReentrancyGuard {
     bytes calldata _sig,
     bool _paywalled
   ) public onlyRegistered {
-    if (bytes(_content).length == 0) revert ContentCannotBeEmpty();
-    if (bytes(_title).length == 0) revert TitleCannotBeEmpty();
-    if (!PostLib.isValidPostSignature(msg.sender, _title, _content, _nonce, _sig)) revert InvalidSignature();
-
-    // TODO: Check that the signature doesn't already exist in the postStore!
-
-    PostLib.Post memory p = PostLib.Post({
-      creator: msg.sender,
-      title: _title,
-      content: _content,
-      id: _sig,
-      signature: _sig,
-      nonce: _nonce,
-      paywalled: _paywalled,
-      createdAt: block.timestamp,
-      lastUpdatedAt: block.timestamp,
-      upvoteCount: 0,
-      downvoteCount: 0
-    });
-
-    postStore[_sig] = p;
-    communityPostIDs.push(_sig);
-    profilePostIDs[msg.sender].push(_sig);
+    postsContract.createPost(msg.sender, _title, _content, _nonce, _sig, _paywalled);
     emit PostCreated(msg.sender, _sig);
   }
 
   /// @notice Get all posts for a given address
   /// @param _addr Wallet address of the registered user whose posts we wish to retrieve
-  function getPostsOfAddress(address _addr) public view onlyRegistered returns (PostLib.Post[] memory) {
-    // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
+  function getPostsOfAddress(address _addr) public view returns (PostLib.Post[] memory) {
     if (!isRegistered(_addr)) revert AddressNotRegistered();
-
-    bytes[] memory sigs = profilePostIDs[_addr];
-    console.log("Sigs length", sigs.length);
-    PostLib.Post[] memory userPosts = new PostLib.Post[](sigs.length);
-    for (uint256 i = 0; i < sigs.length; i++) {
-      // NOTE: Cannot use userPosts.push because push is only for dynamic arrays in STORAGE
-      userPosts[i] = postStore[sigs[i]];
-    }
-    return userPosts;
+    return postsContract.getPostsOfAddress(_addr);
   }
 
-  function getPost(bytes calldata _post_sig) public view onlyRegistered returns (PostLib.Post memory) {
-    PostLib.Post memory p = postStore[_post_sig];
-    if (p.creator == address(0)) revert PostNotFound();
-    return p;
+  function getPost(bytes calldata _post_sig) public view returns (PostLib.Post memory) {
+    return postsContract.getPost(_post_sig);
   }
 
   // TODO: add community ID argument - what community are you trying to get posts for?
   /// @notice Get all posts from a community
-  function getCommunityPosts() public view onlyRegistered returns (PostLib.Post[] memory) {
+  function getCommunityPosts() public view returns (PostLib.Post[] memory) {
     // TODO: Add pagination - https://programtheblockchain.com/posts/2018/04/20/storage-patterns-pagination/
-    PostLib.Post[] memory p = new PostLib.Post[](communityPostIDs.length);
-    for (uint256 i = 0; i < communityPostIDs.length; i++) {
-      p[i] = postStore[communityPostIDs[i]];
-    }
-    return p;
+    return postsContract.getCommunityPosts();
   }
 
-  function editPost(bytes calldata _id, string calldata newContent) public onlyRegistered postExists(_id) {
-    // Ensure post exists
-    PostLib.Post storage post = postStore[_id];
-    if (post.creator != msg.sender) revert OnlyCreatorCanEdit();
-    if (bytes(newContent).length == 0) revert ContentCannotBeEmpty();
-
-    // TODO: Accept newSig arg and verify it against newContent
-
-    post.content = newContent;
-    post.lastUpdatedAt = block.timestamp;
-
+  function editPost(bytes calldata _id, string calldata newContent) public onlyRegistered {
+    postsContract.editPost(msg.sender, _id, newContent);
     emit PostEdited(msg.sender, _id);
   }
 
-  function deletePost(bytes memory _id) public onlyRegistered postExists(_id) {
-    // Ensure the post exists
-    PostLib.Post storage post = postStore[_id];
-    if (post.creator != msg.sender) revert OnlyCreatorCanEdit();
-
-    // TODO: Burn RPT associated with the post (or at least burn some amount of RPT...)
-
-    // Remove post from user's profile
-    bytes[] storage userPosts = profilePostIDs[msg.sender];
-    for (uint256 i = 0; i < userPosts.length; i++) {
-      // Solidity doesn’t have native string comparison, so keccak256 is often used to compare strings by hashing them
-      if (keccak256(userPosts[i]) == keccak256(_id)) {
-        userPosts[i] = userPosts[userPosts.length - 1]; // Efficient gas usage: O(1) rather than O(n).
-        userPosts.pop();
-        break;
-      }
-    }
-
-    deleteCommunityPost(_id);
-    delete postStore[_id];
+  function deletePost(bytes memory _id) public onlyRegistered {
+    postsContract.deletePost(msg.sender, _id);
     emit PostDeleted(msg.sender, _id);
   }
 
-  function deleteCommunityPost(bytes memory _id) internal postExists(_id) {
-    // Remove post from communityPostIDs
-    for (uint256 i = 0; i < communityPostIDs.length; i++) {
-      // Solidity doesn’t have native string comparison, so keccak256 is often used to compare strings by hashing them
-      if (keccak256(communityPostIDs[i]) == keccak256(_id)) {
-        communityPostIDs[i] = communityPostIDs[communityPostIDs.length - 1]; // Efficient gas usage: O(1) rather than O(n).
-        communityPostIDs.pop();
-        break;
-      }
-    }
-  }
-
-  function upvote(bytes calldata _id) public onlyRegistered postExists(_id) {
-    PostLib.Post storage p = postStore[_id];
-    if (upvotedBy[_id][msg.sender]) {
-      p.upvoteCount--;
-      reputationToken.revertUpvotePost(p.creator);
-      delete upvotedBy[_id][msg.sender];
-      return;
-    }
-
-    if (downvotedBy[_id][msg.sender]) {
-      p.downvoteCount--;
-      reputationToken.revertDownvotePost(p.creator);
-      delete downvotedBy[_id][msg.sender];
-    }
-
-    p.upvoteCount++;
-    upvotedBy[_id][msg.sender] = true;
-    reputationToken.upvotePost(p.creator);
+  function upvote(bytes calldata _id) public onlyRegistered {
+    postsContract.upvote(msg.sender, _id);
     emit PostUpvoted(msg.sender, _id);
   }
 
-  function downvote(bytes calldata _id) public onlyRegistered postExists(_id) {
-    PostLib.Post storage p = postStore[_id];
-    if (downvotedBy[_id][msg.sender]) {
-      p.downvoteCount--;
-      reputationToken.revertDownvotePost(p.creator);
-      delete downvotedBy[_id][msg.sender];
-      return;
-    }
+  function upvotedBy(bytes calldata _id, address _addr) public view returns (bool) {
+    return postsContract.upvotedBy(_id, _addr);
+  }
 
-    if (upvotedBy[_id][msg.sender]) {
-      // TODO: undo upvote in reputationToken
-      p.upvoteCount--;
-      reputationToken.revertUpvotePost(p.creator);
-      delete upvotedBy[_id][msg.sender];
-    }
-
-    p.downvoteCount++;
-    downvotedBy[_id][msg.sender] = true;
-    reputationToken.downvotePost(p.creator);
+  function downvote(bytes calldata _id) public onlyRegistered {
+    postsContract.downvote(msg.sender, _id);
     emit PostDownvoted(msg.sender, _id);
   }
 
-  function addComment(bytes calldata _id, string calldata _content) public onlyRegistered postExists(_id) {
-    require(bytes(_content).length > 0, "Comment cannot be empty");
+  function downvotedBy(bytes calldata _id, address _addr) public view returns (bool) {
+    return postsContract.downvotedBy(_id, _addr);
+  }
 
-    PostLib.Comment memory newComment =
-      PostLib.Comment({ commenter: msg.sender, content: _content, createdAt: block.timestamp });
-
-    postComments[_id].push(newComment);
+  function addComment(bytes calldata _id, string calldata _content) public onlyRegistered {
+    postsContract.addComment(msg.sender, _id, _content);
     emit CommentAdded(msg.sender, _id, _content, block.timestamp);
   }
 
-  function getComments(bytes calldata _id) public view postExists(_id) returns (PostLib.Comment[] memory) {
-    return postComments[_id];
+  /// @notice Get comments for a given post ID
+  function getComments(bytes calldata _id) public view returns (PostLib.Comment[] memory) {
+    return postsContract.getComments(_id);
   }
 
-  function updateAvatarCID(string calldata _cid) public onlyRegistered {
-    if (bytes(_cid).length == 0) revert AvatarCIDCannotBeEmpty();
-    profiles[msg.sender].avatarCID = _cid;
+  function isPurchasePending(bytes calldata _id) public view returns (bool) {
+    return postsContract.isPurchasePending(msg.sender, _id);
   }
 
-  function isPurchasePending(bytes calldata _id) public view onlyRegistered postExists(_id) returns (bool) {
-    /**
-     * TODO: This needs to be modified, i.e. if the creator accepts your payment - it wouldn't be "PENDING"
-     * anymore - it would be in the user's mapping storing their copy of the post, which they can decrypt.
-     * That data structure doesn't exist yet...
-     */
-    return bytes(purchaserPublicKeys[_id][msg.sender]).length > 0;
-  }
-
-  function purchasePost(bytes calldata _id, string calldata _pubkey)
-    public
-    payable
-    onlyRegistered
-    postExists(_id)
-    nonReentrant
-  {
-    if (!postStore[_id].paywalled) revert PostNotPaywalled();
-    if (msg.sender == postStore[_id].creator) revert CreatorCannotPayForOwnContent();
+  function purchasePost(bytes calldata _id, string calldata _pubkey) public payable onlyRegistered nonReentrant {
     if (msg.value < PAYWALL_COST) revert InsufficentPostFunds();
-
-    // TODO: This will need to be modified - same reason(s) stated in `hasPurchasedPost` above
-    if (bytes(purchaserPublicKeys[_id][msg.sender]).length > 0) revert PostAlreadyPurchased();
-
-    purchaserPublicKeys[_id][msg.sender] = _pubkey;
-    pendingPurchases[postStore[_id].creator].push(PendingPurchase(msg.sender, _id, _pubkey));
+    postsContract.purchasePost(msg.sender, _id, _pubkey);
+    if (msg.value > PAYWALL_COST) {
+      // Refund any excess ether back to the user
+      uint256 excess = msg.value - PAYWALL_COST;
+      payable(msg.sender).transfer(excess);
+    }
     emit PostPurchased(msg.sender, _id);
   }
 
-  function getPendingPurchases() public view onlyRegistered returns (PendingPurchase[] memory) {
-    return pendingPurchases[msg.sender];
+  function getPendingPurchases() public view returns (Posts.PendingPurchase[] memory) {
+    return postsContract.getPendingPurchases(msg.sender);
   }
 
-  // function declinePurchase(bytes calldata _id, address payable purchaser)
-  //   public
-  //   onlyRegistered
-  //   postExists(_id)
-  //   nonReentrant
-  // {
-  //   // TODO: Only the owner of the post can decline a purchase
-  //   // TODO: Make sure the contract has the funds to handle the refund of the decline
-  //   purchaser.transfer(0.1 ether);
-
-  //   for (uint256 i = 0; i < pendingPurchases[msg.sender].length; i++) {
-  //     if (keccak256(pendingPurchases[msg.sender][i].postId) == keccak256(_id)) {
-  //       pendingPurchases[msg.sender][i] = pendingPurchases[msg.sender][pendingPurchases[msg.sender].length - 1];
-  //       pendingPurchases[msg.sender].pop();
-  //       break;
-  //     }
-  //   }
-  //   delete purchaserPublicKeys[_id][purchaser];
-  // }
+  function declinePurchase(bytes calldata _id, address payable purchaser) public onlyRegistered nonReentrant {
+    postsContract.declinePurchase(msg.sender, _id, purchaser);
+    // TODO: Make sure the contract has the funds to handle the refund of the decline
+    purchaser.transfer(0.1 ether);
+  }
 }

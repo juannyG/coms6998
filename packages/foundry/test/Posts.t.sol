@@ -9,6 +9,74 @@ import "../contracts/Spotlight.sol";
 import "../contracts/Events.sol";
 import "../contracts/PostLib.sol";
 import "../contracts/Error.sol";
+import "../contracts/Posts.sol";
+
+// Set of tests to validate certain calls can only be made from certain addresses
+contract PostContractCallerValidationTest is Test {
+  function testPostsContractRevertsIfSpotlightAddressIsZero() public {
+    vm.expectRevert(SpotlightAddressCannotBeZero.selector);
+    new Posts(address(0), address(0));
+  }
+
+  function testPostsContractRevertsIfReputationAddressIsZero() public {
+    vm.expectRevert(ReputationAddressCannotBeZero.selector);
+    new Posts(vm.addr(1), address(0));
+  }
+
+  function testNonSpotlightAddrCannotCreatePost() public {
+    Posts pContract = new Posts(vm.addr(1), vm.addr(1));
+    vm.expectRevert(OnlySpotlightCanManagePosts.selector);
+    pContract.createPost(vm.addr(1), "title", "content", 1, "sig", false);
+  }
+
+  function testNonSpotlightAddrCannotEditPost() public {
+    Posts pContract = new Posts(vm.addr(1), vm.addr(1));
+    vm.expectRevert(OnlySpotlightCanManagePosts.selector);
+    pContract.editPost(vm.addr(1), "id", "newContent");
+  }
+
+  function testNonSpotlightAddrCannotDeletePost() public {
+    Posts pContract = new Posts(vm.addr(1), vm.addr(1));
+    vm.expectRevert(OnlySpotlightCanManagePosts.selector);
+    pContract.deletePost(vm.addr(1), "id");
+  }
+
+  function testNonSpotlightAddrCannotDeleteProfile() public {
+    Posts pContract = new Posts(vm.addr(1), vm.addr(1));
+    vm.expectRevert(OnlySpotlightCanManagePosts.selector);
+    pContract.deleteProfile(vm.addr(1));
+  }
+
+  function testNonSpotlightAddrCannotUpvote() public {
+    Posts pContract = new Posts(vm.addr(1), vm.addr(1));
+    vm.expectRevert(OnlySpotlightCanManagePosts.selector);
+    pContract.upvote(vm.addr(1), "id");
+  }
+
+  function testNonSpotlightAddrCannotDownVote() public {
+    Posts pContract = new Posts(vm.addr(1), vm.addr(1));
+    vm.expectRevert(OnlySpotlightCanManagePosts.selector);
+    pContract.downvote(vm.addr(1), "id");
+  }
+
+  function testNonSpotlightAddrCannotAddComment() public {
+    Posts pContract = new Posts(vm.addr(1), vm.addr(1));
+    vm.expectRevert(OnlySpotlightCanManagePosts.selector);
+    pContract.addComment(vm.addr(1), "id", "comment");
+  }
+
+  function testNonSpotlightAddrCannotPurchasePost() public {
+    Posts pContract = new Posts(vm.addr(1), vm.addr(1));
+    vm.expectRevert(OnlySpotlightCanManagePosts.selector);
+    pContract.purchasePost(vm.addr(1), "id", "pubkey");
+  }
+
+  function testNonSpotlightAddrCannotDeclinePurchase() public {
+    Posts pContract = new Posts(vm.addr(1), vm.addr(1));
+    vm.expectRevert(OnlySpotlightCanManagePosts.selector);
+    pContract.declinePurchase(vm.addr(1), "id", payable(vm.addr(1)));
+  }
+}
 
 contract PostManagementTest is Test {
   Spotlight public spotlight;
@@ -208,32 +276,6 @@ contract PostManagementTest is Test {
     spotlight.getPostsOfAddress(_addr);
   }
 
-  function testUnregisteredUserCannotGetPostsOfAnotherUser() public {
-    PostLib.Post memory p = createTestPost();
-    vm.startPrank(wallet.addr);
-    spotlight.registerProfile("username");
-    spotlight.createPost(p.title, p.content, p.nonce, signContentViaWallet(wallet, p), false);
-    vm.stopPrank();
-
-    address _addr = vm.addr(2);
-    vm.startPrank(_addr);
-    vm.expectRevert(ProfileNotExist.selector);
-    spotlight.getPostsOfAddress(wallet.addr);
-  }
-
-  function testUnregisteredUserCannotSeePostsOfACommunity() public {
-    PostLib.Post memory p = createTestPost();
-    vm.startPrank(wallet.addr);
-    spotlight.registerProfile("username");
-    spotlight.createPost(p.title, p.content, p.nonce, signContentViaWallet(wallet, p), false);
-    vm.stopPrank();
-
-    address _addr = vm.addr(2);
-    vm.startPrank(_addr);
-    vm.expectRevert(ProfileNotExist.selector);
-    spotlight.getCommunityPosts();
-  }
-
   function testUserCanEditPostSuccess() public {
     vm.startPrank(wallet.addr);
     spotlight.registerProfile("username");
@@ -367,12 +409,24 @@ contract PostManagementTest is Test {
     assertEq(comments[1].content, "Second comment.", "Second comment: content mismatch");
   }
 
-  function testCannotPurchasePostIfPostDoesNotExist() public {
+  function testCannotAddEmptyComment() public {
     vm.startPrank(wallet.addr);
     spotlight.registerProfile("username");
 
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, false);
+
+    vm.expectRevert(CommentCannotBeEmpty.selector);
+    spotlight.addComment(signature, "");
+  }
+
+  function testCannotPurchasePostIfPostDoesNotExist() public {
+    startHoax(wallet.addr);
+    spotlight.registerProfile("username");
+
     vm.expectRevert(PostNotFound.selector);
-    spotlight.purchasePost("does-not-exist", "pubkey");
+    spotlight.purchasePost{ value: 1 ether }("does-not-exist", "pubkey");
   }
 
   function testCannotPurchasePostIfNotRegistered() public {
@@ -399,21 +453,21 @@ contract PostManagementTest is Test {
     vm.stopPrank();
 
     address otherUser = vm.addr(2);
-    vm.startPrank(otherUser);
+    startHoax(otherUser);
     spotlight.registerProfile("username2");
     vm.expectRevert(PostNotPaywalled.selector);
-    spotlight.purchasePost(signature, "pubkey");
+    spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
   }
 
   function testCreatorCannotPayForTheirOwnContent() public {
-    vm.startPrank(wallet.addr);
+    startHoax(wallet.addr);
     spotlight.registerProfile("username");
 
     PostLib.Post memory post = createTestPost();
     bytes memory signature = signContentViaWallet(wallet, post);
     spotlight.createPost(post.title, post.content, post.nonce, signature, true);
     vm.expectRevert(CreatorCannotPayForOwnContent.selector);
-    spotlight.purchasePost(signature, "pubkey");
+    spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
   }
 
   function testUserCannotPurchasePostWithoutProperFunds() public {
@@ -450,5 +504,92 @@ contract PostManagementTest is Test {
 
     vm.expectRevert(PostAlreadyPurchased.selector);
     spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
+  }
+
+  function testCannotDeclinePurchaseIfNotRegistered() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, true);
+    vm.stopPrank();
+
+    vm.startPrank(vm.addr(2));
+    vm.expectRevert(ProfileNotExist.selector);
+    spotlight.declinePurchase("id", payable(vm.addr(2)));
+  }
+
+  function testCannotDeclinePurchaseIfPostDoesNotExist() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    vm.expectRevert(PostNotFound.selector);
+    spotlight.declinePurchase("id", payable(wallet.addr));
+  }
+
+  function testOnlyPostCreatorCanDeclinePurchase() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, true);
+    vm.stopPrank();
+
+    vm.startPrank(vm.addr(2));
+    spotlight.registerProfile("username2");
+    vm.expectRevert(OnlyCreatorCanDeclinePurchase.selector);
+    spotlight.declinePurchase(signature, payable(vm.addr(2)));
+  }
+
+  function testCannotDeclinePurchaseIfPostNotPaywalled() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, false);
+
+    vm.expectRevert(PostNotPaywalled.selector);
+    spotlight.declinePurchase(signature, payable(vm.addr(2)));
+  }
+
+  function testCannotDeclinePurchaseIfPurchaseNotPending() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, true);
+
+    vm.expectRevert(NoPendingPurchaseFound.selector);
+    spotlight.declinePurchase(signature, payable(vm.addr(2)));
+  }
+
+  function testFundTransfersWhenCreatorDeclinesPurchase() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, true);
+
+    address purchaser = vm.addr(2);
+    startHoax(purchaser); // prank, but w/ a balance
+    spotlight.registerProfile("username2");
+
+    // After paying for post, Spotlight holds balance
+    uint256 startingBalance = purchaser.balance;
+    spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
+    assertTrue(spotlight.isPurchasePending(signature));
+    assertEq(startingBalance - spotlight.PAYWALL_COST(), purchaser.balance);
+    assertEq(spotlight.PAYWALL_COST(), address(spotlight).balance);
+    vm.stopPrank();
+
+    // After declining, Spotlight releases balance back to purchaser
+    vm.startPrank(wallet.addr);
+    spotlight.declinePurchase(signature, payable(purchaser));
+    assertEq(startingBalance, purchaser.balance);
   }
 }
