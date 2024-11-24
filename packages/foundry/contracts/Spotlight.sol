@@ -270,7 +270,7 @@ contract Spotlight is ReentrancyGuard {
     _purchaser.transfer(PAYWALL_COST);
   }
 
-  function acceptPurchase(bytes calldata _id, address payable _purchaser, string memory _content)
+  function acceptPurchase(bytes calldata _id, address _purchaser, string memory _content)
     public
     onlyRegistered
     nonReentrant
@@ -278,5 +278,9 @@ contract Spotlight is ReentrancyGuard {
     postsContract.acceptPurchase(msg.sender, _id, _purchaser, _content);
     // TODO: Make sure the contract has the funds to handle the refund of the decline
     payable(msg.sender).transfer(PAYWALL_COST);
+  }
+
+  function getPurchasedPost(bytes calldata _id) public view returns (PostLib.Post memory) {
+    return postsContract.getPurchasedPost(msg.sender, _id);
   }
 }

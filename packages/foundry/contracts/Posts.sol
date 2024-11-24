@@ -331,4 +331,8 @@ contract Posts {
     }
     delete purchaserPublicKeys[_id][_purchaser];
   }
+
+  function getPurchasedPost(address _addr, bytes calldata _id) public view returns (PostLib.Post memory) {
+    return purchasedPosts[_addr][_id];
+  }
 }
