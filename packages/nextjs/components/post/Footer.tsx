@@ -29,8 +29,6 @@ const PostFooter = ({ post }: { post: TPost }) => {
     functionName: "downvotedBy",
     args: [post.signature, address],
   });
-  console.log("hasUpvoted", hasUpvoted);
-  console.log("hasDownvoted", hasDownvoted);
 
   const onUpvoteClick = async (evt: React.MouseEvent<HTMLAnchorElement>) => {
     evt.stopPropagation();

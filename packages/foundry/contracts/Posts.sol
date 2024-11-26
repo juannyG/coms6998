@@ -48,6 +48,9 @@ contract Posts {
   // Map of creator address => list of (users + posts) have they paid for?
   mapping(address => PendingPurchase[]) internal pendingPurchases;
 
+  /// @dev Mapping of purchaser address => map of purchased Posts
+  mapping(address => mapping(bytes => PostLib.Post)) purchasedPosts;
+
   constructor(address _spotlightContract, address _reputationContract) {
     if (_spotlightContract == address(0)) revert SpotlightAddressCannotBeZero();
     if (_reputationContract == address(0)) revert ReputationAddressCannotBeZero();
@@ -282,20 +285,54 @@ contract Posts {
     return pendingPurchases[_addr];
   }
 
-  function declinePurchase(address _addr, bytes calldata _id, address payable purchaser) public {
+  function declinePurchase(address _creator, bytes calldata _id, address _purchaser) public {
+    purchaseSettlementValidations(_id, _purchaser);
+    // TODO: Purchaser is allowed to decline the purchase!
+    if (postStore[_id].creator != _creator) revert OnlyCreatorCanDeclinePurchase();
+    removePurchaseFromPending(_creator, _id, _purchaser);
+  }
+
+  function acceptPurchase(address _creator, bytes calldata _id, address _purchaser, string memory _content) public {
+    purchaseSettlementValidations(_id, _purchaser);
+    PostLib.Post memory p = postStore[_id];
+    if (p.creator != _creator) revert OnlyCreatorCanAcceptPurchase();
+
+    // Create a copy of the post for the purchaser - content is encrypted with their pubkey
+    purchasedPosts[_purchaser][_id] = PostLib.Post({
+      creator: p.creator,
+      title: p.title,
+      content: _content,
+      id: _id,
+      signature: p.signature,
+      nonce: p.nonce,
+      paywalled: true,
+      createdAt: p.createdAt,
+      lastUpdatedAt: p.lastUpdatedAt,
+      upvoteCount: 0, // This won't actually apply
+      downvoteCount: 0 // This won't actually apply
+     });
+    removePurchaseFromPending(_creator, _id, _purchaser);
+  }
+
+  function purchaseSettlementValidations(bytes calldata _id, address _purchaser) internal view {
     if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
     checkPostExists(_id);
-    if (postStore[_id].creator != _addr) revert OnlyCreatorCanDeclinePurchase();
     if (!postStore[_id].paywalled) revert PostNotPaywalled();
-    if (!isPurchasePending(purchaser, _id)) revert NoPendingPurchaseFound();
+    if (!isPurchasePending(_purchaser, _id)) revert NoPendingPurchaseFound();
+  }
 
-    for (uint256 i = 0; i < pendingPurchases[_addr].length; i++) {
-      if (keccak256(pendingPurchases[_addr][i].postId) == keccak256(_id)) {
-        pendingPurchases[_addr][i] = pendingPurchases[_addr][pendingPurchases[_addr].length - 1];
-        pendingPurchases[_addr].pop();
+  function removePurchaseFromPending(address _creator, bytes calldata _id, address _purchaser) internal {
+    for (uint256 i = 0; i < pendingPurchases[_creator].length; i++) {
+      if (keccak256(pendingPurchases[_creator][i].postId) == keccak256(_id)) {
+        pendingPurchases[_creator][i] = pendingPurchases[_creator][pendingPurchases[_creator].length - 1];
+        pendingPurchases[_creator].pop();
         break;
       }
     }
-    delete purchaserPublicKeys[_id][purchaser];
+    delete purchaserPublicKeys[_id][_purchaser];
+  }
+
+  function getPurchasedPost(address _addr, bytes calldata _id) public view returns (PostLib.Post memory) {
+    return purchasedPosts[_addr][_id];
   }
 }

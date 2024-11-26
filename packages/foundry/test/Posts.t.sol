@@ -537,8 +537,14 @@ contract PostManagementTest is Test {
     spotlight.createPost(post.title, post.content, post.nonce, signature, true);
     vm.stopPrank();
 
-    vm.startPrank(vm.addr(2));
+    address purchaser = vm.addr(2);
+    startHoax(purchaser); // prank, but w/ a balance
     spotlight.registerProfile("username2");
+    spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
+    vm.stopPrank();
+
+    vm.startPrank(vm.addr(3));
+    spotlight.registerProfile("username3");
     vm.expectRevert(OnlyCreatorCanDeclinePurchase.selector);
     spotlight.declinePurchase(signature, payable(vm.addr(2)));
   }
@@ -591,5 +597,66 @@ contract PostManagementTest is Test {
     vm.startPrank(wallet.addr);
     spotlight.declinePurchase(signature, payable(purchaser));
     assertEq(startingBalance, purchaser.balance);
+    vm.stopPrank();
+
+    vm.startPrank(purchaser);
+    assertFalse(spotlight.isPurchasePending(signature));
+  }
+
+  function testCreatorCanRetrievePendingPurchases() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, true);
+
+    address purchaser = vm.addr(2);
+    startHoax(purchaser); // prank, but w/ a balance
+    spotlight.registerProfile("username2");
+    spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
+    vm.stopPrank;
+
+    vm.startPrank(wallet.addr);
+    Posts.PendingPurchase[] memory pending = spotlight.getPendingPurchases();
+    assertEq(1, pending.length);
+    assertEq(purchaser, pending[0].purchaser);
+    assertEq(signature, pending[0].postId);
+    assertEq("pubkey", pending[0].pubkey);
+  }
+
+  function testFundTransferAndPostCopyWhenCreatorAcceptsPurchase() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, true);
+
+    address purchaser = vm.addr(2);
+    startHoax(purchaser); // prank, but w/ a balance
+    spotlight.registerProfile("username2");
+    spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
+    vm.stopPrank();
+
+    // After accepting, Spotlight releases balance to creator
+    vm.startPrank(wallet.addr);
+    spotlight.acceptPurchase(signature, purchaser, "newly-encrypted-content-for-you");
+    assertEq(spotlight.PAYWALL_COST(), wallet.addr.balance);
+    assertEq(0, address(spotlight).balance);
+    vm.stopPrank();
+
+    vm.startPrank(purchaser);
+    PostLib.Post memory purchasedPost = spotlight.getPurchasedPost(signature);
+    assertEq(wallet.addr, purchasedPost.creator);
+    assertEq(post.title, purchasedPost.title);
+    assertEq("newly-encrypted-content-for-you", purchasedPost.content);
+    assertEq(signature, purchasedPost.id);
+    assertEq(signature, purchasedPost.signature);
+    assertEq(post.nonce, purchasedPost.nonce);
+    assertTrue(purchasedPost.paywalled);
+
+    // Now that the purchase was settled, it should no longer be pending
+    assertFalse(spotlight.isPurchasePending(signature));
   }
 }

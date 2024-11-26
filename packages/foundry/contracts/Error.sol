@@ -57,3 +57,5 @@ error CommentCannotBeEmpty();
 error OnlyCreatorCanDeclinePurchase();
 
 error NoPendingPurchaseFound();
+
+error OnlyCreatorCanAcceptPurchase();

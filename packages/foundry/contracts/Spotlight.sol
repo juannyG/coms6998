@@ -264,9 +264,23 @@ contract Spotlight is ReentrancyGuard {
     return postsContract.getPendingPurchases(msg.sender);
   }
 
-  function declinePurchase(bytes calldata _id, address payable purchaser) public onlyRegistered nonReentrant {
-    postsContract.declinePurchase(msg.sender, _id, purchaser);
+  function declinePurchase(bytes calldata _id, address payable _purchaser) public onlyRegistered nonReentrant {
+    postsContract.declinePurchase(msg.sender, _id, _purchaser);
     // TODO: Make sure the contract has the funds to handle the refund of the decline
-    purchaser.transfer(0.1 ether);
+    _purchaser.transfer(PAYWALL_COST);
+  }
+
+  function acceptPurchase(bytes calldata _id, address _purchaser, string memory _content)
+    public
+    onlyRegistered
+    nonReentrant
+  {
+    postsContract.acceptPurchase(msg.sender, _id, _purchaser, _content);
+    // TODO: Make sure the contract has the funds to handle the refund of the decline
+    payable(msg.sender).transfer(PAYWALL_COST);
+  }
+
+  function getPurchasedPost(bytes calldata _id) public view returns (PostLib.Post memory) {
+    return postsContract.getPurchasedPost(msg.sender, _id);
   }
 }
