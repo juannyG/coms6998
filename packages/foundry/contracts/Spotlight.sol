@@ -186,6 +186,7 @@ contract Spotlight is ReentrancyGuard {
     bool _paywalled
   ) public onlyRegistered {
     postsContract.createPost(msg.sender, _title, _content, _nonce, _sig, _paywalled);
+    reputationToken.engagementReward(msg.sender);
     emit PostCreated(msg.sender, _sig);
   }
 
@@ -219,6 +220,7 @@ contract Spotlight is ReentrancyGuard {
 
   function upvote(bytes calldata _id) public onlyRegistered {
     postsContract.upvote(msg.sender, _id);
+    reputationToken.engagementReward(msg.sender);
     emit PostUpvoted(msg.sender, _id);
   }
 
@@ -228,6 +230,7 @@ contract Spotlight is ReentrancyGuard {
 
   function downvote(bytes calldata _id) public onlyRegistered {
     postsContract.downvote(msg.sender, _id);
+    reputationToken.engagementReward(msg.sender);
     emit PostDownvoted(msg.sender, _id);
   }
 
@@ -237,6 +240,7 @@ contract Spotlight is ReentrancyGuard {
 
   function addComment(bytes calldata _id, string calldata _content) public onlyRegistered {
     postsContract.addComment(msg.sender, _id, _content);
+    reputationToken.engagementReward(msg.sender);
     emit CommentAdded(msg.sender, _id, _content, block.timestamp);
   }
 
@@ -257,6 +261,7 @@ contract Spotlight is ReentrancyGuard {
       uint256 excess = msg.value - PAYWALL_COST;
       payable(msg.sender).transfer(excess);
     }
+    reputationToken.engagementReward(msg.sender);
     emit PostPurchased(msg.sender, _id);
   }
 
