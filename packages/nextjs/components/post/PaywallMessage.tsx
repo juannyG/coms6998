@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useAccount } from "wagmi";
 import { TPost } from "~~/types/spotlight";
 
@@ -39,12 +40,13 @@ const PaywallMessage = ({
   const trimId = post.id.substring(0, 6) + "..." + post.id.substring(post.id.length - 4);
 
   return (
-    <>
-      <div className="italic">
+    <div className="bg-gray-200 my-4 p-4 rounded-lg">
+      <div className="italic flex flex-col w-full items-center backdrop-blur-md bg-blue-100/30 rounded-lg">
+        <Image height={40} width={40} src="/padlock.png" alt="lock" className="py-2" />
         <div>{trimId} is paywalled.</div>
         <div>{showPaywalMsg()}</div>
       </div>
-    </>
+    </div>
   );
 };
 

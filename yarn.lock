@@ -10733,6 +10733,7 @@ __metadata:
   resolution: "se-2@workspace:."
   dependencies:
     "@lexical/react": ^0.18.0
+    "@metamask/eth-sig-util": ^8.0.0
     daisyui: latest
     eslint: ^9.13.0
     husky: ~8.0.3

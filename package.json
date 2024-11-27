@@ -47,6 +47,7 @@
   },
   "dependencies": {
     "@lexical/react": "^0.18.0",
+    "@metamask/eth-sig-util": "^8.0.0",
     "lexical": "^0.18.0",
     "react-use": "^17.5.1"
   }
