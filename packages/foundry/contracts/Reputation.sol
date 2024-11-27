@@ -133,6 +133,16 @@ contract Reputation is ERC20 {
   }
 
   /**
+   * @dev Issues 1 tokens for enganging with the application
+   * @param receiver The address which will receive the tokens
+   */
+  function engagementReward(address receiver) external {
+    if (!isAllowed(msg.sender)) revert OnlySpotlightContractCanIssueTokens();
+    _applyDecay(receiver); // Apply decay before issuing new tokens
+    _issueToken(receiver, 1);
+  }
+
+  /**
    * Override balanceOf to apply decay
    * @dev Returns the balance of an account after applying decay
    * @param account The address to check balance for

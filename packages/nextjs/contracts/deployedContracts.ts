@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     Spotlight: {
-      address: "0x959922be3caee4b8cd9a407cc3ac1c251c2007b1",
+      address: "0x5fbdb2315678afecb367f032d93f642f64180aa3",
       abi: [
         {
           type: "constructor",
