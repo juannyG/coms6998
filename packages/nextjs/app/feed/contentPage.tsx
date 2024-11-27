@@ -33,7 +33,13 @@ const ContentPage: NextPage = function () {
   }
 
   if (data.length == 0) {
-    return <>No posts yet (To be styled!)</>;
+    return (
+      <div className="flex flex-col items-center mb-4">
+        <p className="text-7xl">🧐</p>
+        <p className="text-2xl">No posts yet</p>
+        <p className="text-lg text-gray-500">Be the first to post something!</p>
+      </div>
+    );
   }
 
   // Calculate pagination
