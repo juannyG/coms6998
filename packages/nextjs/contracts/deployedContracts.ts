@@ -948,12 +948,102 @@ const deployedContracts = {
         },
         {
           type: "error",
+          name: "AlreadyDownvoted",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "AlreadyVoted",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "AvatarCIDCannotBeEmpty",
           inputs: [],
         },
         {
           type: "error",
+          name: "CannotIssueToZeroAddress",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "CommentCannotBeEmpty",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ContentCannotBeEmpty",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "CreatorCannotPayForOwnContent",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "InsufficentPostFunds",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "InvalidSignature",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "NoPendingPurchaseFound",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlyCreatorCanAcceptPurchase",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlyCreatorCanDeclinePurchase",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlyCreatorCanEdit",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightCanManagePosts",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightContractCanBurnTokens",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightContractCanIssueTokens",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostAlreadyPurchased",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostCreatorCannotBeZero",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostNotFound",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostNotPaywalled",
           inputs: [],
         },
         {
@@ -969,6 +1059,21 @@ const deployedContracts = {
         {
           type: "error",
           name: "ReentrancyGuardReentrantCall",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ReputationAddressCannotBeZero",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "SpotlightAddressCannotBeZero",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "TitleCannotBeEmpty",
           inputs: [],
         },
         {
@@ -1933,12 +2038,102 @@ const deployedContracts = {
         },
         {
           type: "error",
+          name: "AlreadyDownvoted",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "AlreadyVoted",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "AvatarCIDCannotBeEmpty",
           inputs: [],
         },
         {
           type: "error",
+          name: "CannotIssueToZeroAddress",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "CommentCannotBeEmpty",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ContentCannotBeEmpty",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "CreatorCannotPayForOwnContent",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "InsufficentPostFunds",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "InvalidSignature",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "NoPendingPurchaseFound",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlyCreatorCanAcceptPurchase",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlyCreatorCanDeclinePurchase",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlyCreatorCanEdit",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightCanManagePosts",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightContractCanBurnTokens",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightContractCanIssueTokens",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostAlreadyPurchased",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostCreatorCannotBeZero",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostNotFound",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostNotPaywalled",
           inputs: [],
         },
         {
@@ -1954,6 +2149,21 @@ const deployedContracts = {
         {
           type: "error",
           name: "ReentrancyGuardReentrantCall",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ReputationAddressCannotBeZero",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "SpotlightAddressCannotBeZero",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "TitleCannotBeEmpty",
           inputs: [],
         },
         {

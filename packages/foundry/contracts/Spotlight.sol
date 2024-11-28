@@ -11,7 +11,7 @@ import "./Posts.sol";
 import "./PostLib.sol";
 import "./Events.sol";
 import "./Reputation.sol";
-import "./Error.sol";
+import "./SpotlightErrors.sol";
 
 ////////////////////////////////////////////////////////////
 // TODO: All writes must validate msg.sender != address(0)
@@ -21,7 +21,7 @@ import "./Error.sol";
 /// @author Team
 /// @notice You can use this contract to manage user profiles and create posts.
 /// @dev This contract is intended to be deployed on Ethereum-compatible networks.
-contract Spotlight is ReentrancyGuard {
+contract Spotlight is ReentrancyGuard, SpotlightErrors {
   uint256 public constant PAYWALL_COST = 0.1 ether;
 
   /// @notice The owner of the contract.
@@ -58,15 +58,15 @@ contract Spotlight is ReentrancyGuard {
 
   /// @notice Modifier to ensure that only registered users can perform certain actions.
   modifier onlyRegistered() {
-    if (!isRegistered(msg.sender)) revert ProfileNotExist();
+    if (!isRegistered(msg.sender)) revert SpotlightErrors.ProfileNotExist();
     _;
   }
 
   /// @notice Modifier to ensure that a username meets the length requirements.
   /// @param _username The username to be validated.
   modifier usernameValid(string memory _username) {
-    if (bytes(_username).length == 0) revert UsernameCannotBeEmpty();
-    if (bytes(_username).length > 32) revert UsernameTooLong();
+    if (bytes(_username).length == 0) revert SpotlightErrors.UsernameCannotBeEmpty();
+    if (bytes(_username).length > 32) revert SpotlightErrors.UsernameTooLong();
     _;
   }
 
@@ -75,10 +75,10 @@ contract Spotlight is ReentrancyGuard {
   /// @param _username The desired username for the profile.
   function registerProfile(string memory _username) public usernameValid(_username) {
     // TODO: Ensure msg.sender != address(0)
-    if (isRegistered(msg.sender)) revert ProfileAlreadyExist();
+    if (isRegistered(msg.sender)) revert SpotlightErrors.ProfileAlreadyExist();
 
     bytes32 usernameHash = _getUsernameHash(_username);
-    if (normalized_username_hashes[usernameHash]) revert UsernameTaken();
+    if (normalized_username_hashes[usernameHash]) revert SpotlightErrors.UsernameTaken();
 
     normalized_username_hashes[usernameHash] = true;
 
@@ -101,7 +101,7 @@ contract Spotlight is ReentrancyGuard {
   /// @param a The address of the profile owner.
   /// @return The username associated with the address.
   function getProfile(address a) public view returns (Profile memory) {
-    if (bytes(profiles[a].username).length == 0) revert ProfileNotExist();
+    if (bytes(profiles[a].username).length == 0) revert SpotlightErrors.ProfileNotExist();
 
     // We want to update this on the way out and NOT the storage state - that costs gas!
     Profile memory profile = profiles[a];
@@ -114,7 +114,7 @@ contract Spotlight is ReentrancyGuard {
   /// @param _newUsername The new username to set for the profile.
   function updateUsername(string memory _newUsername) public onlyRegistered usernameValid(_newUsername) {
     bytes32 newHash = _getUsernameHash(_newUsername);
-    if (normalized_username_hashes[newHash]) revert UsernameTaken();
+    if (normalized_username_hashes[newHash]) revert SpotlightErrors.UsernameTaken();
 
     // Remove the old username hash.
     bytes32 oldHash = _getUsernameHash(profiles[msg.sender].username);
@@ -128,7 +128,7 @@ contract Spotlight is ReentrancyGuard {
   }
 
   function updateAvatarCID(string calldata _cid) public onlyRegistered {
-    if (bytes(_cid).length == 0) revert AvatarCIDCannotBeEmpty();
+    if (bytes(_cid).length == 0) revert SpotlightErrors.AvatarCIDCannotBeEmpty();
     profiles[msg.sender].avatarCID = _cid;
   }
 
@@ -193,7 +193,7 @@ contract Spotlight is ReentrancyGuard {
   /// @notice Get all posts for a given address
   /// @param _addr Wallet address of the registered user whose posts we wish to retrieve
   function getPostsOfAddress(address _addr) public view returns (PostLib.Post[] memory) {
-    if (!isRegistered(_addr)) revert AddressNotRegistered();
+    if (!isRegistered(_addr)) revert SpotlightErrors.AddressNotRegistered();
     return postsContract.getPostsOfAddress(_addr);
   }
 
@@ -254,7 +254,7 @@ contract Spotlight is ReentrancyGuard {
   }
 
   function purchasePost(bytes calldata _id, string calldata _pubkey) public payable onlyRegistered nonReentrant {
-    if (msg.value < PAYWALL_COST) revert InsufficentPostFunds();
+    if (msg.value < PAYWALL_COST) revert SpotlightErrors.InsufficentPostFunds();
     postsContract.purchasePost(msg.sender, _id, _pubkey);
     if (msg.value > PAYWALL_COST) {
       // Refund any excess ether back to the user

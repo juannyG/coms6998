@@ -15,8 +15,8 @@ const exampleTheme = {
     nested: {
       listitem: "editor-nested-listitem",
     },
-    ol: "editor-list-ol",
-    ul: "editor-list-ul",
+    ol: "editor-list-ol list-decimal",
+    ul: "editor-list-ul list-disc",
     listitem: "editor-listitem",
   },
   image: "editor-image",
