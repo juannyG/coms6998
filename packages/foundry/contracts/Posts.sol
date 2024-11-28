@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-import "./Error.sol";
+import "./SpotlightErrors.sol";
 import "./PostLib.sol";
 import "./Reputation.sol";
 
@@ -52,8 +52,8 @@ contract Posts {
   mapping(address => mapping(bytes => PostLib.Post)) purchasedPosts;
 
   constructor(address _spotlightContract, address _reputationContract) {
-    if (_spotlightContract == address(0)) revert SpotlightAddressCannotBeZero();
-    if (_reputationContract == address(0)) revert ReputationAddressCannotBeZero();
+    if (_spotlightContract == address(0)) revert SpotlightErrors.SpotlightAddressCannotBeZero();
+    if (_reputationContract == address(0)) revert SpotlightErrors.ReputationAddressCannotBeZero();
     spotlightContract = _spotlightContract;
     reputationToken = Reputation(_reputationContract);
   }
@@ -61,7 +61,7 @@ contract Posts {
   function checkPostExists(bytes memory _id) internal view {
     PostLib.Post memory post = postStore[_id];
     if (bytes(post.content).length == 0) {
-      revert PostNotFound();
+      revert SpotlightErrors.PostNotFound();
     }
   }
 
@@ -78,10 +78,10 @@ contract Posts {
     bytes calldata _sig,
     bool _paywalled
   ) public {
-    if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
-    if (bytes(_content).length == 0) revert ContentCannotBeEmpty();
-    if (bytes(_title).length == 0) revert TitleCannotBeEmpty();
-    if (!PostLib.isValidPostSignature(_addr, _title, _content, _nonce, _sig)) revert InvalidSignature();
+    if (msg.sender != spotlightContract) revert SpotlightErrors.OnlySpotlightCanManagePosts();
+    if (bytes(_content).length == 0) revert SpotlightErrors.ContentCannotBeEmpty();
+    if (bytes(_title).length == 0) revert SpotlightErrors.TitleCannotBeEmpty();
+    if (!PostLib.isValidPostSignature(_addr, _title, _content, _nonce, _sig)) revert SpotlightErrors.InvalidSignature();
 
     // TODO: Check that the signature doesn't already exist in the postStore!
 
@@ -119,7 +119,7 @@ contract Posts {
 
   function getPost(bytes calldata _post_sig) public view returns (PostLib.Post memory) {
     PostLib.Post memory p = postStore[_post_sig];
-    if (p.creator == address(0)) revert PostNotFound();
+    if (p.creator == address(0)) revert SpotlightErrors.PostNotFound();
     return p;
   }
 
@@ -136,11 +136,11 @@ contract Posts {
 
   function editPost(address _addr, bytes calldata _id, string calldata newContent) public {
     // Ensure post exists
-    if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
+    if (msg.sender != spotlightContract) revert SpotlightErrors.OnlySpotlightCanManagePosts();
     checkPostExists(_id);
     PostLib.Post storage post = postStore[_id];
-    if (post.creator != _addr) revert OnlyCreatorCanEdit();
-    if (bytes(newContent).length == 0) revert ContentCannotBeEmpty();
+    if (post.creator != _addr) revert SpotlightErrors.OnlyCreatorCanEdit();
+    if (bytes(newContent).length == 0) revert SpotlightErrors.ContentCannotBeEmpty();
 
     // TODO: Accept newSig arg and verify it against newContent
 
@@ -150,10 +150,10 @@ contract Posts {
 
   function deletePost(address _addr, bytes memory _id) public {
     // Ensure the post exists
-    if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
+    if (msg.sender != spotlightContract) revert SpotlightErrors.OnlySpotlightCanManagePosts();
     checkPostExists(_id);
     PostLib.Post storage post = postStore[_id];
-    if (post.creator != _addr) revert OnlyCreatorCanEdit();
+    if (post.creator != _addr) revert SpotlightErrors.OnlyCreatorCanEdit();
 
     // TODO: Burn RPT associated with the post (or at least burn some amount of RPT...)
 
@@ -173,7 +173,7 @@ contract Posts {
   }
 
   function deleteProfile(address _addr) public {
-    if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
+    if (msg.sender != spotlightContract) revert SpotlightErrors.OnlySpotlightCanManagePosts();
     for (uint256 i = 0; i < profilePostIDs[_addr].length; ++i) {
       bytes memory id = profilePostIDs[_addr][i];
       deleteCommunityPost(id);
@@ -199,7 +199,7 @@ contract Posts {
   }
 
   function upvote(address _addr, bytes calldata _id) public {
-    if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
+    if (msg.sender != spotlightContract) revert SpotlightErrors.OnlySpotlightCanManagePosts();
     checkPostExists(_id);
     PostLib.Post storage p = postStore[_id];
     if (upvotedBy[_id][_addr]) {
@@ -221,7 +221,7 @@ contract Posts {
   }
 
   function downvote(address _addr, bytes calldata _id) public {
-    if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
+    if (msg.sender != spotlightContract) revert SpotlightErrors.OnlySpotlightCanManagePosts();
     checkPostExists(_id);
     PostLib.Post storage p = postStore[_id];
     if (downvotedBy[_id][_addr]) {
@@ -243,9 +243,9 @@ contract Posts {
   }
 
   function addComment(address _addr, bytes calldata _id, string calldata _content) public {
-    if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
+    if (msg.sender != spotlightContract) revert SpotlightErrors.OnlySpotlightCanManagePosts();
     checkPostExists(_id);
-    if (bytes(_content).length == 0) revert CommentCannotBeEmpty();
+    if (bytes(_content).length == 0) revert SpotlightErrors.CommentCannotBeEmpty();
 
     PostLib.Comment memory newComment =
       PostLib.Comment({ commenter: _addr, content: _content, createdAt: block.timestamp });
@@ -269,13 +269,13 @@ contract Posts {
   }
 
   function purchasePost(address _addr, bytes calldata _id, string calldata _pubkey) public {
-    if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
+    if (msg.sender != spotlightContract) revert SpotlightErrors.OnlySpotlightCanManagePosts();
     checkPostExists(_id);
-    if (!postStore[_id].paywalled) revert PostNotPaywalled();
-    if (_addr == postStore[_id].creator) revert CreatorCannotPayForOwnContent();
+    if (!postStore[_id].paywalled) revert SpotlightErrors.PostNotPaywalled();
+    if (_addr == postStore[_id].creator) revert SpotlightErrors.CreatorCannotPayForOwnContent();
 
     // TODO: This will need to be modified - same reason(s) stated in `hasPurchasedPost` above
-    if (bytes(purchaserPublicKeys[_id][_addr]).length > 0) revert PostAlreadyPurchased();
+    if (bytes(purchaserPublicKeys[_id][_addr]).length > 0) revert SpotlightErrors.PostAlreadyPurchased();
 
     purchaserPublicKeys[_id][_addr] = _pubkey;
     pendingPurchases[postStore[_id].creator].push(PendingPurchase(_addr, _id, _pubkey));
@@ -288,14 +288,14 @@ contract Posts {
   function declinePurchase(address _creator, bytes calldata _id, address _purchaser) public {
     purchaseSettlementValidations(_id, _purchaser);
     // TODO: Purchaser is allowed to decline the purchase!
-    if (postStore[_id].creator != _creator) revert OnlyCreatorCanDeclinePurchase();
+    if (postStore[_id].creator != _creator) revert SpotlightErrors.OnlyCreatorCanDeclinePurchase();
     removePurchaseFromPending(_creator, _id, _purchaser);
   }
 
   function acceptPurchase(address _creator, bytes calldata _id, address _purchaser, string memory _content) public {
     purchaseSettlementValidations(_id, _purchaser);
     PostLib.Post memory p = postStore[_id];
-    if (p.creator != _creator) revert OnlyCreatorCanAcceptPurchase();
+    if (p.creator != _creator) revert SpotlightErrors.OnlyCreatorCanAcceptPurchase();
 
     // Create a copy of the post for the purchaser - content is encrypted with their pubkey
     purchasedPosts[_purchaser][_id] = PostLib.Post({
@@ -315,10 +315,10 @@ contract Posts {
   }
 
   function purchaseSettlementValidations(bytes calldata _id, address _purchaser) internal view {
-    if (msg.sender != spotlightContract) revert OnlySpotlightCanManagePosts();
+    if (msg.sender != spotlightContract) revert SpotlightErrors.OnlySpotlightCanManagePosts();
     checkPostExists(_id);
-    if (!postStore[_id].paywalled) revert PostNotPaywalled();
-    if (!isPurchasePending(_purchaser, _id)) revert NoPendingPurchaseFound();
+    if (!postStore[_id].paywalled) revert SpotlightErrors.PostNotPaywalled();
+    if (!isPurchasePending(_purchaser, _id)) revert SpotlightErrors.NoPendingPurchaseFound();
   }
 
   function removePurchaseFromPending(address _creator, bytes calldata _id, address _purchaser) internal {

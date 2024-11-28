@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import "../contracts/Spotlight.sol";
 import "../contracts/Events.sol";
 import "../contracts/PostLib.sol";
-import "../contracts/Error.sol";
+import "../contracts/SpotlightErrors.sol";
 
 contract VotesTest is Test {
   Spotlight public spotlight;
@@ -39,7 +39,7 @@ contract VotesTest is Test {
   ////////////////////////////////
   function testNonRegisteredUserCannotUpvoteAPost() public {
     vm.startPrank(wallet2.addr);
-    vm.expectRevert(ProfileNotExist.selector);
+    vm.expectRevert(SpotlightErrors.ProfileNotExist.selector);
     spotlight.upvote(postSig);
   }
 
@@ -93,7 +93,7 @@ contract VotesTest is Test {
   ////////////////////////////////
   function testNonRegisteredUserCannotDownvoteAPost() public {
     vm.startPrank(wallet2.addr);
-    vm.expectRevert(ProfileNotExist.selector);
+    vm.expectRevert(SpotlightErrors.ProfileNotExist.selector);
     spotlight.downvote(postSig);
   }
 
