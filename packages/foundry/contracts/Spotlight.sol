@@ -54,6 +54,9 @@ contract Spotlight is ReentrancyGuard, SpotlightErrors {
     reputationToken = new Reputation(address(this));
     postsContract = new Posts(address(this), address(reputationToken));
     reputationToken.setPostsContract(address(postsContract));
+
+    // Make it easier to locate the contract address for importing into wallets
+    emit RPTContractCreated(address(reputationToken));
   }
 
   /// @notice Modifier to ensure that only registered users can perform certain actions.

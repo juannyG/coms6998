@@ -285,11 +285,13 @@ contract Posts {
     return pendingPurchases[_addr];
   }
 
-  function declinePurchase(address _creator, bytes calldata _id, address _purchaser) public {
+  function declinePurchase(address _decliner, bytes calldata _id, address _purchaser) public {
     purchaseSettlementValidations(_id, _purchaser);
-    // TODO: Purchaser is allowed to decline the purchase!
-    if (postStore[_id].creator != _creator) revert SpotlightErrors.OnlyCreatorCanDeclinePurchase();
-    removePurchaseFromPending(_creator, _id, _purchaser);
+    if (postStore[_id].creator == _decliner || _decliner == _purchaser) {
+      removePurchaseFromPending(postStore[_id].creator, _id, _purchaser);
+    } else {
+      revert SpotlightErrors.OnlyCreatorOrPurchaserCanDeclinePurchase();
+    }
   }
 
   function acceptPurchase(address _creator, bytes calldata _id, address _purchaser, string memory _content) public {
