@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import "../contracts/Spotlight.sol";
+import "../contracts/Reputation.sol";
 import "./DeployHelpers.s.sol";
 
 contract DeployScript is ScaffoldETHDeploy {
@@ -16,8 +17,12 @@ contract DeployScript is ScaffoldETHDeploy {
     }
     vm.startBroadcast(deployerPrivateKey);
 
-    // Deploy Spotlight first
-    Spotlight spotlight = new Spotlight(vm.addr(deployerPrivateKey));
+    // Deploy RTP first
+    Reputation rtp = new Reputation();
+    console.logString(string.concat("Reputation deployed at: ", vm.toString(address(rtp))));
+
+    // and then Spotlight
+    Spotlight spotlight = new Spotlight(vm.addr(deployerPrivateKey), address(rtp));
     console.logString(string.concat("Spotlight deployed at: ", vm.toString(address(spotlight))));
 
     // Store deployments for export

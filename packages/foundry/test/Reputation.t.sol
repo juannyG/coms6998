@@ -20,7 +20,8 @@ contract ReputationTest is Test {
     user2 = address(3);
 
     // Deploy contract
-    reputation = new Reputation(spotlight);
+    reputation = new Reputation();
+    reputation.setSpotlightContract(spotlight);
 
     // Label addresses for better trace output
     vm.label(spotlight, "Spotlight");
@@ -30,8 +31,9 @@ contract ReputationTest is Test {
 
   function testConstructor() public {
     // Test constructor requirements
+    Reputation _rpt = new Reputation();
     vm.expectRevert(SpotlightErrors.SpotlightAddressCannotBeZero.selector);
-    new Reputation(address(0));
+    _rpt.setSpotlightContract(address(0));
 
     // Test spotlight address is set correctly
     assertEq(reputation.spotlightContract(), spotlight);

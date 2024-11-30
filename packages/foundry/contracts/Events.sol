@@ -53,5 +53,3 @@ event TokenBurned(address indexed account, uint256 amount);
 event CommentAdded(address indexed commenter, bytes indexed postId, string content, uint256 createdAt);
 
 event PostPurchased(address indexed purchaser, bytes indexed postId);
-
-event RPTContractCreated(address indexed rptAddress);

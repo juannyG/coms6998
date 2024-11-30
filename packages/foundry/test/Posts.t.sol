@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "../contracts/Spotlight.sol";
+import "../contracts/Reputation.sol";
 import "../contracts/Events.sol";
 import "../contracts/PostLib.sol";
 import "../contracts/SpotlightErrors.sol";
@@ -83,7 +84,8 @@ contract PostManagementTest is Test {
   Vm.Wallet public wallet;
 
   function setUp() public {
-    spotlight = new Spotlight(vm.addr(1));
+    Reputation rpt = new Reputation();
+    spotlight = new Spotlight(vm.addr(1), address(rpt));
     wallet = vm.createWallet(1);
   }
 

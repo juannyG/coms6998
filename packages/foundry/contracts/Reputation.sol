@@ -6,15 +6,17 @@ import "./Events.sol";
 import "./SpotlightErrors.sol";
 
 contract Reputation is ERC20 {
-  address public immutable spotlightContract;
+  address public spotlightContract;
   address private postsContract;
   uint256 private constant DECAY_INTERVAL = 15 minutes;
   uint256 private constant DECAY_RATE = 1; // 1% decay every 15 minutes
   mapping(address => uint256) private lastDecayTime;
 
-  constructor(address _spotlightContract) ERC20("Reputation", "RPT") {
-    if (_spotlightContract == address(0)) revert SpotlightErrors.SpotlightAddressCannotBeZero();
-    spotlightContract = _spotlightContract;
+  constructor() ERC20("Reputation", "RPT") { }
+
+  function setSpotlightContract(address _addr) public {
+    if (_addr == address(0)) revert SpotlightErrors.SpotlightAddressCannotBeZero();
+    spotlightContract = _addr;
   }
 
   function setPostsContract(address _addr) public {
