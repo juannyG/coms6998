@@ -49,10 +49,11 @@ contract Spotlight is ReentrancyGuard, SpotlightErrors {
 
   /// @notice Constructor sets the contract owner during deployment.
   /// @param _owner The address of the owner.
-  constructor(address _owner) {
+  constructor(address _owner, address _rtpContract) {
     owner = _owner;
-    reputationToken = new Reputation(address(this));
-    postsContract = new Posts(address(this), address(reputationToken));
+    reputationToken = Reputation(_rtpContract);
+    postsContract = new Posts(address(this), _rtpContract);
+    reputationToken.setSpotlightContract(address(this));
     reputationToken.setPostsContract(address(postsContract));
   }
 

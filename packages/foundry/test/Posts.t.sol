@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 import "../contracts/Spotlight.sol";
+import "../contracts/Reputation.sol";
 import "../contracts/Events.sol";
 import "../contracts/PostLib.sol";
 import "../contracts/SpotlightErrors.sol";
@@ -83,7 +84,8 @@ contract PostManagementTest is Test {
   Vm.Wallet public wallet;
 
   function setUp() public {
-    spotlight = new Spotlight(vm.addr(1));
+    Reputation rpt = new Reputation();
+    spotlight = new Spotlight(vm.addr(1), address(rpt));
     wallet = vm.createWallet(1);
   }
 
@@ -528,7 +530,7 @@ contract PostManagementTest is Test {
     spotlight.declinePurchase("id", payable(wallet.addr));
   }
 
-  function testOnlyPostCreatorCanDeclinePurchase() public {
+  function testCannotDeclinePurchaseIfNotCreatorOrPurchaser() public {
     vm.startPrank(wallet.addr);
     spotlight.registerProfile("username");
 
@@ -545,7 +547,7 @@ contract PostManagementTest is Test {
 
     vm.startPrank(vm.addr(3));
     spotlight.registerProfile("username3");
-    vm.expectRevert(SpotlightErrors.OnlyCreatorCanDeclinePurchase.selector);
+    vm.expectRevert(SpotlightErrors.OnlyCreatorOrPurchaserCanDeclinePurchase.selector);
     spotlight.declinePurchase(signature, payable(vm.addr(2)));
   }
 
@@ -600,6 +602,31 @@ contract PostManagementTest is Test {
     vm.stopPrank();
 
     vm.startPrank(purchaser);
+    assertFalse(spotlight.isPurchasePending(signature));
+  }
+
+  function testFundTransfersWhenPurchaserDeclinesPurchase() public {
+    vm.startPrank(wallet.addr);
+    spotlight.registerProfile("username");
+
+    PostLib.Post memory post = createTestPost();
+    bytes memory signature = signContentViaWallet(wallet, post);
+    spotlight.createPost(post.title, post.content, post.nonce, signature, true);
+
+    address purchaser = vm.addr(2);
+    startHoax(purchaser); // prank, but w/ a balance
+    spotlight.registerProfile("username2");
+
+    // After paying for post, Spotlight holds balance
+    uint256 startingBalance = purchaser.balance;
+    spotlight.purchasePost{ value: 1 ether }(signature, "pubkey");
+    assertTrue(spotlight.isPurchasePending(signature));
+    assertEq(startingBalance - spotlight.PAYWALL_COST(), purchaser.balance);
+    assertEq(spotlight.PAYWALL_COST(), address(spotlight).balance);
+
+    // After declining, Spotlight releases balance back to purchaser
+    spotlight.declinePurchase(signature, payable(purchaser));
+    assertEq(startingBalance, purchaser.balance);
     assertFalse(spotlight.isPurchasePending(signature));
   }
 

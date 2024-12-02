@@ -55,7 +55,7 @@ contract SpotlightErrors {
 
   error CommentCannotBeEmpty();
 
-  error OnlyCreatorCanDeclinePurchase();
+  error OnlyCreatorOrPurchaserCanDeclinePurchase();
 
   error NoPendingPurchaseFound();
 

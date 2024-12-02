@@ -3,6 +3,7 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "../contracts/Spotlight.sol";
+import "../contracts/Reputation.sol";
 import "../contracts/Events.sol";
 import "../contracts/PostLib.sol";
 import "../contracts/SpotlightErrors.sol";
@@ -14,7 +15,8 @@ contract VotesTest is Test {
   bytes public postSig;
 
   function setUp() public {
-    spotlight = new Spotlight(vm.addr(1));
+    Reputation rpt = new Reputation();
+    spotlight = new Spotlight(vm.addr(1), address(rpt));
     wallet1 = vm.createWallet(1);
     wallet2 = vm.createWallet(2);
 
