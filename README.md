@@ -19,7 +19,7 @@ where the contract is deployed. We also deployed it on Polygon, but due to trans
 Because we're using a local testnet, there's a faucet available and a "burner wallet." However, to access all of Spotlight's features you'll need
 to use a [MetaMask](https://metamask.io/) wallet.
 
-Here's how to get it setup:
+#### How to setup MetaMask with Spotlight
 * Install the MetaMask browser extension
 * Setup your MetaMask account if you don't already have one
 * Head on over to [Spotlight](https://35.208.181.51/)
@@ -30,6 +30,11 @@ Here's how to get it setup:
 * Click "Add URL"
 * Under "Chain ID", type 31337
 * You should now see suggestions for the "Currency symbol" and "Network name" fields. You may use them.
+* Click "Save"
+* You may now go back to the Network selector in MetaMask and select "GoChain Testnet"
+
+The following GIF shows what your experience should look like.
+
 ![add-spotlight-to-metamask](https://github.com/user-attachments/assets/521cdb13-664d-4083-87b2-27ce23391775)
 
 # Local Setup
