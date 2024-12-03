@@ -27,7 +27,7 @@ Here's how to get it setup:
 
 # Local Setup
 
-This dApp was built using the [scaffold-eth2](https://docs.scaffoldeth.io/quick-start/installation) framework. Base
+This DApp was built using the [scaffold-eth2](https://docs.scaffoldeth.io/quick-start/installation) framework. Base
 depency versions are as follows:
 * Node v18.19.1
 * Yarn v3.2.3
