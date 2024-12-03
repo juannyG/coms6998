@@ -3,9 +3,11 @@ A web3 reddit.
 
 ## Final Deliverables
 
+### Final Project Report
 [Please review our final project report](final-project-deliverables/COMS6998%20Fall%202024%20-%20Group%2011%20-%20Spotlight%20Final%20Project%20Report.pdf) for
 a comprehensive overview of how Spotlight works, the tokenomics of our project, and further features we would have liked to have implemented.
 
+### Try it out yourself!
 If you'd like to try Spotlight out first hand, we currently have a GCP instance which is hosting the frontend NextJS UI and also our own Ethereum testnet through [forge's anvil](https://book.getfoundry.sh/reference/anvil/).
 
 It is located here: https://35.208.181.51/
