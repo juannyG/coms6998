@@ -13,7 +13,7 @@ https://35.208.181.51/
 
 **NOTE**: The certificate warning is expected. HTTPS was necessary for usage with our IPFS gateway. It is perfectly safe.
 
-This is a GCP instance hosting the frontend NextJS UI and also our own Ethereum testnet through [forge's anvil](https://book.getfoundry.sh/reference/anvil/),
+This is a GCP instance hosting the frontend NextJS UI and also our own Ethereum testnet through [forge's anvil](https://book.getfoundry.sh/reference/anvil/)
 where the contract is deployed. We also deployed it on Polygon, but due to transaction times taking so much time, the user experience feels terrible.
 
 Because we're using a local testnet, there's a faucet available and a "burner wallet." However, to access all of Spotlight's features you'll need
