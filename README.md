@@ -24,7 +24,13 @@ Here's how to get it setup:
 * Setup your MetaMask account if you don't already have one
 * Head on over to [Spotlight](https://35.208.181.51/)
 * The burner wallet may automatically get connected. If so, go ahead and disconnect the wallet.
-* Open the MetaMask extension, click on the top left icon to Select a Network, and click on "Add a custom network" 
+* Open the MetaMask extension, click on the top left icon to Select a Network, and click on "Add a custom network"
+* Click on the dropown under the "Default RPC URL" field, and click "Add RPC URL"
+* Copy & paste https://35.208.181.51:9545 in the "RPC URL" field
+* Click "Add URL"
+* Under "Chain ID", type 31337
+* You should now see suggestions for the "Currency symbol" and "Network name" fields. You may use them.
+![add-spotlight-to-metamask](https://github.com/user-attachments/assets/521cdb13-664d-4083-87b2-27ce23391775)
 
 # Local Setup
 
