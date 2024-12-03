@@ -1,5 +1,5 @@
 # Spotlight
-A web3 reddit: https://35.208.181.51/
+A web3 reddit
 
 ## Final Deliverables
 
