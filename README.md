@@ -37,6 +37,10 @@ The following GIF shows what your experience should look like.
 
 ![add-spotlight-to-metamask](https://github.com/user-attachments/assets/521cdb13-664d-4083-87b2-27ce23391775)
 
+Now, when you "Connect Wallet" in Spotlight, select MetaMask and you should now have access to all features Spotlight has to offer.
+
+You can now import the RPT token into your wallet as well. Token address: `0x5FbDB2315678afecb367f032d93F642f64180aa3`
+
 #### Troubleshooting
 
 ##### 31337 Chain ID is already in use
