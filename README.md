@@ -37,6 +37,14 @@ The following GIF shows what your experience should look like.
 
 ![add-spotlight-to-metamask](https://github.com/user-attachments/assets/521cdb13-664d-4083-87b2-27ce23391775)
 
+#### Troubleshooting
+
+##### 31337 Chain ID is already in use
+If you already have a network that uses 31337 for a chain ID, then you only need to add the Spotlight RPC URL by editing the network and clicking "Add RPC URL"
+
+![another-31337-chain](https://github.com/user-attachments/assets/44350f93-1d15-463e-ba19-ef6e290bb4bb)
+
+
 # Local Setup
 
 This DApp was built using the [scaffold-eth2](https://docs.scaffoldeth.io/quick-start/installation) framework. Base
