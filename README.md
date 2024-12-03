@@ -4,6 +4,7 @@ A web3 reddit.
 ## Final Deliverables
 
 TODO: Render final report to PDF, add to repo, link to it here
+
 TODO: TOC
 
 
@@ -31,4 +32,4 @@ To run Spotlight locally, you'll need to
 You may now open a web browser and navigate to http://localhost:3000 to interact with the DApp locally.
 
 **NOTE**: port 3000 is the default port used by NextJS for serving content. If it is not available, it will increment the port number
-by 1 until it finds a free port. Please double check the output of `yarn start`.
+until it finds a free port. Please double check the output of `yarn start`.
