@@ -9,6 +9,7 @@ import { TransactionsTable } from "./TransactionsTable";
 import { createPublicClient, http } from "viem";
 import { hardhat } from "viem/chains";
 import { useFetchBlocks } from "~~/hooks/scaffold-eth";
+import { spotlightHosted } from "~~/utils/hostedSpotlightChain";
 
 type AddressCodeTabProps = {
   bytecode: string;
@@ -21,7 +22,8 @@ type PageProps = {
 };
 
 const publicClient = createPublicClient({
-  chain: hardhat,
+  //chain: hardhat,
+  chain: spotlightHosted,
   transport: http(),
 });
 

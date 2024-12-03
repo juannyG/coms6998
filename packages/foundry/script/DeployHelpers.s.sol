@@ -17,7 +17,7 @@ contract ScaffoldETHDeploy is Script {
   Deployment[] public deployments;
 
   function setupLocalhostEnv() internal returns (uint256 localhostPrivateKey) {
-    if (block.chainid == 31337) {
+    if (block.chainid == 31337 || block.chainid == 31338) {
       root = vm.projectRoot();
       path = string.concat(root, "/localhost.json");
       string memory json = vm.readFile(path);

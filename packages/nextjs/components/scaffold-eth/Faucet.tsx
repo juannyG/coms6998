@@ -75,7 +75,7 @@ export const Faucet = () => {
   };
 
   // Render only on local chain
-  if (ConnectedChain?.id !== hardhat.id) {
+  if (ConnectedChain?.id !== hardhat.id && ConnectedChain?.id !== 31338) {
     return null;
   }
 

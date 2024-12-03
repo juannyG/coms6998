@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { Address, createPublicClient, http, toHex } from "viem";
 import { hardhat } from "viem/chains";
+import { spotlightHosted } from "~~/utils/hostedSpotlightChain";
 
 const publicClient = createPublicClient({
-  chain: hardhat,
+  //chain: hardhat,
+  chain: spotlightHosted,
   transport: http(),
 });
 

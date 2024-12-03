@@ -1,3 +1,4 @@
+import { spotlightHosted } from "./utils/hostedSpotlightChain";
 import * as chains from "viem/chains";
 
 export type ScaffoldConfig = {
@@ -17,7 +18,7 @@ const scaffoldConfig = {
    *
    * If you want to use the the sepolia network, swap the un/commented lines below.
    */
-  targetNetworks: [chains.foundry],
+  targetNetworks: [spotlightHosted],
   // targetNetworks: [chains.foundry, chains.sepolia],
 
   // The interval at which your front-end polls the RPC servers for new data

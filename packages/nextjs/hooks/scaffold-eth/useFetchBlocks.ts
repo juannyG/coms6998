@@ -5,19 +5,23 @@ import {
   Transaction,
   TransactionReceipt,
   createTestClient,
+  http,
   publicActions,
   walletActions,
   webSocket,
 } from "viem";
 import { hardhat } from "viem/chains";
+import { spotlightHosted } from "~~/utils/hostedSpotlightChain";
 import { decodeTransactionData } from "~~/utils/scaffold-eth";
 
 const BLOCKS_PER_PAGE = 20;
 
 export const testClient = createTestClient({
-  chain: hardhat,
-  mode: "hardhat",
-  transport: webSocket("ws://127.0.0.1:8545"),
+  chain: spotlightHosted,
+  transport: http(),
+  //chain: hardhat,
+  mode: "anvil",
+  //transport: webSocket("ws://127.0.0.1:8545"),
 })
   .extend(publicActions)
   .extend(walletActions);
