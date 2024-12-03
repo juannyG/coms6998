@@ -3,10 +3,21 @@ A web3 reddit.
 
 ## Final Deliverables
 
-TODO: Render final report to PDF, add to repo, link to it here
+[Please review our final project report](final-project-deliverables/COMS6998%20Fall%202024%20-%20Group%2011%20-%20Spotlight%20Final%20Project%20Report.pdf) for
+a comprehensive overview of how Spotlight works, the tokenomics of our project, and further features we would have liked to have implemented.
 
-TODO: TOC
+If you'd like to try Spotlight out first hand, we currently have a GCP instance which is hosting the frontend NextJS UI and also our own Ethereum testnet through [forge's anvil](https://book.getfoundry.sh/reference/anvil/).
 
+It is located here: https://35.208.181.51/
+
+**NOTE**: The certificate warning is expected. HTTPS was necessary for usage with our IPFS gateway. It is perfectly safe.
+
+Because this is a local testnet, the DApp comes with a "burner wallet." After registering, you may interact directly with the contract if you wish,
+using the "Debug Contracts" link at the top of the navbar or dig more deeply into transactions and addresses using the "Block Explorer."
+(_Both of these tools were provided by the [scaffold-eth2](https://docs.scaffoldeth.io/quick-start/installation) framework. We made some tweaks to it, but
+these two things were NOT developed by the team._)
+
+however, to interact with the "paywall post" features, you'll need to use a [MetaMask](https://metamask.io/) wallet.
 
 # Local Setup
 
