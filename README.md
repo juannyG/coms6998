@@ -23,7 +23,8 @@ Here's how to get it setup:
 * Install the MetaMask browser extension
 * Setup your MetaMask account if you don't already have one
 * Head on over to [Spotlight](https://35.208.181.51/)
-* 
+* The burner wallet may automatically get connected. If so, go ahead and disconnect the wallet.
+* Open the MetaMask extension, click on the top left icon to Select a Network, and click on "Add a custom network" 
 
 # Local Setup
 
