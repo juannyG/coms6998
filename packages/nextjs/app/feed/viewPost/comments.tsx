@@ -1,15 +1,22 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import Comment from "./Comment";
 import { Hex } from "viem";
+import { UserProfileContext } from "~~/contexts/UserProfile";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { TComment } from "~~/types/spotlight";
+import { getAvatarURL } from "~~/utils/spotlight";
 
 // TODO: we should consider adding pagination if there are too many comments
 // And add support to edit or delete comments
 // And add support to upvote or downvote comments
 function Comments({ postId }: { postId: Hex }) {
+  const { userProfile } = useContext(UserProfileContext);
   const [comments, setComments] = useState<TComment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const commentsPerPage = 5;
+
   const { writeContractAsync: writeCommentContractAsync } = useScaffoldWriteContract("Spotlight");
 
   const { data: fetchedCommments, refetch: refreshComments } = useScaffoldReadContract({
@@ -44,9 +51,42 @@ function Comments({ postId }: { postId: Hex }) {
     }
   };
 
-  // Format timestamp to readable date
-  const formatDate = (timestamp: bigint) => {
-    return new Date(Number(timestamp) * 1000).toLocaleString();
+  const totalPages = comments ? Math.ceil(comments.length / commentsPerPage) : 0;
+  const currentComments = comments
+    ? comments.slice((currentPage - 1) * commentsPerPage, currentPage * commentsPerPage)
+    : [];
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPageButtons = 5;
+    if (totalPages <= maxPageButtons) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1); // Always show first page
+
+      if (currentPage - 2 >= 3) pages.push("...");
+
+      const start = Math.max(2, currentPage - 2);
+      const end = Math.min(totalPages - 1, currentPage + 2);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (currentPage + 2 < totalPages - 2) pages.push("...");
+
+      pages.push(totalPages); // Always show last page
+    }
+
+    return pages;
   };
 
   return (
@@ -56,7 +96,11 @@ function Comments({ postId }: { postId: Hex }) {
 
       {/* Comment Input Section */}
       <div className="flex items-start gap-5 px-10 mt-3">
-        <img alt="User avatar" src="/avatar.png" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+        <img
+          alt="User avatar"
+          src={getAvatarURL(userProfile?.avatarCID)}
+          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+        />
         <div className="flex-grow">
           <textarea
             placeholder="Add a comment..."
@@ -77,28 +121,27 @@ function Comments({ postId }: { postId: Hex }) {
 
       {/* Render Comments */}
       <div className="flex flex-col px-10 mt-5 space-y-4">
-        {comments?.map((comment, index) => (
+        {currentComments?.map((comment, index) => (
           <div key={index} className="flex gap-5">
-            {/* User Avatar */}
-            <img alt="User avatar" src="/avatar.png" className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
-
-            {/* Comment Content */}
-            <div className="flex flex-col gap-1">
-              {/* User Info */}
-              <div className="flex items-center gap-4">
-                {/* TODO: Get profile of comment to show avatar */}
-                <span className="font-medium text-black text-base">{comment.commenter}</span>
-              </div>
-
-              {/* Comment Text */}
-              <p className="text-[#111624] text-base">{comment.content}</p>
-
-              {/* Timestamp */}
-              <p className="text-[#575757] text-sm">{formatDate(comment.createdAt)}</p>
-            </div>
+            <Comment comment={comment} />
           </div>
         ))}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="join justify-center mt-4">
+          {getPageNumbers().map((page, index) => (
+            <button
+              key={index}
+              className={`join-item btn ${currentPage === page ? "btn-active" : ""}`}
+              onClick={() => typeof page === "number" && handlePageChange(page)}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

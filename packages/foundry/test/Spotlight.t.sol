@@ -3,14 +3,16 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "../contracts/Spotlight.sol";
+import "../contracts/Reputation.sol";
 import "../contracts/Events.sol";
-import "../contracts/Error.sol";
+import "../contracts/SpotlightErrors.sol";
 
 contract SpotlightTest is Test {
   Spotlight public spotlight;
 
   function setUp() public {
-    spotlight = new Spotlight(vm.addr(1));
+    Reputation rpt = new Reputation();
+    spotlight = new Spotlight(vm.addr(1), address(rpt));
   }
 
   function testDeploymentState() public view {
@@ -18,7 +20,7 @@ contract SpotlightTest is Test {
   }
 
   function testCannotGetProfileIfNotRegistered() public {
-    vm.expectRevert(ProfileNotExist.selector);
+    vm.expectRevert(SpotlightErrors.ProfileNotExist.selector);
     spotlight.getProfile(vm.addr(2));
   }
 
@@ -33,13 +35,13 @@ contract SpotlightTest is Test {
   }
 
   function testCannotRegisterEmptyUsername() public {
-    vm.expectRevert(UsernameCannotBeEmpty.selector);
+    vm.expectRevert(SpotlightErrors.UsernameCannotBeEmpty.selector);
     spotlight.registerProfile("");
   }
 
   function testCannotRegisterUsernameMoreThan32bytes() public {
     // Username too long
-    vm.expectRevert(UsernameTooLong.selector);
+    vm.expectRevert(SpotlightErrors.UsernameTooLong.selector);
     spotlight.registerProfile("abcdefghijklmnopqrstuvwxyz-abcdefg");
   }
 
@@ -50,7 +52,7 @@ contract SpotlightTest is Test {
 
     address second_u = vm.addr(2);
     vm.prank(second_u);
-    vm.expectRevert(UsernameTaken.selector);
+    vm.expectRevert(SpotlightErrors.UsernameTaken.selector);
     spotlight.registerProfile("USERname1");
   }
 
@@ -74,7 +76,7 @@ contract SpotlightTest is Test {
   }
 
   function testCannotUpdateUsernameIfNotRegistered() public {
-    vm.expectRevert(ProfileNotExist.selector);
+    vm.expectRevert(SpotlightErrors.ProfileNotExist.selector);
     spotlight.updateUsername("NewUsername");
   }
 
@@ -88,7 +90,7 @@ contract SpotlightTest is Test {
     spotlight.registerProfile("Username2");
 
     vm.prank(user2);
-    vm.expectRevert(UsernameTaken.selector);
+    vm.expectRevert(SpotlightErrors.UsernameTaken.selector);
     spotlight.updateUsername("Username1");
   }
 
@@ -101,7 +103,7 @@ contract SpotlightTest is Test {
     spotlight.deleteProfile();
 
     // Now, getProfile should revert
-    vm.expectRevert(ProfileNotExist.selector);
+    vm.expectRevert(SpotlightErrors.ProfileNotExist.selector);
     spotlight.getProfile(user);
 
     // Username should now be available
@@ -113,7 +115,7 @@ contract SpotlightTest is Test {
   }
 
   function testCannotDeleteProfileIfNotRegistered() public {
-    vm.expectRevert(ProfileNotExist.selector);
+    vm.expectRevert(SpotlightErrors.ProfileNotExist.selector);
     spotlight.deleteProfile();
   }
 
@@ -172,7 +174,7 @@ contract SpotlightTest is Test {
 
     vm.startPrank(user);
     spotlight.registerProfile("Username");
-    vm.expectRevert(AvatarCIDCannotBeEmpty.selector);
+    vm.expectRevert(SpotlightErrors.AvatarCIDCannotBeEmpty.selector);
     spotlight.updateAvatarCID("");
   }
 

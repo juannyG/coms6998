@@ -18,7 +18,7 @@ const FeedPage: NextPage = () => {
       // They need to go register first...
       router.push("/");
     }
-  });
+  }, [userProfile, router]);
 
   if (userProfile === undefined) {
     // We cannot render anything

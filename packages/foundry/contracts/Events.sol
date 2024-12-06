@@ -51,3 +51,5 @@ event TokenBurned(address indexed account, uint256 amount);
 /// @param postId The id of the post
 /// @param content The content of the comment
 event CommentAdded(address indexed commenter, bytes indexed postId, string content, uint256 createdAt);
+
+event PostPurchased(address indexed purchaser, bytes indexed postId);

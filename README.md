@@ -1,70 +1,76 @@
-# Setup
+# [Spotlight](https://35.208.181.51/)
+A web3 reddit
 
-First, install [foundry](https://book.getfoundry.sh/getting-started/installation)
+## Final Deliverables
 
-Next, install the app dependencies
+### Final Project Report
+[Please review our final project report](final-project-deliverables/COMS6998%20Fall%202024%20-%20Group%2011%20-%20Spotlight%20Final%20Project%20Report.pdf) for
+a comprehensive overview of our team, available Spotlight features, how they work, the tokenomics of our project, and further features we would have
+liked to have implemented.
+
+### Try it out yourself
+https://35.208.181.51/
+
+**NOTE**: The certificate warning is expected. HTTPS was necessary for usage with our IPFS gateway. It is perfectly safe.
+
+This is a GCP instance hosting the frontend NextJS UI and also our own Ethereum testnet through [forge's anvil](https://book.getfoundry.sh/reference/anvil/)
+where the contract is deployed. We also deployed it on Polygon, but due to transaction times taking so much time, the user experience feels terrible.
+
+Because we're using a local testnet, there's a faucet available and a "burner wallet." However, to access all of Spotlight's features you'll need
+to use a [MetaMask](https://metamask.io/) wallet.
+
+#### How to setup MetaMask with Spotlight
+* Install the MetaMask browser extension
+* Setup your MetaMask account if you don't already have one
+* Head on over to [Spotlight](https://35.208.181.51/)
+* The burner wallet may automatically get connected. If so, go ahead and disconnect the wallet.
+* Open the MetaMask extension, click on the top left icon to Select a Network, and click on "Add a custom network"
+* Click on the dropown under the "Default RPC URL" field, and click "Add RPC URL"
+* Copy & paste https://35.208.181.51:9545 in the "RPC URL" field
+* Click "Add URL"
+* Under "Chain ID", type 31337
+* You should now see suggestions for the "Currency symbol" and "Network name" fields. You may use them.
+* Click "Save"
+* You may now go back to the Network selector in MetaMask and select "GoChain Testnet"
+
+The following GIF shows what your experience should look like.
+
+![add-spotlight-to-metamask](https://github.com/user-attachments/assets/521cdb13-664d-4083-87b2-27ce23391775)
+
+Now, when you "Connect Wallet" in Spotlight, select MetaMask and you should now have access to all features Spotlight has to offer.
+
+You can now import the RPT token into your wallet as well. Token address: `0x5FbDB2315678afecb367f032d93F642f64180aa3`
+
+#### Troubleshooting
+
+##### 31337 Chain ID is already in use
+If you already have a network that uses 31337 for a chain ID, then you only need to add the Spotlight RPC URL by editing the network and clicking "Add RPC URL"
+
+![another-31337-chain](https://github.com/user-attachments/assets/44350f93-1d15-463e-ba19-ef6e290bb4bb)
+
+
+# Local Setup
+
+This DApp was built using the [scaffold-eth2](https://docs.scaffoldeth.io/quick-start/installation) framework. Base
+depency versions are as follows:
+* Node v18.19.1
+* Yarn v3.2.3
+* Git
+
+Our local testnet tool of choice was [foundry](https://book.getfoundry.sh/getting-started/installation).
+
+After cloning the repo and taking care of the above dependencies, install the DApp's dependencies:
 ```sh
 yarn install
 ```
 
-To run Spotlight locally, you
+To run Spotlight locally, you'll need to 
 1. `cp packages/foundry/.env.example packages/foundry/.env`
 2. `yarn chain` - Bring up the local testnet. This accepts arguments for [forge's anvil](https://book.getfoundry.sh/reference/anvil/)
-3. `yarn start` - Bring up the local NextJS development server
-4. `yarn deploy` - Deploy the contract to the local testnet
+3. `yarn deploy` - Deploy the contract to the local testnet
+4. `yarn start` - Bring up the local NextJS development server
 
-# Deploying to Sepolia
+You may now open a web browser and navigate to http://localhost:3000 to interact with the DApp locally.
 
-## Prerequisites
-* An address private key with sufficient Sepolia ETH
-* [Etherscan](https://etherscan.io/login) API key for verifying contract on Etherscan
-* [Alchemy API key](https://docs.alchemy.com/docs/alchemy-quickstart-guide) (API access to Sepolia miner node)
-* Create a new app in Alchemy
-  * Chose Ethereum testnet Sepolia to get the API key
-
-## Manual deployment to Sepolia
-* Populate vars in `packages/foundry/.env` - these are the values you prepared in the Prerequisites section
-  * `DEPLOYER_PRIVATE_KEY`
-  * `ETHERSCAN_API_KEY`
-  * `ALCHEMY_API_KEY`
-* `yarn deploy --network sepolia` - Deploy the contract to Sepolia
-* `yarn verify --network sepolia` - [Verify the contract on Sepolia](https://book.getfoundry.sh/forge/deploying?highlight=verify#verifying-a-pre-existing-contract)
-
-## Configure NextJS to interact with contract on Sepolia testnet
-Update [scaffold.config.ts](packages/nextjs/scaffold.config.ts) and modify the `targetNetworks` key as described in the comments.
-
-From:
-```
-  targetNetworks: [chains.foundry],
-  // targetNetworks: [chains.foundry, chains.sepolia],
-```
-To:
-```
-  // targetNetworks: [chains.foundry],
-  targetNetworks: [chains.foundry, chains.sepolia],
-```
-
-## Import RPT into Metamask wallet
-* Click "Import tokens"
-* Drop in RPT token address on Sepolia (currently here: https://sepolia.etherscan.io/token/0xd5af0c2c5db2249dfc4a912c536fdfe1ef8ab52a?a=0x1292D9741379cFb7E26F918761E88EF7930b8468)
-
-# IPFS and web3.storage
-
-We have a primary key/proof in the NextJS app we use to delegate permissions out to the client's browser.
-
-The commands for how to generate a key/proof pair can be found here: https://web3.storage/docs/how-to/upload/#bring-your-own-delegations
-
-The docs refer to `KEY` and `PROOF` vars - we prepend `W3S_` to them in `packages/nextjs/.env` for better namespacing.
-
-# VSCode
-
-Helpful Extensions
-
-```
-Name: Solidity
-Id: NomicFoundation.hardhat-solidity
-Description: Solidity and Hardhat support by the Hardhat team
-Version: 0.8.5
-Publisher: Nomic Foundation
-VS Marketplace Link: https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity
-```
+**NOTE**: port 3000 is the default port used by NextJS for serving content. If it is not available, it will increment the port number
+until it finds a free port. Please double check the output of `yarn start`.

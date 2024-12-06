@@ -3,9 +3,10 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "../contracts/Spotlight.sol";
+import "../contracts/Reputation.sol";
 import "../contracts/Events.sol";
 import "../contracts/PostLib.sol";
-import "../contracts/Error.sol";
+import "../contracts/SpotlightErrors.sol";
 
 contract VotesTest is Test {
   Spotlight public spotlight;
@@ -14,7 +15,8 @@ contract VotesTest is Test {
   bytes public postSig;
 
   function setUp() public {
-    spotlight = new Spotlight(vm.addr(1));
+    Reputation rpt = new Reputation();
+    spotlight = new Spotlight(vm.addr(1), address(rpt));
     wallet1 = vm.createWallet(1);
     wallet2 = vm.createWallet(2);
 
@@ -30,7 +32,7 @@ contract VotesTest is Test {
 
     vm.startPrank(wallet1.addr);
     spotlight.registerProfile("username");
-    spotlight.createPost(post.title, post.content, post.nonce, postSig);
+    spotlight.createPost(post.title, post.content, post.nonce, postSig, false);
     vm.stopPrank();
   }
 
@@ -39,7 +41,7 @@ contract VotesTest is Test {
   ////////////////////////////////
   function testNonRegisteredUserCannotUpvoteAPost() public {
     vm.startPrank(wallet2.addr);
-    vm.expectRevert(ProfileNotExist.selector);
+    vm.expectRevert(SpotlightErrors.ProfileNotExist.selector);
     spotlight.upvote(postSig);
   }
 
@@ -93,7 +95,7 @@ contract VotesTest is Test {
   ////////////////////////////////
   function testNonRegisteredUserCannotDownvoteAPost() public {
     vm.startPrank(wallet2.addr);
-    vm.expectRevert(ProfileNotExist.selector);
+    vm.expectRevert(SpotlightErrors.ProfileNotExist.selector);
     spotlight.downvote(postSig);
   }
 

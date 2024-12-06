@@ -6,8 +6,525 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
   31337: {
+    Reputation: {
+      address: "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+      abi: [
+        {
+          type: "constructor",
+          inputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "allowance",
+          inputs: [
+            {
+              name: "owner",
+              type: "address",
+              internalType: "address",
+            },
+            {
+              name: "spender",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "approve",
+          inputs: [
+            {
+              name: "spender",
+              type: "address",
+              internalType: "address",
+            },
+            {
+              name: "value",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "balanceOf",
+          inputs: [
+            {
+              name: "account",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "decimals",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint8",
+              internalType: "uint8",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "downvoteComment",
+          inputs: [
+            {
+              name: "account",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "downvotePost",
+          inputs: [
+            {
+              name: "account",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "engagementReward",
+          inputs: [
+            {
+              name: "receiver",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "name",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "revertDownvotePost",
+          inputs: [
+            {
+              name: "account",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "revertUpvotePost",
+          inputs: [
+            {
+              name: "receiver",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "setPostsContract",
+          inputs: [
+            {
+              name: "_addr",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "setSpotlightContract",
+          inputs: [
+            {
+              name: "_addr",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "spotlightContract",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "symbol",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "totalSupply",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "transfer",
+          inputs: [
+            {
+              name: "to",
+              type: "address",
+              internalType: "address",
+            },
+            {
+              name: "value",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "transferFrom",
+          inputs: [
+            {
+              name: "from",
+              type: "address",
+              internalType: "address",
+            },
+            {
+              name: "to",
+              type: "address",
+              internalType: "address",
+            },
+            {
+              name: "value",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "upvoteComment",
+          inputs: [
+            {
+              name: "receiver",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "upvotePost",
+          inputs: [
+            {
+              name: "receiver",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "event",
+          name: "Approval",
+          inputs: [
+            {
+              name: "owner",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "spender",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "value",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "TokenBurned",
+          inputs: [
+            {
+              name: "account",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "amount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "TokenIssued",
+          inputs: [
+            {
+              name: "receiver",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "amount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "Transfer",
+          inputs: [
+            {
+              name: "from",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "to",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "value",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "error",
+          name: "CannotIssueToZeroAddress",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ERC20InsufficientAllowance",
+          inputs: [
+            {
+              name: "spender",
+              type: "address",
+              internalType: "address",
+            },
+            {
+              name: "allowance",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "needed",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+        },
+        {
+          type: "error",
+          name: "ERC20InsufficientBalance",
+          inputs: [
+            {
+              name: "sender",
+              type: "address",
+              internalType: "address",
+            },
+            {
+              name: "balance",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "needed",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+        },
+        {
+          type: "error",
+          name: "ERC20InvalidApprover",
+          inputs: [
+            {
+              name: "approver",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+        },
+        {
+          type: "error",
+          name: "ERC20InvalidReceiver",
+          inputs: [
+            {
+              name: "receiver",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+        },
+        {
+          type: "error",
+          name: "ERC20InvalidSender",
+          inputs: [
+            {
+              name: "sender",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+        },
+        {
+          type: "error",
+          name: "ERC20InvalidSpender",
+          inputs: [
+            {
+              name: "spender",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightContractCanBurnTokens",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightContractCanIssueTokens",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "SpotlightAddressCannotBeZero",
+          inputs: [],
+        },
+      ],
+      inheritedFunctions: {
+        allowance: "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol",
+        approve: "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol",
+        balanceOf: "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol",
+        decimals: "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol",
+        name: "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol",
+        symbol: "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol",
+        totalSupply: "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol",
+        transfer: "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol",
+        transferFrom: "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol",
+      },
+    },
     Spotlight: {
-      address: "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+      address: "0x5fc8d32690cc91d4c39d9d3abcbd16989f875707",
       abi: [
         {
           type: "constructor",
@@ -17,7 +534,48 @@ const deployedContracts = {
               type: "address",
               internalType: "address",
             },
+            {
+              name: "_rtpContract",
+              type: "address",
+              internalType: "address",
+            },
           ],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "PAYWALL_COST",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "acceptPurchase",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_purchaser",
+              type: "address",
+              internalType: "address",
+            },
+            {
+              name: "_content",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
           stateMutability: "nonpayable",
         },
         {
@@ -62,6 +620,29 @@ const deployedContracts = {
               type: "bytes",
               internalType: "bytes",
             },
+            {
+              name: "_paywalled",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "declinePurchase",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_purchaser",
+              type: "address",
+              internalType: "address payable",
+            },
           ],
           outputs: [],
           stateMutability: "nonpayable",
@@ -104,12 +685,12 @@ const deployedContracts = {
           name: "downvotedBy",
           inputs: [
             {
-              name: "",
+              name: "_id",
               type: "bytes",
               internalType: "bytes",
             },
             {
-              name: "",
+              name: "_addr",
               type: "address",
               internalType: "address",
             },
@@ -213,6 +794,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -236,6 +822,36 @@ const deployedContracts = {
                   name: "downvoteCount",
                   type: "uint256",
                   internalType: "uint256",
+                },
+              ],
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getPendingPurchases",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "tuple[]",
+              internalType: "struct Posts.PendingPurchase[]",
+              components: [
+                {
+                  name: "purchaser",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "postId",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "pubkey",
+                  type: "string",
+                  internalType: "string",
                 },
               ],
             },
@@ -282,6 +898,11 @@ const deployedContracts = {
                   name: "signature",
                   type: "bytes",
                   internalType: "bytes",
+                },
+                {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
                 },
                 {
                   name: "nonce",
@@ -355,6 +976,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -422,6 +1048,101 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "getPurchasedPost",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "tuple",
+              internalType: "struct PostLib.Post",
+              components: [
+                {
+                  name: "creator",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "title",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "content",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "id",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "signature",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
+                  name: "nonce",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "createdAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "lastUpdatedAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "upvoteCount",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "downvoteCount",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+              ],
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "isPurchasePending",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "isRegistered",
           inputs: [
             {
@@ -451,6 +1172,24 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "purchasePost",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_pubkey",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
+          stateMutability: "payable",
         },
         {
           type: "function",
@@ -509,12 +1248,12 @@ const deployedContracts = {
           name: "upvotedBy",
           inputs: [
             {
-              name: "",
+              name: "_id",
               type: "bytes",
               internalType: "bytes",
             },
             {
-              name: "",
+              name: "_addr",
               type: "address",
               internalType: "address",
             },
@@ -637,6 +1376,25 @@ const deployedContracts = {
         },
         {
           type: "event",
+          name: "PostPurchased",
+          inputs: [
+            {
+              name: "purchaser",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "postId",
+              type: "bytes",
+              indexed: true,
+              internalType: "bytes",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
           name: "PostUpvoted",
           inputs: [
             {
@@ -712,7 +1470,27 @@ const deployedContracts = {
         },
         {
           type: "error",
+          name: "AlreadyDownvoted",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "AlreadyVoted",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "AvatarCIDCannotBeEmpty",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "CannotIssueToZeroAddress",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "CommentCannotBeEmpty",
           inputs: [],
         },
         {
@@ -722,7 +1500,27 @@ const deployedContracts = {
         },
         {
           type: "error",
+          name: "CreatorCannotPayForOwnContent",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "InsufficentPostFunds",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "InvalidSignature",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "NoPendingPurchaseFound",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlyCreatorCanAcceptPurchase",
           inputs: [],
         },
         {
@@ -732,7 +1530,42 @@ const deployedContracts = {
         },
         {
           type: "error",
+          name: "OnlyCreatorOrPurchaserCanDeclinePurchase",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightCanManagePosts",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightContractCanBurnTokens",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightContractCanIssueTokens",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostAlreadyPurchased",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostCreatorCannotBeZero",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "PostNotFound",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostNotPaywalled",
           inputs: [],
         },
         {
@@ -743,6 +1576,21 @@ const deployedContracts = {
         {
           type: "error",
           name: "ProfileNotExist",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ReentrancyGuardReentrantCall",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ReputationAddressCannotBeZero",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "SpotlightAddressCannotBeZero",
           inputs: [],
         },
         {
@@ -781,7 +1629,48 @@ const deployedContracts = {
               type: "address",
               internalType: "address",
             },
+            {
+              name: "_rtpContract",
+              type: "address",
+              internalType: "address",
+            },
           ],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "PAYWALL_COST",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "acceptPurchase",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_purchaser",
+              type: "address",
+              internalType: "address",
+            },
+            {
+              name: "_content",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
           stateMutability: "nonpayable",
         },
         {
@@ -826,6 +1715,29 @@ const deployedContracts = {
               type: "bytes",
               internalType: "bytes",
             },
+            {
+              name: "_paywalled",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "declinePurchase",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_purchaser",
+              type: "address",
+              internalType: "address payable",
+            },
           ],
           outputs: [],
           stateMutability: "nonpayable",
@@ -868,12 +1780,12 @@ const deployedContracts = {
           name: "downvotedBy",
           inputs: [
             {
-              name: "",
+              name: "_id",
               type: "bytes",
               internalType: "bytes",
             },
             {
-              name: "",
+              name: "_addr",
               type: "address",
               internalType: "address",
             },
@@ -977,6 +1889,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -1000,6 +1917,36 @@ const deployedContracts = {
                   name: "downvoteCount",
                   type: "uint256",
                   internalType: "uint256",
+                },
+              ],
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getPendingPurchases",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "tuple[]",
+              internalType: "struct Posts.PendingPurchase[]",
+              components: [
+                {
+                  name: "purchaser",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "postId",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "pubkey",
+                  type: "string",
+                  internalType: "string",
                 },
               ],
             },
@@ -1046,6 +1993,11 @@ const deployedContracts = {
                   name: "signature",
                   type: "bytes",
                   internalType: "bytes",
+                },
+                {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
                 },
                 {
                   name: "nonce",
@@ -1119,6 +2071,11 @@ const deployedContracts = {
                   internalType: "bytes",
                 },
                 {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
                   name: "nonce",
                   type: "uint256",
                   internalType: "uint256",
@@ -1186,6 +2143,101 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "getPurchasedPost",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "tuple",
+              internalType: "struct PostLib.Post",
+              components: [
+                {
+                  name: "creator",
+                  type: "address",
+                  internalType: "address",
+                },
+                {
+                  name: "title",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "content",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "id",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "signature",
+                  type: "bytes",
+                  internalType: "bytes",
+                },
+                {
+                  name: "paywalled",
+                  type: "bool",
+                  internalType: "bool",
+                },
+                {
+                  name: "nonce",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "createdAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "lastUpdatedAt",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "upvoteCount",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "downvoteCount",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+              ],
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "isPurchasePending",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "isRegistered",
           inputs: [
             {
@@ -1215,6 +2267,24 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "purchasePost",
+          inputs: [
+            {
+              name: "_id",
+              type: "bytes",
+              internalType: "bytes",
+            },
+            {
+              name: "_pubkey",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
+          stateMutability: "payable",
         },
         {
           type: "function",
@@ -1273,12 +2343,12 @@ const deployedContracts = {
           name: "upvotedBy",
           inputs: [
             {
-              name: "",
+              name: "_id",
               type: "bytes",
               internalType: "bytes",
             },
             {
-              name: "",
+              name: "_addr",
               type: "address",
               internalType: "address",
             },
@@ -1401,6 +2471,25 @@ const deployedContracts = {
         },
         {
           type: "event",
+          name: "PostPurchased",
+          inputs: [
+            {
+              name: "purchaser",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "postId",
+              type: "bytes",
+              indexed: true,
+              internalType: "bytes",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
           name: "PostUpvoted",
           inputs: [
             {
@@ -1476,7 +2565,27 @@ const deployedContracts = {
         },
         {
           type: "error",
+          name: "AlreadyDownvoted",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "AlreadyVoted",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "AvatarCIDCannotBeEmpty",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "CannotIssueToZeroAddress",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "CommentCannotBeEmpty",
           inputs: [],
         },
         {
@@ -1486,7 +2595,27 @@ const deployedContracts = {
         },
         {
           type: "error",
+          name: "CreatorCannotPayForOwnContent",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "InsufficentPostFunds",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "InvalidSignature",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "NoPendingPurchaseFound",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlyCreatorCanAcceptPurchase",
           inputs: [],
         },
         {
@@ -1496,7 +2625,42 @@ const deployedContracts = {
         },
         {
           type: "error",
+          name: "OnlyCreatorOrPurchaserCanDeclinePurchase",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightCanManagePosts",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightContractCanBurnTokens",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "OnlySpotlightContractCanIssueTokens",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostAlreadyPurchased",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostCreatorCannotBeZero",
+          inputs: [],
+        },
+        {
+          type: "error",
           name: "PostNotFound",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "PostNotPaywalled",
           inputs: [],
         },
         {
@@ -1507,6 +2671,21 @@ const deployedContracts = {
         {
           type: "error",
           name: "ProfileNotExist",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ReentrancyGuardReentrantCall",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "ReputationAddressCannotBeZero",
+          inputs: [],
+        },
+        {
+          type: "error",
+          name: "SpotlightAddressCannotBeZero",
           inputs: [],
         },
         {

@@ -9,6 +9,7 @@ export interface TPost {
   title: string;
   content: string;
   nonce: bigint;
+  paywalled: boolean;
   createdAt: bigint;
   lastUpdatedAt: bigint;
   upvoteCount: bigint;
@@ -33,4 +34,10 @@ export interface TComment {
   commenter: Address;
   content: string;
   createdAt: bigint;
+}
+
+export interface TPendingPurchase {
+  postId: Hex;
+  pubkey: string;
+  purchaser: Address;
 }
