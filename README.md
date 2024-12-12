@@ -57,7 +57,7 @@ depency versions are as follows:
 * Yarn v3.2.3
 * Git
 
-Our local testnet tool of choice was [foundry](https://book.getfoundry.sh/getting-started/installation).
+Our local testnet tool of choice was [foundry](https://book.getfoundry.sh/getting-started/installation). Please follow the installation instructions.
 
 After cloning the repo and taking care of the above dependencies, install the DApp's dependencies:
 ```sh
