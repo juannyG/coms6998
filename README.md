@@ -74,3 +74,10 @@ You may now open a web browser and navigate to http://localhost:3000 to interact
 
 **NOTE**: port 3000 is the default port used by NextJS for serving content. If it is not available, it will increment the port number
 until it finds a free port. Please double check the output of `yarn start`.
+
+## Running Tests
+
+To run Solidity contract unit tests:
+```sh
+$ yarn test
+```
